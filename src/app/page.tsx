@@ -1,0 +1,206 @@
+"use client";
+
+import { useState }
+from "react";
+
+export default function Home(){
+
+  const [appName,setAppName] =
+    useState("");
+
+  const [
+    packageName,
+    setPackageName
+  ] = useState("");
+
+  const [htmlCode,setHtmlCode] =
+    useState("");
+
+  const [zipFile,setZipFile] =
+    useState<File|null>(null);
+
+  const [icon,setIcon] =
+    useState<File|null>(null);
+
+  const [status,setStatus] =
+    useState("");
+
+  async function generateAPK(){
+
+    setStatus(
+      "Starting Build..."
+    );
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "appName",
+      appName
+    );
+
+    formData.append(
+      "packageName",
+      packageName
+    );
+
+    formData.append(
+      "htmlCode",
+      htmlCode
+    );
+
+    if(zipFile){
+
+      formData.append(
+        "zipFile",
+        zipFile
+      );
+
+    }
+
+    if(icon){
+
+      formData.append(
+        "icon",
+        icon
+      );
+
+    }
+
+    const response =
+      await fetch(
+
+        "/api/generate",
+
+        {
+          method:"POST",
+
+          body:formData
+        }
+
+      );
+
+    const data =
+      await response.json();
+
+    if(data.success){
+
+      setStatus(
+        "Cloud Build Started 🚀"
+      );
+
+    }else{
+
+      setStatus(
+        "Build Failed"
+      );
+
+    }
+
+  }
+
+  return(
+
+    <main className="container">
+
+      <h1>NijerApp Builder</h1>
+
+      <input
+
+        type="text"
+
+        placeholder="App Name"
+
+        value={appName}
+
+        onChange={(e)=>
+          setAppName(
+            e.target.value
+          )
+        }
+
+      />
+
+      <input
+
+        type="text"
+
+        placeholder="Package Name"
+
+        value={packageName}
+
+        onChange={(e)=>
+          setPackageName(
+            e.target.value
+          )
+        }
+
+      />
+
+      <textarea
+
+        placeholder="Paste HTML"
+
+        value={htmlCode}
+
+        onChange={(e)=>
+          setHtmlCode(
+            e.target.value
+          )
+        }
+
+      />
+
+      <label>
+
+        Upload ZIP
+
+      </label>
+
+      <input
+
+        type="file"
+
+        onChange={(e)=>
+          setZipFile(
+            e.target.files?.[0]
+            || null
+          )
+        }
+
+      />
+
+      <label>
+
+        Upload Icon
+
+      </label>
+
+      <input
+
+        type="file"
+
+        onChange={(e)=>
+          setIcon(
+            e.target.files?.[0]
+            || null
+          )
+        }
+
+      />
+
+      <button
+        onClick={generateAPK}
+      >
+
+        Generate APK
+
+      </button>
+
+      <p>{status}</p>
+
+    </main>
+
+  );
+
+}

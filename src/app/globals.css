@@ -1,0 +1,57 @@
+body{
+
+  margin:0;
+
+  padding:40px;
+
+  font-family:sans-serif;
+
+  background:#0f172a;
+
+  color:white;
+
+}
+
+.container{
+
+  max-width:700px;
+
+  margin:auto;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:20px;
+
+}
+
+input,
+textarea,
+button{
+
+  padding:15px;
+
+  border:none;
+
+  border-radius:10px;
+
+  font-size:16px;
+
+}
+
+textarea{
+
+  min-height:200px;
+
+}
+
+button{
+
+  background:#2563eb;
+
+  color:white;
+
+  cursor:pointer;
+
+}
