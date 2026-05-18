@@ -146,8 +146,32 @@ export async function uploadBinaryFile(
 
 
 
-export async function triggerWorkflow(){
+export async function triggerWorkflow() {
 
-  return 200;
+  // WAIT FOR GITHUB UPDATE
 
+  await new Promise((resolve) =>
+    setTimeout(resolve, 8000)
+  );
+
+  const response =
+    await fetch(
+      `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/workflows/android.yml/dispatches`,
+      {
+        method: "POST",
+
+        headers,
+
+        body: JSON.stringify({
+          ref: "main",
+        }),
+      }
+    );
+
+  const data =
+    await response.text();
+
+  console.log(data);
+
+  return true;
 }

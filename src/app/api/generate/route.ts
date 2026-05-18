@@ -104,18 +104,21 @@ export async function POST(
 
     }
 
-    // ICON UPDATE
+  
 
-    if(icon){
+// UPDATE ICON
 
-      const bytes =
-        await icon.arrayBuffer();
+if (icon) {
 
-      const base64 =
-        Buffer.from(bytes)
-        .toString("base64");
+  const bytes =
+    await icon.arrayBuffer();
 
-const iconPaths = [
+  const base64 =
+    Buffer.from(
+      bytes
+    ).toString("base64");
+
+  const iconPaths = [
 
 "android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/ic_launcher.png",
 
@@ -137,23 +140,20 @@ const iconPaths = [
 
 "android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
 
-];
+  ];
 
-      for(const iconPath of iconPaths){
+  for (const iconPath of iconPaths) {
 
-        await uploadBinaryFile(
+    await uploadBinaryFile(
+      iconPath,
+      base64,
+      "updated icon"
+    );
 
-          iconPath,
+  }
+}
 
-          base64,
 
-          "updated icon"
-
-        );
-
-      }
-
-    }
 
     // APP NAME UPDATE
 

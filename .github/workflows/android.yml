@@ -1,15 +1,7 @@
 name: Build Android APK
 
 on:
-  push:
-    branches:
-      - main
-
-    paths:
-
-      - 'android-template/**'
-
-      - '.github/workflows/android.yml'
+  workflow_dispatch:
 
 jobs:
 
@@ -22,47 +14,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Pull Latest Changes
+        run: git pull origin main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Grant Permission
-        run: chmod +x gradlew
-        working-directory: android-template/WebAppEngine
-
-      - name: Clean Gradle
-        run: ./gradlew clean
-        working-directory: android-template/WebAppEngine
-
-      - name: Remove Default WebP Icons
+      - name: Remove Old Icons
         run: |
 
-          rm -f app/src/main/res/mipmap-mdpi/ic_launcher.webp
-          rm -f app/src/main/res/mipmap-hdpi/ic_launcher.webp
-          rm -f app/src/main/res/mipmap-xhdpi/ic_launcher.webp
-          rm -f app/src/main/res/mipmap-xxhdpi/ic_launcher.webp
-          rm -f app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp
-
-          rm -f app/src/main/res/mipmap-mdpi/ic_launcher_round.webp
-          rm -f app/src/main/res/mipmap-hdpi/ic_launcher_round.webp
-          rm -f app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp
-          rm -f app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp
-          rm -f app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp
-
-        working-directory: android-template/WebAppEngine
-
-
+          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/*.webp
+          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-hdpi/*.webp
+          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-xhdpi/*.webp
+          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-xxhdpi/*.webp
+          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/*.webp
 
       - name: Build APK
-        run: ./gradlew assembleDebug
-        working-directory: android-template/WebAppEngine
+        run: |
 
-      - name: Upload APK
+          cd android-template/WebAppEngine
+
+          chmod +x gradlew
+
+          ./gradlew clean
+
+          ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: generated-apk

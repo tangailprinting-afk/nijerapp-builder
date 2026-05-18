@@ -52,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient());
 
         // Load Local HTML App
-        webView.loadUrl("file:///android_asset/www/index.html");
+        webView.loadUrl(
+    "file:///android_asset/www/index.html"
+);
     }
 
     @Override
