@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "nijerapp.amarapp.app"
+        applicationId = "miah.rabbiami.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
