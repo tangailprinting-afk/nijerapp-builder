@@ -24,6 +24,8 @@ export default function Home(){
 
   const [status,setStatus] =
     useState("");
+    const [downloadUrl,setDownloadUrl] =
+  useState("");
 
   async function generateAPK(){
 
@@ -124,6 +126,22 @@ export default function Home(){
                     "APK Build Success ✅"
                   );
 
+const downloadResponse =
+  await fetch(
+    "/api/download"
+  );
+
+const downloadData =
+  await downloadResponse.json();
+
+if(downloadData.success){
+
+  setDownloadUrl(
+    downloadData.url
+  );
+
+}
+                  
                 }else{
 
                   setStatus(
@@ -263,6 +281,30 @@ export default function Home(){
         {status}
 
       </p>
+{
+
+downloadUrl && (
+
+<a
+
+  href={downloadUrl}
+
+  target="_blank"
+
+>
+
+  <button>
+
+    Download APK
+
+  </button>
+
+</a>
+
+)
+
+}
+
 
     </main>
 
