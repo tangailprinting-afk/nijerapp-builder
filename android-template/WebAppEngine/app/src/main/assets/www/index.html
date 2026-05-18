@@ -3,16 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আমার জীবনবৃত্তান্ত (Bio)</title>
+    <title>আমার বায়ো | My Single Page Bio</title>
     <style>
-        /* CSS: ডিজাইন অংশ */
-        :root {
-            --primary-color: #2563eb;
-            --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --bg-gray: #f3f4f6;
-        }
-
+        /* CSS রিসেট এবং গ্লোবাল স্টাইল */
         * {
             margin: 0;
             padding: 0;
@@ -21,145 +14,164 @@
         }
 
         body {
-            background-color: var(--bg-gray);
-            color: var(--text-dark);
-            line-height: 1.6;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            background: #fff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        /* প্রোফাইল সেকশন */
-        .profile-header {
+        /* বায়ো কার্ড স্টাইল */
+        .bio-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
             text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* প্রোফাইল ছবি */
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #00adb5;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 173, 181, 0.5);
+        }
+
+        /* নাম ও পদবী */
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        p.tagline {
+            color: #00adb5;
+            font-size: 1rem;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        /* সোশ্যাল ও কাজের লিঙ্কসমূহ */
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             margin-bottom: 30px;
         }
 
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: #ddd;
-            margin-bottom: 15px;
-            object-fit: cover;
-            border: 4px solid var(--primary-color);
-        }
-
-        h1 { font-size: 2.5rem; color: var(--primary-color); }
-        .tagline { color: var(--text-light); font-weight: 500; }
-
-        /* সেকশন টাইটেল */
-        h2 {
-            border-bottom: 2px solid var(--primary-color);
-            display: inline-block;
-            margin: 20px 0 15px;
-            padding-bottom: 5px;
-        }
-
-        /* স্কিল বার */
-        .skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .skill-tag {
-            background: var(--primary-color);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
-        /* কন্টাক্ট বাটন */
-        .contact-btn {
-            display: block;
-            width: fit-content;
-            margin: 30px auto 0;
-            padding: 12px 30px;
-            background: var(--primary-color);
-            color: white;
+        .bio-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
             text-decoration: none;
-            border-radius: 5px;
-            transition: transform 0.3s;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
         }
 
-        .contact-btn:hover {
-            transform: scale(1.05);
+        .bio-link:hover {
+            background: #00adb5;
+            color: #111;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 173, 181, 0.4);
         }
 
-        /* ডার্ক মোড সুইচ */
-        .theme-switch {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+        /* ডার্ক/লাইট মোড বাটন স্টাইল */
+        .theme-btn {
+            background: transparent;
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
             cursor: pointer;
-            padding: 10px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            transition: 0.3s;
         }
 
-        /* ডার্ক মোড স্টাইল */
-        body.dark-mode {
-            background-color: #111827;
-            color: #f9fafb;
+        .theme-btn:hover {
+            background: #ffffff;
+            color: #111;
         }
-        body.dark-mode .container {
-            background: #1f2937;
+
+        /* লাইট মোড থিম (JavaScript এর জন্য) */
+        body.light-mode {
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            color: #333333;
+        }
+        body.light-mode .bio-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        body.light-mode .bio-link {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333333;
+        }
+        body.light-mode .bio-link:hover {
+            background: #00adb5;
+            color: #ffffff;
+        }
+        body.light-mode .theme-btn {
+            border-color: #333333;
+            color: #333333;
+        }
+        body.light-mode .theme-btn:hover {
+            background: #333333;
+            color: #ffffff;
         }
     </style>
 </head>
 <body>
 
-    <div class="theme-switch" onclick="toggleDarkMode()">🌓</div>
+    <div class="bio-card">
+        <!-- প্রোফাইল ছবি (আপনার ছবির লিঙ্ক এখানে দিন) -->
+        <img src="https://via.placeholder.com/150" alt="Profile Picture" class="profile-img">
 
-    <div class="container">
-        <!-- হেডার -->
-        <header class="profile-header">
-            <img src="https://via.placeholder.com/150" alt="প্রোফাইল ছবি" class="profile-img">
-            <h1>আপনার নাম এখানে</h1>
-            <p class="tagline">ফুল-স্ট্যাক ওয়েব ডেভেলপার | টেক উৎসাহী</p>
-        </header>
+        <!-- আপনার নাম এবং ছোট পরিচয় -->
+        <h1>আপনার নাম এখানে</h1>
+        <p class="tagline">ওয়েব ডেভেলপার ও ডিজাইনার</p>
 
-        <!-- সম্পর্কে -->
-        <section>
-            <h2>আমার সম্পর্কে</h2>
-            <p>আমি একজন ফ্রিল্যান্স ওয়েব ডেভেলপার। গত ৩ বছর ধরে আমি আধুনিক টেকনোলজি ব্যবহার করে ইউজার-ফ্রেন্ডলি ওয়েবসাইট তৈরি করছি। নতুন কিছু শেখা এবং সমস্যার সমাধান করা আমার শখ।</p>
-        </section>
+        <!-- সোশ্যাল মিডিয়া ও গুরুত্বপূর্ণ লিঙ্কসমূহ -->
+        <div class="links-container">
+            <a href="https://yourportfolio.com" target="_blank" class="bio-link">🌐 আমার পোর্টফোলিও</a>
+            <a href="https://github.com" target="_blank" class="bio-link">🐙 গিটহাব (GitHub)</a>
+            <a href="https://linkedin.com" target="_blank" class="bio-link">💼 লিঙ্কডইন (LinkedIn)</a>
+            <a href="https://facebook.com" target="_blank" class="bio-link">📘 ফেসবুক (Facebook)</a>
+            <a href="mailto:your-email@example.com" class="bio-link">✉️ ইমেইল করুন</a>
+        </div>
 
-        <!-- দক্ষতা -->
-        <section>
-            <h2>দক্ষতা (Skills)</h2>
-            <div class="skills">
-                <span class="skill-tag">HTML5</span>
-                <span class="skill-tag">CSS3</span>
-                <span class="skill-tag">JavaScript</span>
-                <span class="skill-tag">React</span>
-                <span class="skill-tag">Node.js</span>
-            </div>
-        </section>
-
-        <!-- যোগাযোগ -->
-        <section>
-            <h2>যোগাযোগ</h2>
-            <p>📧 ইমেইল: example@gmail.com</p>
-            <p>📍 ঠিকানা: ঢাকা, বাংলাদেশ</p>
-            <a href="mailto:example@gmail.com" class="contact-btn">আমাকে ইমেইল করুন</a>
-        </section>
+        <!-- ইন্টারঅ্যাক্টিভ জাভাস্ক্রিপ্ট বাটন (থিম পরিবর্তন) -->
+        <button class="theme-btn" id="themeToggle">থিম পরিবর্তন করুন</button>
     </div>
 
+    <!-- জাভাস্ক্রিপ্ট কোড -->
     <script>
-        // JavaScript: ডার্ক মোড লজিক
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-        }
+        const themeToggleBtn = document.getElementById('themeToggle');
+        
+        themeToggleBtn.addEventListener('click', () => {
+            // বডিতে লাইট-মোড ক্লাস যোগ বা বাদ দেওয়া
+            document.body.classList.toggle('light-mode');
+            
+            // বাটনের টেক্সট পরিবর্তন
+            if(document.body.classList.contains('light-mode')) {
+                themeToggleBtn.textContent = "ডার্ক মোড করুন";
+            } else {
+                themeToggleBtn.textContent = "থিম পরিবর্তন করুন";
+            }
+        });
     </script>
+
 </body>
 </html>
