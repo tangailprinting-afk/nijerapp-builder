@@ -8,7 +8,7 @@ export async function GET(){
     const response =
       await fetch(
 
-`https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/artifacts`,
+`https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/releases/latest`,
 
         {
 
@@ -31,10 +31,15 @@ export async function GET(){
     const data =
       await response.json();
 
-    const artifact =
-      data.artifacts?.[0];
+    const apk =
+      data.assets?.find(
+        (item:any)=>
 
-    if(!artifact){
+item.name.endsWith(".apk")
+
+      );
+
+    if(!apk){
 
       return NextResponse.json({
 
@@ -48,7 +53,8 @@ export async function GET(){
 
       success:true,
 
-      url:artifact.archive_download_url
+      url:
+apk.browser_download_url
 
     });
 
