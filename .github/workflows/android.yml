@@ -31,6 +31,22 @@ jobs:
         run: ./gradlew clean
         working-directory: android-template/WebAppEngine
 
+
+      - name: Remove Default WebP Icons
+        run: |
+
+          rm -f app/src/main/res/mipmap-mdpi/ic_launcher.webp
+
+          rm -f app/src/main/res/mipmap-hdpi/ic_launcher.webp
+
+          rm -f app/src/main/res/mipmap-xhdpi/ic_launcher.webp
+
+          rm -f app/src/main/res/mipmap-xxhdpi/ic_launcher.webp
+
+          rm -f app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp
+
+        working-directory: android-template/WebAppEngine
+
       - name: Build APK
         run: ./gradlew assembleDebug
         working-directory: android-template/WebAppEngine
