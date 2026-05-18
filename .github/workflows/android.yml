@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+    paths:
+
+      - 'android-template/**'
+
+      - '.github/workflows/android.yml'
+
 jobs:
 
   build:
