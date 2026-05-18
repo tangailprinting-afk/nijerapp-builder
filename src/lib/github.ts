@@ -149,6 +149,13 @@ export async function uploadBinaryFile(
 
 export async function triggerWorkflow(){
 
+  // WAIT FOR GITHUB SYNC
+
+  await new Promise(
+    (resolve)=>
+      setTimeout(resolve,5000)
+  );
+
   const response =
     await fetch(
 
