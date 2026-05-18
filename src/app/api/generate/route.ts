@@ -27,6 +27,11 @@ export async function POST(
         "appName"
       ) as string;
 
+    const packageName =
+      formData.get(
+        "packageName"
+      ) as string;
+
     const htmlCode =
       formData.get(
         "htmlCode"
@@ -41,6 +46,27 @@ export async function POST(
       formData.get(
         "zipFile"
       ) as File;
+
+    // VALIDATE PACKAGE
+
+    const validPackage =
+/^[a-z]+\.[a-z0-9]+\.[a-z0-9]+$/;
+
+    if(
+      !validPackage.test(
+        packageName
+      )
+    ){
+
+      return NextResponse.json({
+
+        success:false,
+
+        error:"Invalid Package"
+
+      });
+
+    }
 
     // HTML UPDATE
 
@@ -104,21 +130,19 @@ export async function POST(
 
     }
 
-  
+    // UPDATE ICON
 
-// UPDATE ICON
+    if(icon){
 
-if (icon) {
+      const bytes =
+        await icon.arrayBuffer();
 
-  const bytes =
-    await icon.arrayBuffer();
+      const base64 =
+        Buffer.from(
+          bytes
+        ).toString("base64");
 
-  const base64 =
-    Buffer.from(
-      bytes
-    ).toString("base64");
-
-  const iconPaths = [
+      const iconPaths = [
 
 "android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/ic_launcher.png",
 
@@ -140,20 +164,135 @@ if (icon) {
 
 "android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
 
-  ];
+      ];
 
-  for (const iconPath of iconPaths) {
+      for(const iconPath of iconPaths){
 
-    await uploadBinaryFile(
-      iconPath,
-      base64,
-      "updated icon"
+        await uploadBinaryFile(
+
+          iconPath,
+
+          base64,
+
+          "updated icon"
+
+        );
+
+      }
+
+    }
+
+    // PACKAGE UPDATE
+
+    const gradlePath =
+"android-template/WebAppEngine/app/build.gradle.kts";
+
+    const gradleResponse =
+      await fetch(
+
+`https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/${gradlePath}`,
+
+        {
+
+          headers:{
+
+            Authorization:
+`Bearer ${process.env.GITHUB_TOKEN}`
+
+          },
+
+          cache:"no-store"
+
+        }
+
+      );
+
+    const gradleData =
+      await gradleResponse.json();
+
+    const gradleContent =
+      Buffer.from(
+
+        gradleData.content,
+
+        "base64"
+
+      ).toString("utf8");
+
+    const updatedGradle =
+      gradleContent.replace(
+
+/applicationId\s=\s"[^"]+"/,
+
+`applicationId = "${packageName}"`
+
+      );
+
+    await updateGitHubFile(
+
+      gradlePath,
+
+      updatedGradle,
+
+      "updated package"
+
     );
 
-  }
-}
+    // MANIFEST UPDATE
 
+    const manifestPath =
+"android-template/WebAppEngine/app/src/main/AndroidManifest.xml";
 
+    const manifestResponse =
+      await fetch(
+
+`https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/${manifestPath}`,
+
+        {
+
+          headers:{
+
+            Authorization:
+`Bearer ${process.env.GITHUB_TOKEN}`
+
+          },
+
+          cache:"no-store"
+
+        }
+
+      );
+
+    const manifestData =
+      await manifestResponse.json();
+
+    const manifestContent =
+      Buffer.from(
+
+        manifestData.content,
+
+        "base64"
+
+      ).toString("utf8");
+
+    const updatedManifest =
+      manifestContent.replace(
+
+/package="[^"]+"/,
+
+`package="${packageName}"`
+
+      );
+
+    await updateGitHubFile(
+
+      manifestPath,
+
+      updatedManifest,
+
+      "updated manifest"
+
+    );
 
     // APP NAME UPDATE
 
