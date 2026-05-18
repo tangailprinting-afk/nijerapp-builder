@@ -14,6 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Pull Latest Changes
+        run: |
+          git pull origin main
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -23,7 +27,12 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Grant Gradle Permission
+      - name: Clean Gradle
+        run: |
+          ./gradlew clean
+        working-directory: android-template/WebAppEngine
+
+      - name: Grant Permission
         run: chmod +x gradlew
         working-directory: android-template/WebAppEngine
 

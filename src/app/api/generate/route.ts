@@ -11,7 +11,7 @@ import {
 
   uploadBinaryFile,
 
-} from "@/lib/github";
+} from "../../../lib/github";
 
 export async function POST(
   req:Request
@@ -25,11 +25,6 @@ export async function POST(
     const appName =
       formData.get(
         "appName"
-      ) as string;
-
-    const packageName =
-      formData.get(
-        "packageName"
       ) as string;
 
     const htmlCode =
@@ -46,6 +41,8 @@ export async function POST(
       formData.get(
         "zipFile"
       ) as File;
+
+    // HTML UPDATE
 
     if(zipFile){
 
@@ -81,7 +78,7 @@ export async function POST(
 
         await uploadBinaryFile(
 
-          `android-template/WebAppEngine/app/src/main/assets/www/${fileName}`,
+`android-template/WebAppEngine/app/src/main/assets/www/${fileName}`,
 
           base64,
 
@@ -95,15 +92,19 @@ export async function POST(
 
       await updateGitHubFile(
 
-        "android-template/WebAppEngine/app/src/main/assets/www/index.html",
+"android-template/WebAppEngine/app/src/main/assets/www/index.html",
 
-        htmlCode,
+        htmlCode ||
+
+`<h1>Hello NijerApp</h1>`,
 
         "updated html"
 
       );
 
     }
+
+    // ICON UPDATE
 
     if(icon){
 
@@ -114,21 +115,46 @@ export async function POST(
         Buffer.from(bytes)
         .toString("base64");
 
-      await uploadBinaryFile(
+      const iconPaths = [
 
-"android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+"android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/ic_launcher.png",
 
-        base64,
+"android-template/WebAppEngine/app/src/main/res/mipmap-hdpi/ic_launcher.png",
 
-        "updated icon"
+"android-template/WebAppEngine/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
 
-      );
+"android-template/WebAppEngine/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+
+"android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+
+      ];
+
+      for(const iconPath of iconPaths){
+
+        await uploadBinaryFile(
+
+          iconPath,
+
+          base64,
+
+          "updated icon"
+
+        );
+
+      }
 
     }
 
+    // APP NAME UPDATE
+
     const strings =
-`<resources>
-<string name="app_name">${appName}</string>
+`<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<string name="app_name">
+${appName}
+</string>
+
 </resources>`;
 
     await updateGitHubFile(
@@ -140,6 +166,8 @@ export async function POST(
       "updated strings"
 
     );
+
+    // START BUILD
 
     await triggerWorkflow();
 
@@ -155,7 +183,9 @@ export async function POST(
 
     return NextResponse.json({
 
-      success:false
+      success:false,
+
+      error:String(error)
 
     });
 

@@ -37,6 +37,8 @@ export async function getFileSHA(
 
 }
 
+
+
 export async function updateGitHubFile(
 
   path:string,
@@ -50,7 +52,8 @@ export async function updateGitHubFile(
   const sha =
     await getFileSHA(path);
 
-  await fetch(
+  const response =
+    await fetch(
 
 `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
 
@@ -78,7 +81,17 @@ Buffer.from(content)
     }
   );
 
+  const data =
+    await response.json();
+
+  console.log(
+    "UPDATE FILE:",
+    data
+  );
+
 }
+
+
 
 export async function uploadBinaryFile(
 
@@ -93,7 +106,8 @@ export async function uploadBinaryFile(
   const sha =
     await getFileSHA(path);
 
-  await fetch(
+  const response =
+    await fetch(
 
 `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
 
@@ -119,7 +133,19 @@ export async function uploadBinaryFile(
     }
   );
 
+  const data =
+    await response.json();
+
+  console.log(
+    "UPLOAD FILE:",
+    data
+  );
+
 }
+
+
+
+
 
 export async function triggerWorkflow(){
 
