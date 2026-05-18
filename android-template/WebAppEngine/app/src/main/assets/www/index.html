@@ -1,1 +1,234 @@
-<p>amar app</p>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মডার্ন নিওন বায়ো</title>
+    <style>
+        /* গ্লোবাল স্টাইল */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* মেইন কন্টেইনার */
+        .container {
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        /* প্রোফাইল ইমেজ ও গ্লো ইফেক্ট */
+        .avatar-box {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 25px;
+        }
+
+        .avatar-box::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            background: linear-gradient(45deg, #ff007f, #00f0ff);
+            border-radius: 50%;
+            z-index: 1;
+            animation: rotateGlow 6s linear infinite;
+        }
+
+        .profile-img {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #0b0f19;
+            z-index: 2;
+            top: 5px;
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* নাম এবং টাইপিং অ্যানিমেশন */
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #00f0ff, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* টাইপিং টেক্সট স্টাইল */
+        .typing-text {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            min-height: 25px;
+            margin-bottom: 35px;
+            font-weight: 400;
+        }
+
+        .cursor {
+            display: inline-block;
+            background-color: #00f0ff;
+            margin-left: 3px;
+            width: 3px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* লিঙ্ক বাটন স্টাইল */
+        .links-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .link-card {
+            background: #171e30;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #232d45;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .link-card:hover {
+            transform: scale(1.03);
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        /* বাটনের ভেতরের আইকন বা অ্যারো */
+        .link-card span.arrow {
+            color: #ff007f;
+            transition: transform 0.2s;
+        }
+
+        .link-card:hover span.arrow {
+            transform: translateX(5px);
+            color: #00f0ff;
+        }
+
+        /* ফুটার */
+        footer {
+            margin-top: 50px;
+            font-size: 0.85rem;
+            color: #4a5568;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- প্রোফাইল পিকচার এরিয়া -->
+        <div class="avatar-box">
+            <img src="https://via.placeholder.com/150" alt="Avatar" class="profile-img">
+        </div>
+
+        <!-- নাম -->
+        <h1>আপনার নাম এখানে</h1>
+        
+        <!-- জাভাস্ক্রিপ্ট দ্বারা নিয়ন্ত্রিত অটো-টাইপিং বায়ো -->
+        <div class="typing-text"><span id="text"></span><span class="cursor">&nbsp;</span></div>
+
+        <!-- লিঙ্কসমূহ -->
+        <div class="links-wrap">
+            <a href="#" target="_blank" class="link-card">
+                <span>🚀 অফিশিয়াল পোর্টফোলিও</span>
+                <span class="arrow">➔</span>
+            </a>
+            <a href="#" target="_blank" class="link-card">
+                <span>🎨 ক্রিয়েটিভ প্রজেক্টস</span>
+                <span class="arrow">➔</span>
+            </a>
+            <a href="#" target="_blank" class="link-card">
+                <span>🎬 ইউটিউব চ্যানেল</span>
+                <span class="arrow">➔</span>
+            </a>
+            <a href="#" target="_blank" class="link-card">
+                <span>💬 মেসেজ পাঠান</span>
+                <span class="arrow">➔</span>
+            </a>
+        </div>
+
+        <!-- ফুটার -->
+        <footer>© 2026 | ALL RIGHTS RESERVED</footer>
+    </div>
+
+    <!-- জাভাস্ক্রিপ্ট (অটো টাইপিং ইফেক্ট) -->
+    <script>
+        // এখানে আপনি আপনার পেশা বা বায়ো লাইনগুলো পরিবর্তন করতে পারেন
+        const words = ["কনটেন্ট ক্রিয়েটর", "মোশন গ্রাফিক্স ডিজাইনার", "এআই এনথুসিয়াস্ট"];
+        let i = 0;
+        let timer;
+
+        function typingEffect() {
+            let word = words[i].split("");
+            var loopTyping = function() {
+                if (word.length > 0) {
+                    document.getElementById('text').innerHTML += word.shift();
+                } else {
+                    setTimeout(deletingEffect, 2000); // লেখা শেষ হওয়ার পর ২ সেকেন্ড থামবে
+                    return false;
+                }
+                timer = setTimeout(loopTyping, 100); // টাইপিং স্পিড
+            };
+            loopTyping();
+        }
+
+        function deletingEffect() {
+            let word = words[i].split("");
+            var loopDeleting = function() {
+                if (word.length > 0) {
+                    word.pop();
+                    document.getElementById('text').innerHTML = word.join("");
+                } else {
+                    if (words.length > (i + 1)) {
+                        i++;
+                    } else {
+                        i = 0;
+                    }
+                    setTimeout(typingEffect, 500); // কাটার পর নতুন লেখা শুরুর গ্যাপ
+                    return false;
+                }
+                timer = setTimeout(loopDeleting, 50); // কাটার স্পিড
+            };
+            loopDeleting();
+        }
+
+        // অ্যানিমেশন শুরু
+        typingEffect();
+    </script>
+
+</body>
+</html>
