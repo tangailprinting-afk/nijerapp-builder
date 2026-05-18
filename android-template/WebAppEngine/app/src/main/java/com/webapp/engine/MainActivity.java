@@ -1,68 +1,135 @@
 package com.webapp.engine;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity
+extends AppCompatActivity {
 
     WebView webView;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(
+        Bundle savedInstanceState
+    ) {
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        webView = findViewById(R.id.webView);
+        if (
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
-        WebSettings webSettings = webView.getSettings();
+            ActivityCompat.requestPermissions(
+
+                this,
+
+                new String[]{
+                    Manifest.permission.POST_NOTIFICATIONS
+                },
+
+                1
+
+            );
+
+        }
+
+        setContentView(
+            R.layout.activity_main
+        );
+
+        webView =
+            findViewById(
+                R.id.webView
+            );
+
+        WebSettings webSettings =
+            webView.getSettings();
 
         // Enable JavaScript
-        webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptEnabled(
+            true
+        );
 
         // Enable Storage
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(
+            true
+        );
+
+        webSettings.setDatabaseEnabled(
+            true
+        );
 
         // File Access
-        webSettings.setAllowFileAccess(true);
-        webSettings.setAllowContentAccess(true);
+        webSettings.setAllowFileAccess(
+            true
+        );
+
+        webSettings.setAllowContentAccess(
+            true
+        );
 
         // Offline Cache
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-
-        // Zoom
-        webSettings.setBuiltInZoomControls(false);
+        webSettings.setCacheMode(
+            WebSettings.LOAD_DEFAULT
+        );
 
         // Responsive
-        webSettings.setLoadWithOverviewMode(true);
-        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(
+            true
+        );
+
+        webSettings.setUseWideViewPort(
+            true
+        );
 
         // Mixed Content
         webSettings.setMixedContentMode(
-                android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
         );
 
         // Keep inside app
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(
+            new WebViewClient()
+        );
 
-        // Load Local HTML App
+        // Load Local HTML
         webView.loadUrl(
-    "file:///android_asset/www/index.html"
-);
+
+"file:///android_asset/www/index.html"
+
+        );
+
     }
 
     @Override
     public void onBackPressed() {
-        if (webView.canGoBack()) {
+
+        if(webView.canGoBack()){
+
             webView.goBack();
-        } else {
+
+        }else{
+
             super.onBackPressed();
+
         }
+
     }
+
 }

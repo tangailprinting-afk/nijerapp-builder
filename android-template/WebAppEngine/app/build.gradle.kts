@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation("com.onesignal:OneSignal:[5.1.6, 5.1.99]")
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
