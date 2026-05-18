@@ -9,13 +9,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
 
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Pull Latest Changes
-        run: git pull origin main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -28,31 +28,35 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Grant Gradle Permission
+        run: chmod +x android-template/WebAppEngine/gradlew
 
-      - name: Remove Old Icons
+      - name: Delete Old Icons
         run: |
 
-          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/*.webp
-          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-hdpi/*.webp
-          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-xhdpi/*.webp
-          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-xxhdpi/*.webp
-          rm -f android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/*.webp
+          find android-template/WebAppEngine/app/src/main/res -name "*.webp" -delete
 
       - name: Build APK
         run: |
 
           cd android-template/WebAppEngine
 
-          chmod +x gradlew
-
-          ./gradlew clean
-
           ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: generated-apk
-          path: android-template/WebAppEngine/app/build/outputs/apk/debug/app-debug.apk
+          name: app-debug
+          path: |
+
+            android-template/WebAppEngine/app/build/outputs/apk/debug/*.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+
+          tag_name: release-${{ github.run_id }}
+
+          files: |
+
+            android-template/WebAppEngine/app/build/outputs/apk/debug/*.apk
