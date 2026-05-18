@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "miah.rabbiami.app"
+        applicationId = "com.wfsdfsd.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
