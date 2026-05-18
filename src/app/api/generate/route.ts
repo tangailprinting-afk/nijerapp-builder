@@ -318,11 +318,14 @@ ${appName}
 
     // START BUILD
 
-    await triggerWorkflow();
+   const runId =
+  await triggerWorkflow();
 
     return NextResponse.json({
 
-      success:true
+      success:true,
+
+      runId
 
     });
 

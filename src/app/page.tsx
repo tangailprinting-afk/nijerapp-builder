@@ -27,72 +27,131 @@ export default function Home(){
 
   async function generateAPK(){
 
-    setStatus(
-      "Starting Build..."
-    );
+    try{
 
-    const formData =
-      new FormData();
-
-    formData.append(
-      "appName",
-      appName
-    );
-
-    formData.append(
-      "packageName",
-      packageName
-    );
-
-    formData.append(
-      "htmlCode",
-      htmlCode
-    );
-
-    if(zipFile){
-
-      formData.append(
-        "zipFile",
-        zipFile
+      setStatus(
+        "Starting Cloud Build..."
       );
 
-    }
-
-    if(icon){
+      const formData =
+        new FormData();
 
       formData.append(
-        "icon",
-        icon
+        "appName",
+        appName
       );
 
-    }
+      formData.append(
+        "packageName",
+        packageName
+      );
 
-    const response =
-      await fetch(
+      formData.append(
+        "htmlCode",
+        htmlCode
+      );
 
-        "/api/generate",
+      if(zipFile){
 
-        {
-          method:"POST",
+        formData.append(
+          "zipFile",
+          zipFile
+        );
 
-          body:formData
+      }
+
+      if(icon){
+
+        formData.append(
+          "icon",
+          icon
+        );
+
+      }
+
+      const response =
+        await fetch(
+
+          "/api/generate",
+
+          {
+            method:"POST",
+
+            body:formData
+          }
+
+        );
+
+      const data =
+        await response.json();
+
+      if(data.success){
+
+        setStatus(
+          "Cloud Build Started 🚀"
+        );
+
+        if(data.runId){
+
+          const interval =
+            setInterval(async()=>{
+
+              const statusResponse =
+                await fetch(
+
+`/api/status?runId=${data.runId}`
+
+                );
+
+              const statusData =
+                await statusResponse.json();
+
+              if(
+                statusData.status ===
+                "completed"
+              ){
+
+                clearInterval(
+                  interval
+                );
+
+                if(
+                  statusData.conclusion ===
+                  "success"
+                ){
+
+                  setStatus(
+                    "APK Build Success ✅"
+                  );
+
+                }else{
+
+                  setStatus(
+                    "APK Build Failed ❌"
+                  );
+
+                }
+
+              }
+
+            },5000);
+
         }
 
-      );
+      }else{
 
-    const data =
-      await response.json();
+        setStatus(
+          "Build Failed ❌"
+        );
 
-    if(data.success){
+      }
+
+    }catch(error){
+
+      console.log(error);
 
       setStatus(
-        "Cloud Build Started 🚀"
-      );
-
-    }else{
-
-      setStatus(
-        "Build Failed"
+        "Server Error ❌"
       );
 
     }
@@ -103,7 +162,9 @@ export default function Home(){
 
     <main className="container">
 
-      <h1>NijerApp Builder</h1>
+      <h1>
+        NijerApp Builder
+      </h1>
 
       <input
 
@@ -197,7 +258,11 @@ export default function Home(){
 
       </button>
 
-      <p>{status}</p>
+      <p>
+
+        {status}
+
+      </p>
 
     </main>
 
