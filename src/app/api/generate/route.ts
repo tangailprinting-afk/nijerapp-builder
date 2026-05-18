@@ -115,7 +115,7 @@ export async function POST(
         Buffer.from(bytes)
         .toString("base64");
 
-      const iconPaths = [
+const iconPaths = [
 
 "android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/ic_launcher.png",
 
@@ -125,9 +125,19 @@ export async function POST(
 
 "android-template/WebAppEngine/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
 
-"android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+"android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
 
-      ];
+"android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+
+"android-template/WebAppEngine/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+
+"android-template/WebAppEngine/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+
+"android-template/WebAppEngine/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+
+"android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
+
+];
 
       for(const iconPath of iconPaths){
 
