@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.sdfsdfsdf.app"
+        applicationId = "com.onesignaltest.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
