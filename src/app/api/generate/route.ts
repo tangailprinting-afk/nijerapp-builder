@@ -1,5 +1,7 @@
 import AdmZip from "adm-zip";
 
+import sharp from "sharp";
+
 import { NextResponse }
 from "next/server";
 
@@ -134,47 +136,79 @@ export async function POST(
 
     if(icon){
 
-      const bytes =
-        await icon.arrayBuffer();
-
-      const base64 =
+      const iconBuffer =
         Buffer.from(
-          bytes
-        ).toString("base64");
+          await icon.arrayBuffer()
+        );
 
-      const iconPaths = [
+      const iconSizes = [
 
-"android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+        {
+          size:48,
+          folder:"mipmap-mdpi"
+        },
 
-"android-template/WebAppEngine/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+        {
+          size:72,
+          folder:"mipmap-hdpi"
+        },
 
-"android-template/WebAppEngine/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+        {
+          size:96,
+          folder:"mipmap-xhdpi"
+        },
 
-"android-template/WebAppEngine/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+        {
+          size:144,
+          folder:"mipmap-xxhdpi"
+        },
 
-"android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
-
-"android-template/WebAppEngine/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
-
-"android-template/WebAppEngine/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
-
-"android-template/WebAppEngine/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
-
-"android-template/WebAppEngine/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
-
-"android-template/WebAppEngine/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
+        {
+          size:192,
+          folder:"mipmap-xxxhdpi"
+        }
 
       ];
 
-      for(const iconPath of iconPaths){
+      for(
+        const item
+        of iconSizes
+      ){
+
+        const resizedIcon =
+          await sharp(iconBuffer)
+
+            .resize(
+              item.size,
+              item.size
+            )
+
+            .png()
+
+            .toBuffer();
+
+        const base64 =
+          resizedIcon.toString(
+            "base64"
+          );
 
         await uploadBinaryFile(
 
-          iconPath,
+`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher.png`,
 
           base64,
 
           "updated icon"
+
+        );
+
+        await uploadBinaryFile(
+
+`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher_round.png`,
+
+          base64,
+
+          "updated round icon"
 
         );
 
@@ -318,8 +352,8 @@ ${appName}
 
     // START BUILD
 
-   const runId =
-  await triggerWorkflow();
+    const runId =
+      await triggerWorkflow();
 
     return NextResponse.json({
 
