@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.bbbb.app"
+        applicationId = "com.vercel.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
