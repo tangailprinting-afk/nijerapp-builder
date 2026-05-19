@@ -17,6 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Pull Latest Changes
+        run: git pull origin main
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -28,13 +31,26 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Grant Gradle Permission
-        run: chmod +x android-template/WebAppEngine/gradlew
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Delete Old Icons
+      - name: Remove Old Icons
         run: |
 
           find android-template/WebAppEngine/app/src/main/res -name "*.webp" -delete
+
+          find android-template/WebAppEngine/app/src/main/res -name "ic_launcher.webp" -delete
+
+          find android-template/WebAppEngine/app/src/main/res -name "ic_launcher_round.webp" -delete
+
+      - name: Force Clean Build
+        run: |
+
+          cd android-template/WebAppEngine
+
+          chmod +x gradlew
+
+          ./gradlew clean
 
       - name: Build APK
         run: |
@@ -46,7 +62,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: generated-apk
           path: |
 
             android-template/WebAppEngine/app/build/outputs/apk/debug/*.apk
