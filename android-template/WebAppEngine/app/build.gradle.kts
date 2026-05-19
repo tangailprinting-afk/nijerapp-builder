@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "calculatorfinal.app.app"
+        applicationId = "last.app.com"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
