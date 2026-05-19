@@ -3,16 +3,21 @@ package com.webapp.engine;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.WindowCompat;
+
+import androidx.core.graphics.Insets;
+
+import androidx.core.view.ViewCompat;
+
+import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity
 extends AppCompatActivity {
@@ -25,41 +30,14 @@ extends AppCompatActivity {
         Bundle savedInstanceState
     ) {
 
-        super.onCreate(
-            savedInstanceState
-        );
-
-        // STATUS BAR COLOR
-
-        getWindow().setStatusBarColor(
-            Color.BLACK
-        );
-
-        // NAVIGATION BAR COLOR
-
-        getWindow().setNavigationBarColor(
-            Color.BLACK
-        );
-
-        // SAFE AREA FIX
-
-        WindowCompat.setDecorFitsSystemWindows(
-            getWindow(),
-            true
-        );
+        super.onCreate(savedInstanceState);
 
         if (
-
             ContextCompat.checkSelfPermission(
-
                 this,
-
                 Manifest.permission.POST_NOTIFICATIONS
-
             )
-
             != PackageManager.PERMISSION_GRANTED
-
         ) {
 
             ActivityCompat.requestPermissions(
@@ -67,18 +45,51 @@ extends AppCompatActivity {
                 this,
 
                 new String[]{
-
                     Manifest.permission.POST_NOTIFICATIONS
-
                 },
 
                 1
 
             );
+
         }
 
         setContentView(
             R.layout.activity_main
+        );
+
+        // SAFE AREA SUPPORT
+
+        ViewCompat.setOnApplyWindowInsetsListener(
+
+            findViewById(android.R.id.content),
+
+            (view, windowInsets) -> {
+
+                Insets insets =
+
+                    windowInsets.getInsets(
+
+                        WindowInsetsCompat.Type.systemBars()
+
+                    );
+
+                view.setPadding(
+
+                    0,
+
+                    insets.top,
+
+                    0,
+
+                    insets.bottom
+
+                );
+
+                return windowInsets;
+
+            }
+
         );
 
         webView =
@@ -90,13 +101,11 @@ extends AppCompatActivity {
             webView.getSettings();
 
         // Enable JavaScript
-
         webSettings.setJavaScriptEnabled(
             true
         );
 
         // Enable Storage
-
         webSettings.setDomStorageEnabled(
             true
         );
@@ -106,7 +115,6 @@ extends AppCompatActivity {
         );
 
         // File Access
-
         webSettings.setAllowFileAccess(
             true
         );
@@ -115,22 +123,12 @@ extends AppCompatActivity {
             true
         );
 
-        webSettings.setAllowFileAccessFromFileURLs(
-            true
-        );
-
-        webSettings.setAllowUniversalAccessFromFileURLs(
-            true
-        );
-
         // Offline Cache
-
         webSettings.setCacheMode(
             WebSettings.LOAD_DEFAULT
         );
 
         // Responsive
-
         webSettings.setLoadWithOverviewMode(
             true
         );
@@ -140,50 +138,53 @@ extends AppCompatActivity {
         );
 
         // Mixed Content
-
         webSettings.setMixedContentMode(
 
             WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
         );
 
-        // Scroll Bars
+        // Better Mobile Experience
 
-        webView.setVerticalScrollBarEnabled(
+        webSettings.setBuiltInZoomControls(
             false
         );
 
-        webView.setHorizontalScrollBarEnabled(
+        webSettings.setDisplayZoomControls(
+            false
+        );
+
+        webSettings.setSupportZoom(
             false
         );
 
         // Keep inside app
-
         webView.setWebViewClient(
             new WebViewClient()
         );
 
         // Load Local HTML
-
         webView.loadUrl(
 
-            "file:///android_asset/www/index.html"
+"file:///android_asset/www/index.html"
 
         );
+
     }
 
     @Override
     public void onBackPressed() {
 
-        if (
-            webView.canGoBack()
-        ) {
+        if(webView.canGoBack()){
 
             webView.goBack();
 
-        } else {
+        }else{
 
             super.onBackPressed();
+
         }
+
     }
+
 }
