@@ -1,1 +1,193 @@
-com.habibali.app
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8" />
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>
+NATIVE FEATURE TEST
+</title>
+
+<style>
+
+body {
+
+  background: #111;
+
+  color: white;
+
+  font-family: sans-serif;
+
+  padding: 20px;
+}
+
+button {
+
+  width: 100%;
+
+  padding: 15px;
+
+  margin-bottom: 12px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #333;
+
+  color: white;
+
+  font-size: 18px;
+}
+
+pre {
+
+  background: #000;
+
+  padding: 15px;
+
+  border-radius: 10px;
+
+  overflow: auto;
+
+  white-space: pre-wrap;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+Feature Test
+</h1>
+
+<button onclick="testInternet()">
+TEST INTERNET
+</button>
+
+<button onclick="testStorage()">
+TEST STORAGE
+</button>
+
+<button onclick="testDevice()">
+TEST DEVICE
+</button>
+
+<button onclick="testNotification()">
+TEST NOTIFICATION
+</button>
+
+<pre id="output">
+Waiting...
+</pre>
+
+<script>
+
+const output =
+  document.getElementById(
+    "output"
+  );
+
+// INTERNET
+
+async function testInternet() {
+
+  output.innerHTML =
+    JSON.stringify({
+
+      online:
+        navigator.onLine
+
+    }, null, 2);
+}
+
+// STORAGE
+
+async function testStorage() {
+
+  localStorage.setItem(
+    "test",
+    "HELLO STORAGE"
+  );
+
+  const data =
+    localStorage.getItem(
+      "test"
+    );
+
+  output.innerHTML =
+    JSON.stringify({
+
+      storage:
+        data
+
+    }, null, 2);
+}
+
+// DEVICE
+
+async function testDevice() {
+
+  output.innerHTML =
+    JSON.stringify({
+
+      userAgent:
+        navigator.userAgent,
+
+      platform:
+        navigator.platform,
+
+      language:
+        navigator.language,
+
+    }, null, 2);
+}
+
+// NOTIFICATION
+
+async function testNotification() {
+
+  if (
+    "Notification"
+    in window
+  ) {
+
+    const permission =
+      await Notification.requestPermission();
+
+    output.innerHTML =
+      JSON.stringify({
+
+        permission
+
+      }, null, 2);
+
+    if (
+      permission ===
+      "granted"
+    ) {
+
+      new Notification(
+        "Notification Working!"
+      );
+    }
+
+  } else {
+
+    output.innerHTML =
+      "Notification not supported";
+  }
+}
+
+</script>
+
+</body>
+</html>
