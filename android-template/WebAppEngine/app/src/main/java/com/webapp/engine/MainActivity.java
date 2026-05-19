@@ -3,6 +3,7 @@ package com.webapp.engine;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -26,6 +27,18 @@ extends AppCompatActivity {
 
         super.onCreate(
             savedInstanceState
+        );
+
+        // STATUS BAR COLOR
+
+        getWindow().setStatusBarColor(
+            Color.BLACK
+        );
+
+        // NAVIGATION BAR COLOR
+
+        getWindow().setNavigationBarColor(
+            Color.BLACK
         );
 
         // SAFE AREA FIX
