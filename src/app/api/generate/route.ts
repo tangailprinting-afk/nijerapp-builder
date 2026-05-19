@@ -13,6 +13,8 @@ import {
 
   uploadBinaryFile,
 
+  deleteGitHubFile,
+
 } from "../../../lib/github";
 
 export async function POST(
@@ -132,28 +134,99 @@ export async function POST(
 
     }
 
-
-     // UPDATE ICON
+    // UPDATE ICON
 
     if(icon){
 
-      const bytes =
-        await icon.arrayBuffer();
-
-      const base64 =
+      const iconBuffer =
         Buffer.from(
-          bytes
-        ).toString("base64");
+          await icon.arrayBuffer()
+        );
 
-      await uploadBinaryFile(
+      const iconSizes = [
 
-        "assets/icon.png",
+        {
+          size:48,
+          folder:"mipmap-mdpi"
+        },
 
-        base64,
+        {
+          size:72,
+          folder:"mipmap-hdpi"
+        },
 
-        "updated icon"
+        {
+          size:96,
+          folder:"mipmap-xhdpi"
+        },
 
-      );
+        {
+          size:144,
+          folder:"mipmap-xxhdpi"
+        },
+
+        {
+          size:192,
+          folder:"mipmap-xxxhdpi"
+        }
+
+      ];
+
+      for(
+        const item
+        of iconSizes
+      ){
+
+        await deleteGitHubFile(
+
+`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher.png`
+
+        );
+
+        await deleteGitHubFile(
+
+`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher_round.png`
+
+        );
+
+        const resizedIcon =
+          await sharp(iconBuffer)
+
+            .resize(
+              item.size,
+              item.size
+            )
+
+            .png()
+
+            .toBuffer();
+
+        const base64 =
+          resizedIcon.toString(
+            "base64"
+          );
+
+        await uploadBinaryFile(
+
+`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher.png`,
+
+          base64,
+
+          "updated icon"
+
+        );
+
+        await uploadBinaryFile(
+
+`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher_round.png`,
+
+          base64,
+
+          "updated round icon"
+
+        );
+
+      }
 
     }
 

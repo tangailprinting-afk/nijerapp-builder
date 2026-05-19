@@ -129,3 +129,38 @@ export async function getWorkflowStatus(
 
   return await response.json();
 }
+export async function deleteGitHubFile(
+  path:string
+){
+
+  const sha =
+    await getFileSha(path);
+
+  if(!sha){
+    return;
+  }
+
+  await fetch(
+
+`https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/${path}`,
+
+    {
+
+      method:"DELETE",
+
+      headers,
+
+      body:JSON.stringify({
+
+        message:
+"delete old icon",
+
+        sha
+
+      })
+
+    }
+
+  );
+
+}
