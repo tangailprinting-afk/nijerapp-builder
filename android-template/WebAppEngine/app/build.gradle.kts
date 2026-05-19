@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mimmiah.app"
+        applicationId = "com.ssssssssss.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
