@@ -1,0 +1,177 @@
+const SECRET_KEY = "Sadia_Secure_2026";
+const BUCKET_NAME = "CVKhata";
+const KEY_ID = "127479b50f70";
+const APP_KEY = "005d1da566f4b3c0646b9e4da892518999917a4c8c";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, PUT, POST, OPTIONS, DELETE",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+async function getB2Context() {
+  const authUrl = "https://api.backblazeb2.com/b2api/v2/b2_authorize_account";
+  const creds = btoa(`${KEY_ID}:${APP_KEY}`);
+  const authRes = await fetch(authUrl, {
+    headers: { Authorization: `Basic ${creds}` }
+  });
+  if (!authRes.ok) throw new Error("B2 Auth Failed: " + (await authRes.text()));
+  const authData = await authRes.json();
+
+  const bucketListUrl = `${authData.apiUrl}/b2api/v2/b2_list_buckets`;
+  const bucketRes = await fetch(bucketListUrl, {
+    method: "POST",
+    headers: { Authorization: authData.authorizationToken },
+    body: JSON.stringify({ accountId: authData.accountId })
+  });
+  if (!bucketRes.ok) throw new Error("Bucket list failed: " + (await bucketRes.text()));
+  const bucketData = await bucketRes.json();
+  const bucket = bucketData.buckets.find(b => b.bucketName === BUCKET_NAME);
+  if (!bucket) throw new Error(`Bucket "${BUCKET_NAME}" not found`);
+
+  return {
+    authToken: authData.authorizationToken,
+    apiUrl: authData.apiUrl,
+    downloadUrl: authData.downloadUrl,
+    bucketId: bucket.bucketId
+  };
+}
+
+export default {
+  async fetch(request) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+
+    if (method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    try {
+      const ctx = await getB2Context();
+
+      // --- 1. LIST FILES ---
+      if (method === "GET" && path === "/list") {
+        const prefix = url.searchParams.get("prefix") || "";
+        const listUrl = `${ctx.apiUrl}/b2api/v2/b2_list_file_names`;
+        const listBody = JSON.stringify({
+          bucketId: ctx.bucketId,
+          prefix: prefix,
+          maxFileCount: 500
+        });
+        const listRes = await fetch(listUrl, {
+          method: "POST",
+          headers: {
+            Authorization: ctx.authToken,
+            "Content-Type": "application/json"
+          },
+          body: listBody
+        });
+        const listData = await listRes.json();
+        const files = (listData.files || []).map(f => f.fileName);
+        return new Response(JSON.stringify(files), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+
+      // --- 2. GENERATE DOWNLOAD TOKEN ---
+      if (method === "GET" && path === "/generate-token") {
+        let filePath = url.searchParams.get("path");
+        if (!filePath) return new Response("Missing path", { status: 400, headers: corsHeaders });
+
+        filePath = filePath.replace(/^\/+/, '');
+        const expires = Math.floor(Date.now() / 1000) + 300; // 5 min
+        const token = btoa(SECRET_KEY + "/" + filePath + expires).substring(0, 16);
+        const signedUrl = `${url.origin}/${filePath}?token=${token}&expires=${expires}`;
+
+        return new Response(JSON.stringify({ url: signedUrl, expires }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+
+      // --- 3. SECURITY CHECK (For Originals Only) ---
+      if (method === "GET" && path.includes("/original/")) {
+        const token = url.searchParams.get("token");
+        const expires = parseInt(url.searchParams.get("expires"));
+        const now = Math.floor(Date.now() / 1000);
+
+        if (!token || !expires || now > expires) {
+          return new Response("Link Expired or Invalid!", { status: 403, headers: corsHeaders });
+        }
+
+        const cleanPath = path.replace(/^\/+/, '');
+        const expectedToken = btoa(SECRET_KEY + "/" + cleanPath + expires).substring(0, 16);
+
+        if (token !== expectedToken) {
+          return new Response("Unauthorized Access!", { status: 401, headers: corsHeaders });
+        }
+      }
+
+      // --- 4. UPLOAD (PUT) ---
+      if (method === "PUT") {
+        const uploadUrlRes = await fetch(`${ctx.apiUrl}/b2api/v2/b2_get_upload_url`, {
+          method: "POST",
+          headers: { Authorization: ctx.authToken },
+          body: JSON.stringify({ bucketId: ctx.bucketId })
+        });
+        const uploadUrlData = await uploadUrlRes.json();
+        
+        const b2Response = await fetch(uploadUrlData.uploadUrl, {
+          method: "POST",
+          headers: {
+            Authorization: uploadUrlData.authorizationToken,
+            "X-Bz-File-Name": encodeURIComponent(path.replace(/^\/+/, '')),
+            "Content-Type": "b2/x-auto",
+            "X-Bz-Content-Sha1": "do_not_verify"
+          },
+          body: request.body
+        });
+        return new Response("Uploaded", { status: 200, headers: corsHeaders });
+      }
+
+      // --- 5. DELETE FILE ---
+      if (method === "DELETE") {
+        const fileName = path.replace(/^\/+/, '');
+        // ফাইলের সব ভার্সন পেতে প্রথমে লিস্ট করতে হয় (B2 এর নিয়ম)
+        const listUrl = `${ctx.apiUrl}/b2api/v2/b2_list_file_versions`;
+        const listRes = await fetch(listUrl, {
+          method: "POST",
+          headers: { Authorization: ctx.authToken, "Content-Type": "application/json" },
+          body: JSON.stringify({ bucketId: ctx.bucketId, fileName: fileName })
+        });
+        const listData = await listRes.json();
+        const fileVersion = listData.files[0];
+
+        if (fileVersion) {
+          await fetch(`${ctx.apiUrl}/b2api/v2/b2_delete_file_version`, {
+            method: "POST",
+            headers: { Authorization: ctx.authToken, "Content-Type": "application/json" },
+            body: JSON.stringify({ fileName: fileVersion.fileName, fileId: fileVersion.fileId })
+          });
+          return new Response("Deleted", { status: 200, headers: corsHeaders });
+        }
+        return new Response("File not found", { status: 404, headers: corsHeaders });
+      }
+
+      // --- 6. DEFAULT FILE FETCH & DOWNLOAD ---
+      const fileUrl = `${ctx.downloadUrl}/file/${BUCKET_NAME}${path}`;
+      const fileRes = await fetch(fileUrl, {
+        headers: { Authorization: ctx.authToken }
+      });
+
+      const response = new Response(fileRes.body, fileRes);
+      
+      // যদি টোকেন থাকে (মানে ডাউনলোড রিকোয়েস্ট), তবে ফোর্স ডাউনলোড করাও
+      if (url.searchParams.has("token")) {
+        const fileName = path.split('/').pop();
+        response.headers.set("Content-Disposition", `attachment; filename="${fileName}"`);
+      }
+
+      Object.keys(corsHeaders).forEach(key => response.headers.set(key, corsHeaders[key]));
+      return response;
+
+    } catch (err) {
+      return new Response("Worker Error: " + err.message, { status: 500, headers: corsHeaders });
+    }
+  }
+};
