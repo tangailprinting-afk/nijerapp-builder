@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.sfsfd.app"
+        applicationId = "com.sdfsdfsdfs.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
