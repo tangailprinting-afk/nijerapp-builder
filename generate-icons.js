@@ -101,6 +101,8 @@ item.folder +
 
   // FOREGROUND ICON
 
+  // FOREGROUND ICON
+
   const foregroundOutput =
     await sharp(buffer)
 
@@ -109,6 +111,16 @@ item.folder +
     .png()
 
     .toBuffer();
+
+  fs.mkdirSync(
+
+"android-template/WebAppEngine/app/src/main/res/drawable",
+
+  {
+    recursive:true
+  }
+
+  );
 
   fs.writeFileSync(
 
