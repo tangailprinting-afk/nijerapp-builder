@@ -1,1 +1,239 @@
-com.yyyyyy.app
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বাকি-হিসাব PRO – সম্পূর্ণ ড্যাশবোর্ড</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- ========================= লোডিং ওভারলে ========================= -->
+    <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
+
+    <!-- ========================= হেডার ========================= -->
+    <header>
+        <div class="header-top">
+            <div class="logo">
+                <i class="fas fa-store-alt"></i>
+                <span>তিন ভাই টেলিকম <strong>ইউসুফ</strong></span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="calcToggleBtn" title="ক্যালকুলেটর"><i class="fas fa-calculator"></i></button>
+                <button class="icon-btn" id="searchToggleBtn" title="সার্চ"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div id="searchBar" class="search-bar-header hidden">
+            <i class="fas fa-search"></i>
+            <input type="text" id="globalSearchInput" placeholder="কাস্টমার / মেমো খুঁজুন...">
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><i class="fas fa-coins"></i><span>মোট বিক্রি</span><strong id="totalSales">০</strong></div>
+            <div class="stat-card warning"><i class="fas fa-hand-holding-usd"></i><span>মোট বাকি</span><strong id="totalDue">০</strong></div>
+        </div>
+    </header>
+
+    <!-- ========================= নিচের ন্যাভিগেশন ========================= -->
+    <nav class="bottom-nav">
+        <button id="btn-home" class="active-tab" data-section="home-sec"><i class="fas fa-home"></i><span>হোম</span></button>
+        <button id="btn-customer" data-section="customer-sec"><i class="fas fa-user-plus"></i><span>কাস্টমার</span></button>
+        <button id="btn-product" data-section="product-sec"><i class="fas fa-box"></i><span>পণ্য</span></button>
+        <button id="btn-memo" data-section="memo-sec"><i class="fas fa-receipt"></i><span>মেমো</span></button>
+    </nav>
+
+    <!-- ========================= মূল কন্টেন্ট ========================= -->
+    <main id="app">
+
+        <!-- ===== ১. হোম / ড্যাশবোর্ড ===== -->
+        <section id="home-sec">
+            <div class="section-header">
+                <h3><i class="fas fa-chart-pie"></i> ড্যাশবোর্ড</h3>
+                <div class="filter-chips">
+                    <span class="chip active" data-filter="all">সব</span>
+                    <span class="chip" data-filter="due">বাকি পাওনা</span>
+                    <span class="chip" data-filter="today">আজকের</span>
+                </div>
+            </div>
+            <div class="card-list">
+                <h4><i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> বাকি পাওনা কাস্টমার</h4>
+                <div id="dueCustomerList" class="horizontal-scroll"></div>
+            </div>
+            <div class="card-list">
+                <h4><i class="fas fa-user-plus"></i> নতুন কাস্টমার</h4>
+                <div id="newCustomerList" class="horizontal-scroll"></div>
+            </div>
+            <div class="card-list">
+                <h4><i class="fas fa-history"></i> সাম্প্রতিক মেমো</h4>
+                <div id="recentMemos" class="list-container"></div>
+            </div>
+        </section>
+
+        <!-- ===== ২. কাস্টমার ব্যবস্থাপনা ===== -->
+        <section id="customer-sec" style="display:none;">
+            <h3 id="customerFormTitle">নতুন কাস্টমার</h3>
+            <div class="form-group">
+                <input type="text" id="custName" placeholder="নাম *" required>
+                <input type="tel" id="custMobile" placeholder="মোবাইল নম্বর *" required>
+                <input type="text" id="custAddress" placeholder="ঠিকানা (ঐচ্ছিক)">
+                <label class="file-label"><i class="fas fa-camera"></i> ছবি (ঐচ্ছিক)<input type="file" id="custImg" accept="image/*"></label>
+                <img id="cPre" class="preview-img" src="" alt="প্রিভিউ" style="display:none;">
+                <input type="hidden" id="custEditId">
+                <button class="btn-primary" id="saveCustomerBtn"><i class="fas fa-save"></i> সংরক্ষণ</button>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchCust" placeholder="নাম বা মোবাইল খুঁজুন...">
+            </div>
+            <div id="customerList" class="list-container"></div>
+        </section>
+
+        <!-- ===== ৩. পণ্য ব্যবস্থাপনা ===== -->
+        <section id="product-sec" style="display:none;">
+            <h3 id="productFormTitle">নতুন পণ্য</h3>
+            <div class="form-group">
+                <input type="text" id="prodName" placeholder="পণ্যের নাম *" required>
+                <input type="text" id="prodDesc" placeholder="বিবরণ (ঐচ্ছিক)">
+                <input type="number" id="prodPrice" placeholder="একক মূল্য (ঐচ্ছিক)" step="0.01">
+                <input type="number" id="prodStock" placeholder="স্টক সংখ্যা (ঐচ্ছিক)">
+                <label class="file-label"><i class="fas fa-camera"></i> ছবি (ঐচ্ছিক)<input type="file" id="prodImg" accept="image/*"></label>
+                <img id="pPre" class="preview-img" src="" alt="প্রিভিউ" style="display:none;">
+                <input type="hidden" id="prodEditId">
+                <button class="btn-primary" id="saveProductBtn"><i class="fas fa-save"></i> সংরক্ষণ</button>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchProd" placeholder="পণ্য খুঁজুন...">
+            </div>
+            <div id="productList" class="list-container"></div>
+        </section>
+
+        <!-- ===== ৪. মেমো / বিক্রয় তৈরি ===== -->
+        <section id="memo-sec" style="display:none;">
+            <h3>বিক্রয় মেমো তৈরি</h3>
+            <div class="form-group">
+                <select id="selectCustomer"><option value="">কাস্টমার সিলেক্ট করুন</option></select>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <span>পণ্য / সেবা</span>
+                        <span>পরিমাণ</span>
+                        <span>একক মূল্য</span>
+                        <span>সর্বমোট</span>
+                        <span></span>
+                    </div>
+                    <div id="productRows">
+                        <!-- ডায়নামিক রো -->
+                    </div>
+                </div>
+                <!-- পণ্যের জন্য ডাটালিস্ট (একবারই) -->
+                <datalist id="productDataList"></datalist>
+                
+                <button class="btn-outline" id="addProductRowBtn">
+                    <i class="fas fa-plus-circle"></i> পণ্য যোগ করুন
+                </button>
+
+                <div class="summary">
+                    <div><span>সাবটোটাল:</span> <strong id="subtotalDisplay">০</strong> টাকা</div>
+                    <div class="discount-row">
+                        <label>ডিসকাউন্ট:</label>
+                        <input type="number" id="discountInput" value="0" placeholder="0">
+                    </div>
+                    <div><span>মোট:</span> <strong id="totalDisplay">০</strong> টাকা</div>
+                    <div class="paid-row">
+                        <label>জমা:</label>
+                        <input type="number" id="paidAmount" value="0" placeholder="0">
+                    </div>
+                    <div class="due-display">
+                        বাকি: <span id="liveDue">০</span> টাকা
+                    </div>
+                </div>
+                <button class="btn-accent" id="createMemoBtn">
+                    <i class="fas fa-save"></i> মেমো সংরক্ষণ করুন
+                </button>
+            </div>
+        </section>
+
+        <!-- ===== ৫. কাস্টমার বিস্তারিত পেজ ===== -->
+        <section id="customer-detail-sec" style="display:none;">
+            <button class="back-btn" id="customerDetailBackBtn"><i class="fas fa-arrow-left"></i> কাস্টমার তালিকায় ফিরুন</button>
+            <div class="detail-header">
+                <img id="custDetailImg" class="detail-avatar" src="https://via.placeholder.com/150" alt="কাস্টমার ছবি">
+                <div>
+                    <h3 id="custDetailName">নাম</h3>
+                    <p id="custDetailMobile">মোবাইল</p>
+                    <p id="custDetailAddress">ঠিকানা</p>
+                </div>
+            </div>
+            <div class="detail-stats">
+                <span>মোট ক্রয়: <strong id="custTotalBuy">০</strong> টাকা</span>
+                <span>বাকি: <strong id="custTotalDue" class="text-danger">০</strong> টাকা</span>
+                <button class="btn-primary" id="payAllDueBtn"><i class="fas fa-check-circle"></i> সমস্ত বাকি পরিশোধ</button>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-calendar-alt"></i>
+                <input type="date" id="detailFromDate">
+                <span style="margin:0 8px;">থেকে</span>
+                <input type="date" id="detailToDate">
+            </div>
+            <div id="customerMemosList" class="list-container"></div>
+        </section>
+
+        <!-- ===== ৬. পণ্য বিস্তারিত পেজ ===== -->
+        <section id="product-detail-sec" style="display:none;">
+            <button class="back-btn" id="productDetailBackBtn"><i class="fas fa-arrow-left"></i> পণ্য তালিকায় ফিরুন</button>
+            <div class="detail-header">
+                <img id="prodDetailImg" class="detail-avatar" src="https://via.placeholder.com/150" alt="পণ্য ছবি">
+                <div>
+                    <h3 id="prodDetailName">পণ্যের নাম</h3>
+                    <p id="prodDetailDesc">বিবরণ</p>
+                    <p>মূল্য: <strong id="prodDetailPrice">-</strong> | স্টক: <strong id="prodDetailStock">0</strong></p>
+                </div>
+            </div>
+            <button class="btn-primary" id="editProdFromDetailBtn"><i class="fas fa-edit"></i> সম্পাদনা করুন</button>
+        </section>
+
+    </main>
+
+    <!-- ========================= পেমেন্ট মোডাল ========================= -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-money-bill-wave"></i> বাকি পরিশোধ</h3>
+            <div id="paymentMemoInfo"></div>
+            <input type="number" id="paymentAmount" placeholder="পরিশোধের পরিমাণ" step="0.01">
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-accent" id="submitPaymentBtn" style="flex:1;">জমা দিন</button>
+                <button class="btn-secondary" id="closePaymentModalBtn" style="flex:1;">বাতিল</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================= মেমো বিস্তারিত মোডাল (ভিউ & প্রিন্ট) ========================= -->
+    <div id="memoDetailModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-file-invoice"></i> মেমো বিস্তারিত</h3>
+            <div id="memoDetailContent"></div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-accent" id="printMemoBtn" style="flex:1;"><i class="fas fa-print"></i> প্রিন্ট</button>
+                <button class="btn-secondary" id="closeMemoDetailBtn" style="flex:1;">বন্ধ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================= ক্যালকুলেটর মোডাল ========================= -->
+    <div id="calcModal" class="modal">
+        <div class="modal-content calc-body">
+            <h3><i class="fas fa-calculator"></i> ক্যালকুলেটর</h3>
+            <input type="text" id="calcScreen" readonly placeholder="0">
+            <div class="calc-buttons" id="calcButtons"></div>
+            <button class="btn-secondary" id="closeCalcBtn">বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <!-- ========================= টোস্ট নোটিফিকেশন ========================= -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ========================= স্ক্রিপ্ট ========================= -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
