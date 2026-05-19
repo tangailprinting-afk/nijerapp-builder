@@ -1,1 +1,470 @@
-com.vercel.app
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>NijerApp Full Test</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
+}
+
+body{
+
+  background:#0f172a;
+  color:white;
+  padding:20px;
+
+}
+
+.container{
+
+  max-width:700px;
+  margin:auto;
+
+}
+
+.card{
+
+  background:#1e293b;
+  padding:20px;
+  border-radius:16px;
+  margin-bottom:20px;
+
+}
+
+h1{
+
+  margin-bottom:20px;
+  text-align:center;
+
+}
+
+button{
+
+  border:none;
+  padding:14px;
+  border-radius:10px;
+  cursor:pointer;
+  margin-top:10px;
+  width:100%;
+  font-size:16px;
+  font-weight:bold;
+
+}
+
+.primary{
+
+  background:#2563eb;
+  color:white;
+
+}
+
+.danger{
+
+  background:#dc2626;
+  color:white;
+
+}
+
+.success{
+
+  background:#16a34a;
+  color:white;
+
+}
+
+input{
+
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  margin-top:10px;
+
+}
+
+textarea{
+
+  width:100%;
+  height:120px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  padding:12px;
+
+}
+
+img{
+
+  width:100%;
+  border-radius:12px;
+  margin-top:10px;
+
+}
+
+.status{
+
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:#334155;
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>
+🚀 NijerApp Full Feature Test
+</h1>
+
+<div class="card">
+
+<h2>📦 Local Storage Test</h2>
+
+<input
+  id="storageInput"
+  placeholder="Write something..."
+/>
+
+<button
+  class="primary"
+  onclick="saveData()"
+>
+Save Data
+</button>
+
+<button
+  class="danger"
+  onclick="clearData()"
+>
+Clear Data
+</button>
+
+<div
+  class="status"
+  id="storageStatus"
+></div>
+
+</div>
+
+<div class="card">
+
+<h2>📶 Internet Status</h2>
+
+<div
+  class="status"
+  id="internetStatus"
+>
+Checking...
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📷 Camera Test</h2>
+
+<input
+  type="file"
+  accept="image/*"
+  capture="environment"
+  id="cameraInput"
+/>
+
+<img
+  id="preview"
+/>
+
+</div>
+
+<div class="card">
+
+<h2>🔔 Notification Test</h2>
+
+<button
+  class="success"
+  onclick="showNotification()"
+>
+Show Notification
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>📳 Vibration Test</h2>
+
+<button
+  class="primary"
+  onclick="vibratePhone()"
+>
+Vibrate Phone
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>📁 File System Test</h2>
+
+<textarea
+  id="fileText"
+  placeholder="Write file content..."
+></textarea>
+
+<button
+  class="success"
+  onclick="downloadTextFile()"
+>
+Download Text File
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>🕒 Persistent Data Test</h2>
+
+<div
+  class="status"
+  id="persistentData"
+></div>
+
+</div>
+
+</div>
+
+<script>
+
+// LOCAL STORAGE
+
+function loadData(){
+
+  const data =
+    localStorage.getItem(
+      "nijerapp_test"
+    );
+
+  if(data){
+
+    document.getElementById(
+      "persistentData"
+    ).innerHTML =
+
+      "Saved Data: " + data;
+
+  }
+
+}
+
+function saveData(){
+
+  const value =
+    document.getElementById(
+      "storageInput"
+    ).value;
+
+  localStorage.setItem(
+    "nijerapp_test",
+    value
+  );
+
+  document.getElementById(
+    "storageStatus"
+  ).innerHTML =
+
+    "✅ Data Saved";
+
+  loadData();
+
+}
+
+function clearData(){
+
+  localStorage.removeItem(
+    "nijerapp_test"
+  );
+
+  document.getElementById(
+    "storageStatus"
+  ).innerHTML =
+
+    "❌ Data Cleared";
+
+  document.getElementById(
+    "persistentData"
+  ).innerHTML = "";
+
+}
+
+loadData();
+
+// INTERNET STATUS
+
+function updateInternetStatus(){
+
+  const status =
+    navigator.onLine
+    ? "🟢 Online"
+    : "🔴 Offline";
+
+  document.getElementById(
+    "internetStatus"
+  ).innerHTML = status;
+
+}
+
+window.addEventListener(
+  "online",
+  updateInternetStatus
+);
+
+window.addEventListener(
+  "offline",
+  updateInternetStatus
+);
+
+updateInternetStatus();
+
+// CAMERA PREVIEW
+
+document
+.getElementById("cameraInput")
+.addEventListener(
+  "change",
+  function(e){
+
+    const file =
+      e.target.files[0];
+
+    if(file){
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        function(event){
+
+          document.getElementById(
+            "preview"
+          ).src =
+            event.target.result;
+
+        };
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+
+  }
+);
+
+// NOTIFICATION
+
+async function showNotification(){
+
+  if(
+    "Notification"
+    in window
+  ){
+
+    const permission =
+      await Notification.requestPermission();
+
+    if(
+      permission === "granted"
+    ){
+
+      new Notification(
+
+        "🚀 NijerApp Test",
+
+        {
+          body:
+"Notification Working Successfully"
+        }
+
+      );
+
+    }
+
+  }
+
+}
+
+// VIBRATION
+
+function vibratePhone(){
+
+  if(
+    navigator.vibrate
+  ){
+
+    navigator.vibrate(
+      [300,100,300]
+    );
+
+    alert(
+      "📳 Vibrating..."
+    );
+
+  }else{
+
+    alert(
+      "Vibration Not Supported"
+    );
+
+  }
+
+}
+
+// FILE DOWNLOAD
+
+function downloadTextFile(){
+
+  const text =
+    document.getElementById(
+      "fileText"
+    ).value;
+
+  const blob =
+    new Blob(
+      [text],
+      {
+        type:"text/plain"
+      }
+    );
+
+  const a =
+    document.createElement("a");
+
+  a.href =
+    URL.createObjectURL(blob);
+
+  a.download =
+    "nijerapp-test.txt";
+
+  a.click();
+
+}
+
+</script>
+
+</body>
+</html>
