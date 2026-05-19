@@ -136,6 +136,8 @@ export async function POST(
 
     // UPDATE ICON
 
+    // SAVE ICON BASE64
+
     if(icon){
 
       const iconBuffer =
@@ -143,90 +145,20 @@ export async function POST(
           await icon.arrayBuffer()
         );
 
-      const iconSizes = [
-
-        {
-          size:48,
-          folder:"mipmap-mdpi"
-        },
-
-        {
-          size:72,
-          folder:"mipmap-hdpi"
-        },
-
-        {
-          size:96,
-          folder:"mipmap-xhdpi"
-        },
-
-        {
-          size:144,
-          folder:"mipmap-xxhdpi"
-        },
-
-        {
-          size:192,
-          folder:"mipmap-xxxhdpi"
-        }
-
-      ];
-
-      for(
-        const item
-        of iconSizes
-      ){
-
-        await deleteGitHubFile(
-
-`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher.png`
-
+      const base64 =
+        iconBuffer.toString(
+          "base64"
         );
 
-        await deleteGitHubFile(
+      await updateGitHubFile(
 
-`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher_round.png`
+"android-template/WebAppEngine/icon.txt",
 
-        );
+        base64,
 
-        const resizedIcon =
-          await sharp(iconBuffer)
+        "updated icon"
 
-            .resize(
-              item.size,
-              item.size
-            )
-
-            .png()
-
-            .toBuffer();
-
-        const base64 =
-          resizedIcon.toString(
-            "base64"
-          );
-
-        await uploadBinaryFile(
-
-`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher.png`,
-
-          base64,
-
-          "updated icon"
-
-        );
-
-        await uploadBinaryFile(
-
-`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher_round.png`,
-
-          base64,
-
-          "updated round icon"
-
-        );
-
-      }
+      );
 
     }
 
