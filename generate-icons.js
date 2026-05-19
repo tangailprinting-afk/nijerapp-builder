@@ -99,6 +99,29 @@ item.folder +
 
   }
 
+  // FOREGROUND ICON
+
+  const foregroundOutput =
+    await sharp(buffer)
+
+    .resize(512,512)
+
+    .png()
+
+    .toBuffer();
+
+  fs.writeFileSync(
+
+"android-template/WebAppEngine/app/src/main/res/drawable/ic_launcher_foreground.png",
+
+    foregroundOutput
+
+  );
+
+  console.log(
+    "Generated foreground icon"
+  );
+
 }
 
 run();
