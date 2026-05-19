@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.habibali.app"
+        applicationId = "test.newapp.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
