@@ -60,37 +60,41 @@ extends AppCompatActivity {
 
         // SAFE AREA SUPPORT
 
-        ViewCompat.setOnApplyWindowInsetsListener(
+   
 
-            findViewById(android.R.id.content),
+ViewCompat.setOnApplyWindowInsetsListener(
 
-            (view, windowInsets) -> {
+    webView,
 
-                Insets insets =
+    (view, windowInsets) -> {
 
-                    windowInsets.getInsets(
+        Insets insets =
 
-                        WindowInsetsCompat.Type.systemBars()
+            windowInsets.getInsets(
 
-                    );
+                WindowInsetsCompat.Type.systemBars()
 
-                view.setPadding(
+            );
 
-                    0,
+        view.setPadding(
 
-                    insets.top,
+            0,
 
-                    0,
+            insets.top,
 
-                    insets.bottom
+            0,
 
-                );
-
-                return windowInsets;
-
-            }
+            insets.bottom
 
         );
+
+        return windowInsets;
+
+    }
+
+);
+
+
 
         webView =
             findViewById(
