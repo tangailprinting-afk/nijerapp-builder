@@ -11,6 +11,7 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
 
 public class MainActivity
 extends AppCompatActivity {
@@ -23,14 +24,29 @@ extends AppCompatActivity {
         Bundle savedInstanceState
     ) {
 
-        super.onCreate(savedInstanceState);
+        super.onCreate(
+            savedInstanceState
+        );
+
+        // SAFE AREA FIX
+
+        WindowCompat.setDecorFitsSystemWindows(
+            getWindow(),
+            true
+        );
 
         if (
+
             ContextCompat.checkSelfPermission(
+
                 this,
+
                 Manifest.permission.POST_NOTIFICATIONS
+
             )
+
             != PackageManager.PERMISSION_GRANTED
+
         ) {
 
             ActivityCompat.requestPermissions(
@@ -38,13 +54,14 @@ extends AppCompatActivity {
                 this,
 
                 new String[]{
+
                     Manifest.permission.POST_NOTIFICATIONS
+
                 },
 
                 1
 
             );
-
         }
 
         setContentView(
@@ -60,11 +77,13 @@ extends AppCompatActivity {
             webView.getSettings();
 
         // Enable JavaScript
+
         webSettings.setJavaScriptEnabled(
             true
         );
 
         // Enable Storage
+
         webSettings.setDomStorageEnabled(
             true
         );
@@ -74,6 +93,7 @@ extends AppCompatActivity {
         );
 
         // File Access
+
         webSettings.setAllowFileAccess(
             true
         );
@@ -82,12 +102,22 @@ extends AppCompatActivity {
             true
         );
 
+        webSettings.setAllowFileAccessFromFileURLs(
+            true
+        );
+
+        webSettings.setAllowUniversalAccessFromFileURLs(
+            true
+        );
+
         // Offline Cache
+
         webSettings.setCacheMode(
             WebSettings.LOAD_DEFAULT
         );
 
         // Responsive
+
         webSettings.setLoadWithOverviewMode(
             true
         );
@@ -97,39 +127,50 @@ extends AppCompatActivity {
         );
 
         // Mixed Content
+
         webSettings.setMixedContentMode(
 
-WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
         );
 
+        // Scroll Bars
+
+        webView.setVerticalScrollBarEnabled(
+            false
+        );
+
+        webView.setHorizontalScrollBarEnabled(
+            false
+        );
+
         // Keep inside app
+
         webView.setWebViewClient(
             new WebViewClient()
         );
 
         // Load Local HTML
+
         webView.loadUrl(
 
-"file:///android_asset/www/index.html"
+            "file:///android_asset/www/index.html"
 
         );
-
     }
 
     @Override
     public void onBackPressed() {
 
-        if(webView.canGoBack()){
+        if (
+            webView.canGoBack()
+        ) {
 
             webView.goBack();
 
-        }else{
+        } else {
 
             super.onBackPressed();
-
         }
-
     }
-
 }
