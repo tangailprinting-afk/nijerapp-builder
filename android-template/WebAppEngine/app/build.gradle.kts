@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "test.tangail.app"
+        applicationId = "com.yyyyyyyyy.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
