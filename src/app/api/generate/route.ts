@@ -132,87 +132,28 @@ export async function POST(
 
     }
 
-    // UPDATE ICON
+
+     // UPDATE ICON
 
     if(icon){
 
-      const iconBuffer =
+      const bytes =
+        await icon.arrayBuffer();
+
+      const base64 =
         Buffer.from(
-          await icon.arrayBuffer()
-        );
+          bytes
+        ).toString("base64");
 
-      const iconSizes = [
+      await uploadBinaryFile(
 
-        {
-          size:48,
-          folder:"mipmap-mdpi"
-        },
+        "assets/icon.png",
 
-        {
-          size:72,
-          folder:"mipmap-hdpi"
-        },
+        base64,
 
-        {
-          size:96,
-          folder:"mipmap-xhdpi"
-        },
+        "updated icon"
 
-        {
-          size:144,
-          folder:"mipmap-xxhdpi"
-        },
-
-        {
-          size:192,
-          folder:"mipmap-xxxhdpi"
-        }
-
-      ];
-
-      for(
-        const item
-        of iconSizes
-      ){
-
-        const resizedIcon =
-          await sharp(iconBuffer)
-
-            .resize(
-              item.size,
-              item.size
-            )
-
-            .png()
-
-            .toBuffer();
-
-        const base64 =
-          resizedIcon.toString(
-            "base64"
-          );
-
-        await uploadBinaryFile(
-
-`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher.png`,
-
-          base64,
-
-          "updated icon"
-
-        );
-
-        await uploadBinaryFile(
-
-`android-template/WebAppEngine/app/src/main/res/${item.folder}/ic_launcher_round.png`,
-
-          base64,
-
-          "updated round icon"
-
-        );
-
-      }
+      );
 
     }
 
