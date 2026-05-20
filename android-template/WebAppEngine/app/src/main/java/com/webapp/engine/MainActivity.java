@@ -1,6 +1,5 @@
 package com.webapp.engine;
-import android.view.Window;
-import android.view.WindowInsetsController;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
@@ -15,11 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import androidx.core.graphics.Insets;
-
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 public class MainActivity
 extends AppCompatActivity {
 
@@ -32,20 +26,6 @@ extends AppCompatActivity {
     ) {
 
         super.onCreate(savedInstanceState);
-
-Window window = getWindow();
-
-if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-
-    window.getInsetsController().setSystemBarsAppearance(
-
-        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-
-        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-
-    );
-
-}
 
         // NOTIFICATION PERMISSION
 
@@ -92,52 +72,18 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
                 R.id.webView
             );
 
-        // SAFE AREA SUPPORT
-
-        ViewCompat.setOnApplyWindowInsetsListener(
-
-            webView,
-
-            (view, windowInsets) -> {
-
-                Insets insets =
-
-                    windowInsets.getInsets(
-
-                        WindowInsetsCompat.Type.systemBars()
-
-                    );
-
-                view.setPadding(
-
-                    0,
-
-                    insets.top,
-
-                    0,
-
-                    insets.bottom
-
-                );
-
-                return windowInsets;
-
-            }
-
-        );
-
         // WEB SETTINGS
 
         WebSettings webSettings =
             webView.getSettings();
 
-        // Enable JavaScript
+        // JAVASCRIPT
 
         webSettings.setJavaScriptEnabled(
             true
         );
 
-        // Enable Storage
+        // STORAGE
 
         webSettings.setDomStorageEnabled(
             true
@@ -147,7 +93,7 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             true
         );
 
-        // File Access
+        // FILE ACCESS
 
         webSettings.setAllowFileAccess(
             true
@@ -157,13 +103,13 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             true
         );
 
-        // Offline Cache
+        // CACHE
 
         webSettings.setCacheMode(
             WebSettings.LOAD_DEFAULT
         );
 
-        // Responsive
+        // RESPONSIVE
 
         webSettings.setLoadWithOverviewMode(
             true
@@ -173,7 +119,7 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             true
         );
 
-        // Mixed Content
+        // MIXED CONTENT
 
         webSettings.setMixedContentMode(
 
@@ -181,7 +127,7 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
 
         );
 
-        // Better Mobile Experience
+        // ZOOM
 
         webSettings.setBuiltInZoomControls(
             false
@@ -195,13 +141,29 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             false
         );
 
-        // Keep Inside App
+        // KEEP INSIDE APP
 
         webView.setWebViewClient(
             new WebViewClient()
         );
 
-        // LOAD LOCAL HTML
+        // SAFE TOP + BOTTOM SPACE
+
+        webView.setPadding(
+
+            0,
+
+            getStatusBarHeight(),
+
+            0,
+
+            getNavigationBarHeight()
+
+        );
+
+        webView.setClipToPadding(false);
+
+        // LOAD APP
 
         webView.loadUrl(
 
@@ -211,18 +173,78 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
 
     }
 
+    // STATUS BAR HEIGHT
+
+    private int getStatusBarHeight() {
+
+        int result = 0;
+
+        int resourceId =
+            getResources().getIdentifier(
+
+                "status_bar_height",
+
+                "dimen",
+
+                "android"
+
+            );
+
+        if (resourceId > 0) {
+
+            result =
+                getResources().getDimensionPixelSize(
+                    resourceId
+                );
+
+        }
+
+        return result;
+
+    }
+
+    // NAVIGATION BAR HEIGHT
+
+    private int getNavigationBarHeight() {
+
+        int result = 0;
+
+        int resourceId =
+            getResources().getIdentifier(
+
+                "navigation_bar_height",
+
+                "dimen",
+
+                "android"
+
+            );
+
+        if (resourceId > 0) {
+
+            result =
+                getResources().getDimensionPixelSize(
+                    resourceId
+                );
+
+        }
+
+        return result;
+
+    }
+
     @Override
     public void onBackPressed() {
 
-        if(
+        if (
 
             webView.canGoBack()
 
-        ){
+        ) {
 
             webView.goBack();
 
-        }else{
+        } else {
 
             super.onBackPressed();
 
