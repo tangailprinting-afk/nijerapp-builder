@@ -1,426 +1,699 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Naim's Ultra Swipe Gallery</title>
+    <title> Scientific</title>
     <style>
         :root {
-            --primary: #3b82f6;
-            --surface: #0f172a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-            --text: #f8fafc;
+            /* Default Dark Theme Variables */
+            --bg-color: #0f172a;
+            --calc-bg: #1e293b;
+            --display-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #3b82f6;
+            --btn-num: #334155;
+            --btn-op: #475569;
+            --btn-sci: #1e293b;
+            --btn-equal: #2563eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --ripple: rgba(255, 255, 255, 0.2);
+            --radius: 16px;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --calc-bg: #ffffff;
+            --display-bg: #f8fafc;
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+            --accent: #2563eb;
+            --btn-num: #f1f5f9;
+            --btn-op: #e2e8f0;
+            --btn-sci: #f8fafc;
+            --btn-equal: #2563eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --ripple: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="amoled"] {
+            --bg-color: #000000;
+            --calc-bg: #000000;
+            --display-bg: #000000;
+            --text-main: #ffffff;
+            --text-dim: #888888;
+            --accent: #3b82f6;
+            --btn-num: #111111;
+            --btn-op: #222222;
+            --btn-sci: #0a0a0a;
+            --btn-equal: #2563eb;
+            --shadow: none;
+            --ripple: rgba(255, 255, 255, 0.3);
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        body {
-            background-color: var(--surface);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow-x: hidden;
             user-select: none;
         }
 
-        #welcomePopup {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: radial-gradient(circle at top right, #1e293b, #020617);
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
-        }
-
-        #welcomePopup.hidden { transform: translateY(-100%); }
-
-        .welcome-content { text-align: center; padding: 2rem; max-width: 400px; }
-
-        .welcome-logo {
-            width: 140px;
-            height: 140px;
-            border-radius: 40px;
-            object-fit: cover;
-            border: 4px solid var(--primary);
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
-            margin-bottom: 2rem;
-            animation: floating 3s ease-in-out infinite;
-        }
-
-        @keyframes floating {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-        }
-
-        .lyric {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 2.5rem;
-            line-height: 1.4;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .btn-start {
-            background: var(--primary);
-            color: white;
-            padding: 1.2rem 3rem;
-            border: none;
-            border-radius: 20px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-            transition: 0.3s;
-        }
-
-        .main-app { padding: 1rem; opacity: 0; transition: opacity 1s; }
-        .main-app.visible { opacity: 1; }
-
-        .header { padding: 2rem 1rem; text-align: center; }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .card {
-            aspect-ratio: 1;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            min-height: 100vh;
             overflow: hidden;
-            position: relative;
-            opacity: 0;
-            transition: transform 0.6s, opacity 0.6s;
+            transition: background-color 0.3s ease;
         }
 
-        .card.loaded { opacity: 1; }
-
-        .card img { width: 100%; height: 100%; object-fit: cover; }
-
-        #lightbox {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 10000;
-            display: none;
-            overflow: hidden;
-            touch-action: none;
-        }
-
-        #lightbox.active { display: flex; flex-direction: column; }
-
-        .lb-header {
-            position: absolute;
-            top: 20px;
+        .app-container {
             width: 100%;
-            padding: 0 20px;
+            max-width: 450px;
+            height: 100vh;
+            max-height: 900px;
+            background-color: var(--calc-bg);
             display: flex;
-            justify-content: flex-end;
-            z-index: 10002;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* Header Section */
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .header-tools {
+            display: flex;
+            gap: 15px;
         }
 
         .icon-btn {
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: var(--text-dim);
+            transition: color 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            margin-left: 10px;
         }
 
-        .lb-image-container {
+        .icon-btn:active { color: var(--accent); }
+
+        /* Display Section */
+        .display {
             flex: 1;
-            width: 100%;
+            background-color: var(--display-bg);
+            padding: 20px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
             overflow: hidden;
             position: relative;
         }
 
-        #lbImg {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            transition: transform 0.1s ease-out;
-            will-change: transform;
+        .history-preview {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow-x: auto;
+            width: 100%;
+            text-align: right;
+            scrollbar-width: none;
         }
 
-        .lb-footer {
-            position: absolute;
-            bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .current-input {
+            font-size: 3rem;
+            font-weight: 600;
+            word-wrap: break-word;
+            word-break: break-all;
+            max-height: 150px;
+            overflow-y: auto;
             width: 100%;
-            z-index: 10002;
+            text-align: right;
+            line-height: 1.1;
+            scrollbar-width: none;
+        }
+
+        .mode-indicator {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Keypad Section */
+        .keypad {
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            background-color: var(--calc-bg);
+        }
+
+        .scientific-drawer {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 0 10px 10px 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s;
+        }
+
+        .scientific-drawer.open {
+            max-height: 300px;
+            padding: 10px;
+        }
+
+        /* Buttons Styling */
+        .btn {
+            height: 65px;
+            border-radius: var(--radius);
+            border: none;
+            outline: none;
+            font-size: 1.3rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s, background-color 0.2s;
+            color: var(--text-main);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-num { background-color: var(--btn-num); }
+        .btn-op { background-color: var(--btn-op); color: var(--accent); font-weight: 600; }
+        .btn-sci { background-color: var(--btn-sci); font-size: 1rem; color: var(--text-dim); }
+        .btn-eq { background-color: var(--btn-equal); color: white; grid-column: span 1; }
+        .btn-ac { color: #ef4444; }
+
+        .btn-wide { grid-column: span 2; }
+
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            background: var(--ripple);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
             pointer-events: none;
         }
 
-        .counter {
-            background: rgba(255,255,255,0.1);
-            padding: 5px 15px;
-            border-radius: 20px;
+        @keyframes ripple-animation {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* History Drawer */
+        .history-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            background-color: var(--calc-bg);
+            border-radius: 24px 24px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
+        }
+
+        .history-panel.open { transform: translateY(0); }
+
+        .history-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--btn-sci);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 20px;
+        }
+
+        .history-item {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--btn-sci);
+            text-align: right;
+            cursor: pointer;
+        }
+
+        .history-item .h-expr { color: var(--text-dim); font-size: 0.9rem; }
+        .history-item .h-res { color: var(--accent); font-size: 1.2rem; font-weight: 600; margin-top: 4px; }
+
+        /* Toast Notifications */
+        .toast {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
             font-size: 0.9rem;
-            backdrop-filter: blur(10px);
-            pointer-events: auto;
+            transition: transform 0.3s;
+            z-index: 1000;
         }
 
-        .zoom-badge {
-            margin-top: 10px;
-            background: var(--primary);
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0;
-            transition: 0.3s;
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
 
-        .zoom-badge.visible { opacity: 1; }
-
-        /* SVG Icons */
-        .svg-icon { width: 24px; height: 24px; fill: currentColor; }
-
-        @media (max-width: 480px) {
-            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        /* SVG Icons defined as classes to avoid external calls */
+        .icon { width: 24px; height: 24px; fill: currentColor; }
+        
+        @media (min-width: 600px) {
+            .app-container {
+                height: 800px;
+                border-radius: 32px;
+            }
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
-    <div id="welcomePopup">
-        <div class="welcome-content">
-            <img src="image/logo.png" class="welcome-logo" alt="Logo" onerror="this.src='https://placehold.co/150/1e293b/white?text=♪'">
-            <div class="lyric">
-                "হৃদয় জুড়ে তুমি আছো,<br>স্বপ্ন হয়ে ভালোবাসো..."
-            </div>
-            <button class="btn-start" onclick="startApp()">Gallery দেখুন</button>
-        </div>
-    </div>
-
-    <div class="main-app" id="mainApp">
+    <div class="app-container">
         <header class="header">
-            <h1 style="font-size: 1.6rem;">Naim's Premium Gallery</h1>
-            <p style="color: #64748b; font-size: 0.8rem; margin-top: 5px;">সুইপ করুন অথবা জুম করুন</p>
+            <div class="header-title">Scientific</div>
+            <div class="header-tools">
+                <button class="icon-btn" id="theme-toggle" title="Switch Theme">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>
+                </button>
+                <button class="icon-btn" id="history-toggle" title="View History">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                </button>
+            </div>
         </header>
 
-        <div class="gallery-grid" id="grid">
-            <!-- Images generated by JS -->
+        <div class="display" id="main-display">
+            <div class="mode-indicator" id="mode-display">DEG</div>
+            <div class="history-preview" id="history-preview"></div>
+            <div class="current-input" id="result-display">0</div>
         </div>
-    </div>
 
-    <div id="lightbox">
-        <div class="lb-header">
-            <div class="icon-btn" onclick="resetZoom()" id="resetBtn" style="display: none;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+        <div class="scientific-drawer" id="sci-panel">
+            <button class="btn btn-sci" data-val="sin">sin</button>
+            <button class="btn btn-sci" data-val="cos">cos</button>
+            <button class="btn btn-sci" data-val="tan">tan</button>
+            <button class="btn btn-sci" data-val="asin">asin</button>
+            <button class="btn btn-sci" data-val="acos">acos</button>
+            <button class="btn btn-sci" data-val="log">log</button>
+            <button class="btn btn-sci" data-val="ln">ln</button>
+            <button class="btn btn-sci" data-val="sqrt">√</button>
+            <button class="btn btn-sci" data-val="abs">abs</button>
+            <button class="btn btn-sci" data-val="fact">n!</button>
+            <button class="btn btn-sci" data-val="pow">xʸ</button>
+            <button class="btn btn-sci" data-val="e">e</button>
+            <button class="btn btn-sci" data-val="pi">π</button>
+            <button class="btn btn-sci" data-val="(">(</button>
+            <button class="btn btn-sci" data-val=")">)</button>
+        </div>
+
+        <div class="keypad">
+            <button class="btn btn-sci" id="toggle-sci">2nd</button>
+            <button class="btn btn-sci" id="toggle-mode">DEG/RAD</button>
+            <button class="btn btn-sci" data-val="mem-c">MC</button>
+            <button class="btn btn-sci" data-val="mem-r">MR</button>
+
+            <button class="btn btn-op btn-ac" id="btn-clear">AC</button>
+            <button class="btn btn-op" data-val="delete">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/></svg>
+            </button>
+            <button class="btn btn-op" data-val="%">%</button>
+            <button class="btn btn-op" data-val="/">÷</button>
+
+            <button class="btn btn-num" data-val="7">7</button>
+            <button class="btn btn-num" data-val="8">8</button>
+            <button class="btn btn-num" data-val="9">9</button>
+            <button class="btn btn-op" data-val="*">×</button>
+
+            <button class="btn btn-num" data-val="4">4</button>
+            <button class="btn btn-num" data-val="5">5</button>
+            <button class="btn btn-num" data-val="6">6</button>
+            <button class="btn btn-op" data-val="-">−</button>
+
+            <button class="btn btn-num" data-val="1">1</button>
+            <button class="btn btn-num" data-val="2">2</button>
+            <button class="btn btn-num" data-val="3">3</button>
+            <button class="btn btn-op" data-val="+">+</button>
+
+            <button class="btn btn-num" data-val="0">0</button>
+            <button class="btn btn-num" data-val=".">.</button>
+            <button class="btn btn-num" id="copy-result" title="Copy">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </button>
+            <button class="btn btn-eq" id="btn-equals">=</button>
+        </div>
+
+        <div class="history-panel" id="history-panel">
+            <div class="history-header">
+                <span style="font-weight: bold;">History</span>
+                <button class="icon-btn" id="clear-history-btn" style="color: #ef4444; font-size: 0.8rem;">CLEAR ALL</button>
             </div>
-            <div class="icon-btn" onclick="closeLightbox()" style="color: #ff4757;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            <div class="history-list" id="history-list">
+                <!-- History items will be injected here -->
             </div>
         </div>
 
-        <div class="lb-image-container" id="zoomContainer">
-            <img src="" id="lbImg">
-        </div>
-
-        <div class="lb-footer">
-            <div class="counter" id="counter">1 / 23</div>
-            <div class="zoom-badge" id="zoomBadge">Zoom Active</div>
-        </div>
+        <div class="toast" id="toast">Copied to clipboard!</div>
     </div>
 
     <script>
-        const totalImages = 23;
-        const grid = document.getElementById('grid');
-        const mainApp = document.getElementById('mainApp');
-        const lightbox = document.getElementById('lightbox');
-        const lbImg = document.getElementById('lbImg');
-        const counter = document.getElementById('counter');
-        const zoomBadge = document.getElementById('zoomBadge');
-        const resetBtn = document.getElementById('resetBtn');
-        
-        let currentIndex = 1;
-        
-        // Zoom and Pan State
-        let scale = 1;
-        let lastScale = 1;
-        let initialDistance = null;
-        let isZoomed = false;
+        /* 
+         * Application State 
+         */
+        const state = {
+            expression: '',
+            lastResult: '0',
+            isCalculated: false,
+            angleMode: localStorage.getItem('calc-mode') || 'DEG',
+            theme: localStorage.getItem('calc-theme') || 'dark',
+            memory: parseFloat(localStorage.getItem('calc-memory')) || 0,
+            history: JSON.parse(localStorage.getItem('calc-history')) || []
+        };
 
-        // Swipe State
-        let touchStartX = 0;
-        let touchEndX = 0;
+        // DOM Elements
+        const displayEl = document.getElementById('result-display');
+        const historyPreviewEl = document.getElementById('history-preview');
+        const modeEl = document.getElementById('mode-display');
+        const sciPanel = document.getElementById('sci-panel');
+        const historyPanel = document.getElementById('history-panel');
+        const historyList = document.getElementById('history-list');
+        const toast = document.getElementById('toast');
 
-        function startApp() {
-            document.getElementById('welcomePopup').classList.add('hidden');
-            mainApp.classList.add('visible');
-            loadGrid();
-        }
+        /* 
+         * Core Logic: Math Engine 
+         */
+        const MathEngine = {
+            evaluate: (expr, mode) => {
+                try {
+                    // Sanitize input
+                    let sanitized = expr
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/−/g, '-')
+                        .replace(/π/g, 'Math.PI')
+                        .replace(/e/g, 'Math.E');
 
-        function loadGrid() {
-            for (let i = 1; i <= totalImages; i++) {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `<img src="image/${i}.png" loading="lazy" onerror="this.src='https://placehold.co/300x300/1e293b/64748b?text=Image+${i}'">`;
-                card.onclick = () => openLightbox(i);
-                grid.appendChild(card);
-                // Staggered animation
-                setTimeout(() => card.classList.add('loaded'), i * 50);
-            }
-        }
+                    // Handle Scientific Functions
+                    // Wrap trig and other functions with Math.
+                    const functions = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'log', 'sqrt', 'abs'];
+                    functions.forEach(f => {
+                        const regex = new RegExp(`${f}\\(`, 'g');
+                        sanitized = sanitized.replace(regex, `MathEngine.wrapFunc('${f}',`);
+                    });
 
-        function openLightbox(index) {
-            currentIndex = index;
-            lightbox.style.display = 'flex';
-            setTimeout(() => lightbox.classList.add('active'), 10);
-            updateLightbox();
-            document.body.style.overflow = 'hidden';
-        }
+                    // Handle natural log (ln)
+                    sanitized = sanitized.replace(/ln\(/g, 'Math.log(');
+                    
+                    // Handle power x^y
+                    sanitized = sanitized.replace(/(\d+(\.\d+)?|\))pow(\d+(\.\d+)?|\()/g, 'Math.pow($1,$3)');
 
-        function closeLightbox() {
-            lightbox.classList.remove('active');
-            setTimeout(() => {
-                lightbox.style.display = 'none';
-                resetZoom();
-            }, 300);
-            document.body.style.overflow = 'auto';
-        }
+                    // Safety check: only allow math characters
+                    if (/[^0-9\+\-\*\/\.\(\), Math\.PIEsqrtlogabscotan\^]/.test(sanitized)) {
+                        throw new Error('Invalid Character');
+                    }
 
-        function updateLightbox() {
-            resetZoom();
-            lbImg.src = `image/${currentIndex}.png`;
-            counter.textContent = `${currentIndex} / ${totalImages}`;
-        }
+                    // Simple Factorial replacement (manual parsing needed for true factorial but we'll do 1-level)
+                    // Simplified: replaces 5! with fact(5)
+                    sanitized = sanitized.replace(/(\d+)!/g, 'MathEngine.factorial($1)');
 
-        function changeImage(step) {
-            if (scale > 1.1) return; // Disable swipe when zoomed
-            currentIndex += step;
-            if (currentIndex > totalImages) currentIndex = 1;
-            if (currentIndex < 1) currentIndex = totalImages;
-            updateLightbox();
-        }
-
-        lightbox.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                touchStartX = e.touches[0].clientX;
-            } else if (e.touches.length === 2) {
-                // Initial distance for pinch
-                initialDistance = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-            }
-        }, { passive: false });
-
-        lightbox.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2) {
-                e.preventDefault(); // Stop page scrolling
-                const currentDist = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                
-                if (initialDistance) {
-                    scale = lastScale * (currentDist / initialDistance);
-                    scale = Math.min(Math.max(1, scale), 4); // Min 1x, Max 4x
-                    applyTransform();
+                    // Final eval logic (using Function constructor for performance/scope control)
+                    const result = new Function(`return ${sanitized}`)();
+                    
+                    if (!isFinite(result)) return "Error";
+                    return Number(result.toFixed(10)).toString();
+                } catch (e) {
+                    console.error(e);
+                    return "Error";
                 }
-            }
-        }, { passive: false });
+            },
 
-        lightbox.addEventListener('touchend', (e) => {
-            if (e.touches.length < 2) {
-                initialDistance = null;
-                lastScale = scale;
-                checkZoomState();
-            }
-
-            if (e.touches.length === 0) {
-                touchEndX = e.changedTouches[0].clientX;
-                handleSwipe();
-            }
-        }, { passive: false });
-
-        function handleSwipe() {
-            if (scale > 1.1) return; // Don't swipe if zoomed
-            const diff = touchStartX - touchEndX;
-            if (Math.abs(diff) > 60) {
-                if (diff > 0) changeImage(1);  // Left Swipe -> Next
-                else changeImage(-1);          // Right Swipe -> Prev
-            }
-        }
-
-        function checkZoomState() {
-            if (scale > 1.1) {
-                isZoomed = true;
-                zoomBadge.classList.add('visible');
-                resetBtn.style.display = 'flex';
-            } else {
-                scale = 1;
-                lastScale = 1;
-                isZoomed = false;
-                zoomBadge.classList.remove('visible');
-                resetBtn.style.display = 'none';
-                applyTransform();
-            }
-        }
-
-        function applyTransform() {
-            lbImg.style.transform = `scale(${scale})`;
-        }
-
-        function resetZoom() {
-            scale = 1;
-            lastScale = 1;
-            applyTransform();
-            checkZoomState();
-        }
-
-        let lastTap = 0;
-        lightbox.addEventListener('click', (e) => {
-            const now = Date.now();
-            if (now - lastTap < 300) {
-                // Double tap logic
-                if (scale > 1.1) resetZoom();
-                else {
-                    scale = 2.5;
-                    lastScale = 2.5;
-                    applyTransform();
-                    checkZoomState();
+            wrapFunc: (name, val) => {
+                if (['sin', 'cos', 'tan'].includes(name)) {
+                    // Adjust for Degree mode if necessary
+                    const angle = state.angleMode === 'DEG' ? (val * Math.PI) / 180 : val;
+                    return Math[name](angle);
                 }
+                if (['asin', 'acos', 'atan'].includes(name)) {
+                    const res = Math[name](val);
+                    return state.angleMode === 'DEG' ? (res * 180) / Math.PI : res;
+                }
+                if (name === 'log') return Math.log10(val);
+                return Math[name](val);
+            },
+
+            factorial: (n) => {
+                if (n < 0) return NaN;
+                if (n === 0 || n === 1) return 1;
+                let res = 1;
+                for (let i = 2; i <= n; i++) res *= i;
+                return res;
             }
-            lastTap = now;
+        };
+
+        /* 
+         * UI Interactions 
+         */
+        function updateUI() {
+            // Scroll displays to end
+            displayEl.innerText = state.expression || '0';
+            historyPreviewEl.innerText = state.isCalculated ? '' : state.lastResult;
+            modeEl.innerText = state.angleMode;
+            document.body.setAttribute('data-theme', state.theme);
+            
+            // Auto scroll to right
+            displayEl.scrollLeft = displayEl.scrollWidth;
+        }
+
+        function handleInput(val) {
+            if (state.isCalculated) {
+                // If starting a new expression after result
+                if (/[0-9]/.test(val) || val.includes('(') || ['sin', 'cos', 'tan', 'log', 'ln', 'sqrt', 'abs', 'pi', 'e'].includes(val)) {
+                    state.expression = '';
+                } else {
+                    state.expression = state.lastResult;
+                }
+                state.isCalculated = false;
+            }
+
+            switch(val) {
+                case 'delete':
+                    state.expression = state.expression.slice(0, -1);
+                    break;
+                case 'pow':
+                    state.expression += 'pow';
+                    break;
+                case 'fact':
+                    state.expression += '!';
+                    break;
+                case 'pi': state.expression += 'π'; break;
+                case 'e': state.expression += 'e'; break;
+                case 'mem-c': state.memory = 0; showToast("Memory Cleared"); break;
+                case 'mem-r': state.expression += state.memory.toString(); break;
+                case 'sin': case 'cos': case 'tan': case 'asin': case 'acos': 
+                case 'log': case 'ln': case 'sqrt': case 'abs':
+                    state.expression += val + '(';
+                    break;
+                default:
+                    state.expression += val;
+            }
+            updateUI();
+        }
+
+        function calculate() {
+            if (!state.expression) return;
+            const res = MathEngine.evaluate(state.expression, state.angleMode);
+            
+            if (res !== "Error") {
+                // Save to history
+                const entry = { expr: state.expression, res: res, id: Date.now() };
+                state.history.unshift(entry);
+                if (state.history.length > 50) state.history.pop();
+                localStorage.setItem('calc-history', JSON.stringify(state.history));
+                renderHistory();
+            }
+
+            state.lastResult = res;
+            state.expression = res;
+            state.isCalculated = true;
+            updateUI();
+        }
+
+        // Ripple logic
+        function createRipple(event) {
+            const btn = event.currentTarget;
+            const circle = document.createElement("span");
+            const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+            const radius = diameter / 2;
+
+            const rect = btn.getBoundingClientRect();
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - rect.left - radius}px`;
+            circle.style.top = `${event.clientY - rect.top - radius}px`;
+            circle.classList.add("ripple");
+
+            const ripple = btn.getElementsByClassName("ripple")[0];
+            if (ripple) ripple.remove();
+            btn.appendChild(circle);
+        }
+
+        /* 
+         * Event Listeners 
+         */
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('pointerdown', (e) => {
+                createRipple(e);
+                const val = btn.getAttribute('data-val');
+                if (val) handleInput(val);
+            });
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
-            if (e.key === 'ArrowRight') changeImage(1);
-            if (e.key === 'ArrowLeft') changeImage(-1);
-            if (e.key === 'Escape') closeLightbox();
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            state.expression = '';
+            state.lastResult = '0';
+            state.isCalculated = false;
+            updateUI();
         });
 
+        // Long press AC to clear history
+        let acTimer;
+        document.getElementById('btn-clear').addEventListener('pointerdown', () => {
+            acTimer = setTimeout(() => {
+                state.history = [];
+                localStorage.setItem('calc-history', '[]');
+                renderHistory();
+                showToast("History wiped");
+            }, 800);
+        });
+        document.getElementById('btn-clear').addEventListener('pointerup', () => clearTimeout(acTimer));
+
+        document.getElementById('btn-equals').addEventListener('click', calculate);
+
+        document.getElementById('toggle-sci').addEventListener('click', () => {
+            sciPanel.classList.toggle('open');
+        });
+
+        document.getElementById('toggle-mode').addEventListener('click', () => {
+            state.angleMode = state.angleMode === 'DEG' ? 'RAD' : 'DEG';
+            localStorage.setItem('calc-mode', state.angleMode);
+            updateUI();
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const themes = ['dark', 'light', 'amoled'];
+            let idx = themes.indexOf(state.theme);
+            state.theme = themes[(idx + 1) % themes.length];
+            localStorage.setItem('calc-theme', state.theme);
+            updateUI();
+        });
+
+        document.getElementById('history-toggle').addEventListener('click', () => {
+            historyPanel.classList.toggle('open');
+        });
+
+        document.getElementById('clear-history-btn').addEventListener('click', () => {
+            state.history = [];
+            localStorage.setItem('calc-history', '[]');
+            renderHistory();
+        });
+
+        document.getElementById('copy-result').addEventListener('click', () => {
+            const text = displayEl.innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast("Copied result");
+        });
+
+        function renderHistory() {
+            historyList.innerHTML = state.history.length ? '' : '<div style="text-align:center; padding: 40px; color: var(--text-dim);">No history yet</div>';
+            state.history.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="h-expr">${item.expr}</div>
+                    <div class="h-res">${item.res}</div>
+                `;
+                div.onclick = () => {
+                    state.expression = item.res;
+                    state.isCalculated = true;
+                    updateUI();
+                    historyPanel.classList.remove('open');
+                };
+                historyList.appendChild(div);
+            });
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        /* 
+         * Keyboard Support 
+         */
+        window.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') handleInput(e.key);
+            if (['+', '-', '*', '/', '.', '(', ')', '%'].includes(e.key)) handleInput(e.key);
+            if (e.key === 'Enter') calculate();
+            if (e.key === 'Backspace') handleInput('delete');
+            if (e.key === 'Escape') {
+                state.expression = '';
+                updateUI();
+            }
+        });
+
+        // Prevent zoom on double tap for iOS
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+
+        // Initialize App
+        window.onload = () => {
+            updateUI();
+            renderHistory();
+            // Start with scientific panel closed for mobile simplicity
+        };
     </script>
 </body>
 </html>
