@@ -2,484 +2,434 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naim's Musical Gallery</title>
-    <!-- Google Fonts for Aesthetic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Naim's Ultra Premium Gallery</title>
     <style>
         :root {
-            --primary-color: #6c5ce7;
-            --accent-color: #a29bfe;
-            --bg-color: #f8f9fa;
-            --text-dark: #2d3436;
+            --primary: #3b82f6;
+            --surface: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Hind Siliguri', 'Poppins', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--surface);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow-x: hidden;
+            user-select: none;
         }
 
-        /* ১. ওয়েলকাম পপআপ (Welcome Screen) */
         #welcomePopup {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), 
-                        url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=2070&auto=format&fit=crop') center/cover;
+            inset: 0;
+            z-index: 9999;
+            background: radial-gradient(circle at top right, #1e293b, #020617);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 3000;
-            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: transform 1.2s cubic-bezier(0.85, 0, 0.15, 1);
         }
 
         #welcomePopup.hidden {
             transform: translateY(-100%);
         }
 
-        .welcome-card {
+        .welcome-content {
             text-align: center;
-            color: #fff;
-            max-width: 90%;
-            padding: 30px;
-            animation: fadeIn 1.5s ease-out;
+            padding: 2rem;
+            max-width: 400px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .welcome-img {
+        .welcome-logo {
             width: 150px;
             height: 150px;
-            border-radius: 50%;
-            border: 5px solid var(--accent-color);
+            border-radius: 40px;
             object-fit: cover;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
+            margin-bottom: 2rem;
+            animation: floating 3s ease-in-out infinite;
         }
 
-        .lyric-text {
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .lyric {
             font-size: 1.5rem;
-            margin-bottom: 25px;
-            font-style: italic;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2.5rem;
             line-height: 1.4;
-            color: #dfe6e9;
         }
 
-        .get-started-btn {
-            background-color: var(--primary-color);
+        .btn-start {
+            background: var(--primary);
             color: white;
+            padding: 1.2rem 3rem;
             border: none;
-            padding: 15px 40px;
+            border-radius: 20px;
             font-size: 1.1rem;
-            border-radius: 30px;
+            font-weight: bold;
             cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+            transition: 0.3s;
         }
 
-        .get-started-btn:hover {
-            background-color: #5b4bc4;
-            transform: translateY(-3px);
+        .btn-start:active { transform: scale(0.95); }
+
+        .main-app {
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 1s;
         }
 
-        /* ২. মূল কন্টেন্ট (Gallery) */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        .main-app.visible { opacity: 1; }
 
-        header {
+        .header {
+            padding: 3rem 1rem;
             text-align: center;
-            padding: 30px 0;
         }
 
-        header h2 {
-            font-size: 2rem;
-            color: var(--text-dark);
-            margin-bottom: 10px;
-        }
-
-        /* সার্চ বার */
-        .search-box {
-            position: sticky;
-            top: 15px;
-            z-index: 100;
-            margin-bottom: 30px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            font-size: 1rem;
-            outline: none;
-        }
-
-        /* গ্যালারী গ্রিড */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .gallery-item {
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-
-        .gallery-item.hide { display: none; }
-
-        .img-container {
-            aspect-ratio: 1/1;
+        .card {
+            aspect-ratio: 1;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             overflow: hidden;
             cursor: pointer;
+            position: relative;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.6s, opacity 0.6s;
         }
 
-        .gallery-item img {
+        .card.loaded {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: 0.5s;
         }
 
-        .gallery-item:hover img { transform: scale(1.1); }
+        .card:hover img { transform: scale(1.1); }
 
-        .item-info {
-            padding: 8px;
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #636e72;
-        }
-
-        /* ৩. লাইটবক্স */
-        .lightbox {
+        #lightbox {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
+            inset: 0;
+            background: #000;
+            z-index: 10000;
             display: none;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            z-index: 4000;
+            justify-content: center;
         }
 
-        .lightbox.active { display: flex; flex-direction: column; }
+        #lightbox.active { display: flex; }
 
-        .lightbox-img {
-            max-width: 90%;
-            max-height: 70vh;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
-
-        .lightbox-caption {
-            color: #fff;
-            margin-top: 20px;
-            font-size: 1.2rem;
-        }
-
-        .close-btn {
+        .lb-controls {
             position: absolute;
-            top: 20px; right: 25px;
-            color: #fff; font-size: 40px; cursor: pointer;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 11;
         }
 
-        .nav-btn {
+        .control-group {
+            display: flex;
+            gap: 15px;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 15px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lb-image-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #lbImg {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* প্রগ্রেস বার */
+        .progress-container {
             position: absolute;
-            top: 50%; transform: translateY(-50%);
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
             background: rgba(255,255,255,0.1);
-            color: #fff; border: none;
-            padding: 15px; border-radius: 50%; cursor: pointer;
-            font-size: 20px;
         }
 
-        .prev-btn { left: 10px; }
-        .next-btn { right: 10px; }
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s linear;
+        }
 
-        /* মোবাইল রেসপন্সিভনেস */
+        .counter {
+            position: absolute;
+            bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* সাইড নেভিগেশন */
+        .nav-side {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .nav-side:hover { opacity: 1; background: linear-gradient(to right, rgba(0,0,0,0.5), transparent); }
+        .nav-right:hover { background: linear-gradient(to left, rgba(0,0,0,0.5), transparent); }
+        .nav-left { left: 0; }
+        .nav-right { right: 0; }
+
+        .svg-icon { width: 24px; height: 24px; fill: currentColor; }
+
         @media (max-width: 480px) {
-            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-            .lyric-text { font-size: 1.2rem; }
-            header h2 { font-size: 1.5rem; }
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .welcome-logo { width: 120px; height: 120px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ওয়েলকাম পপআপ -->
     <div id="welcomePopup">
-        <div class="welcome-card">
-            <!-- নাঈমের ডেমো ছবি -->
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop" class="welcome-img" alt="Naim">
-            <p class="lyric-text">"হৃদয় জুড়ে তুমি আছো,<br>স্বপ্ন হয়ে ভালোবাসো..."</p>
-            <button class="get-started-btn" onclick="startApp()">Get Started</button>
+        <div class="welcome-content">
+            <img src="image/logo.png" class="welcome-logo" alt="Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' font-size=\'40\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'>♪</text></svg>'">
+            <div class="lyric">
+                "হৃদয় জুড়ে তুমি আছো,<br>স্বপ্ন হয়ে ভালোবাসো..."
+            </div>
+            <button class="btn-start" onclick="startApp()">Explore Gallery</button>
         </div>
     </div>
 
-    <!-- মূল গ্যালারী কন্টেন্ট -->
-    <div class="container">
-        <header>
-            <h2>Naim's Song Gallery</h2>
-            <p>আপনার প্রিয় গান এবং মুহূর্তগুলো খুঁজুন</p>
+    <div class="main-app" id="mainApp">
+        <header class="header">
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Collection</h1>
+            <p style="color: #64748b;">A premium visual journey</p>
         </header>
-        <div class="search-box">
-            <input type="text" id="searchInput" class="search-input" placeholder="গানের নাম বা টাইটেল দিয়ে খুঁজুন...">
-        </div>
 
-        <div class="gallery-grid" id="galleryGrid">
-            <!-- ডেমো ছবিসমূহ -->
-            <div class="gallery-item" data-title="আগে কি সুন্দর দিন কাটাইতাম">
-                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiiZuxtXW4w7UeXnE8Sy3DwmMHKaC1o48rUb5Vy3jIlLUueBlnIsLxPK59TpUE0mqRtxHH-jgEHud-TZEUqjp6Hoy-iojsJfKcNlkcIUVYNdnJao6W7UUw-LGec95PyQcPCQh7PKsCenCVcVvhS77ugvqWQ120zAq01lwcZI9knAh12Kd7AB8B2BU-pcaJh/s842/age-ki-sondor-din-kataitam.png" alt="Song 1"></div>
-                <div class="item-info">আগে কি সুন্দর দিন কাটাইতাম</div>
-            </div>
-            <div class="gallery-item" data-title="প্রেম একবার এসেছিলো নীরবে">
-                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhMzvgy3BeFGIp9k9bHgti3ZQFazGGdQcLAh67bEe6jijxfhGvuFyuxHeN_4uAP3AkbP1CsI8yEj3tV8TOwSxzSXne5SclCtLtWGQeu5TE8aHKeBbsgyKjXjBpqM4BcvdAeZEfFt0iQI-WmZ_qCB5lk3DK6LrZeew4aXW0j2J_M9ZIsM_grBWdOtdPExklB/s842/%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A7%87%E0%A6%AE-%E0%A6%8F%E0%A6%95%E0%A6%AC%E0%A6%BE%E0%A6%B0-%E0%A6%8F%E0%A6%B8%E0%A7%87%E0%A6%9B%E0%A6%BF%E0%A6%B2%E0%A7%8B-%E0%A6%A8%E0%A7%80%E0%A6%B0%E0%A6%AC%E0%A7%87.png" alt="Song 2"></div>
-                <div class="item-info">প্রেম একবার এসেছিলো নীরবে</div>
-            </div>
-            <div class="gallery-item" data-title="আশা ছিলো ভালোবাসা ছিল">
-                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiC093tVdU6D_EQWwK_yhe1q8KYxtHM6xDe6szdSetFyYk3yDdoIKD4IAST_-5tlK2jUULE1DfioQ71lljY64yRMZg3mM0yD9xwHTfS9VbIjmdcMGhJpHFYIS7vbHUBI8JX8iskv8w0wwZM7O2NMYSlgsZrBuHqJH5WNr1YcHfB3oXlzxcZBtzvHnK7AdBW/s842/1.png" alt="Song 3"></div>
-                <div class="item-info">আশা ছিলো ভালোবাসা ছিল</div>
-            </div>
-            <div class="gallery-item" data-title="তুমি কি দেখেছো কভু">
-                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbDAJwFYUuZnjDG6X04wlS5Dlc54kKAWL7AtE1h4_hPmEaIzfdXEVhNSwVGVRmKlEeci5-RbSM5pt2ubMGkuFOeH8VTUHO5Bjfz5Pj3OqX3RVEIXpdr0Pmsx1a7Wjz7AW6Z6eJHMnY514v8iQMfk42LkUpXA9Y3g1Ir5-gLaCJXfkougW7jre9d06rcHpL/s842/2.png" alt="Song 4"></div>
-                <div class="item-info">তুমি কি দেখেছো কভু</div>
-            </div>
-            <div class="gallery-item" data-title="কত সুখে আছি আমি">
-                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhbgG_eN4hh18b2-YNioPT-Wo7lpaICDycZySUiGLCBxJwDPANkfclQCyXrL5XoGa7ZlHcAK0zxLuYTa1ZzdjAGwpV0rESkWYTmZH_hJNJr9l-43InDWXDEaWPqWaYWd6iz2WHGKI7O2h6ytjoLExMFhX3B3zdJs_GndcGtMFuOUQoyZzJxkuJzE7mQVbU9/s842/3.png" alt="Song 5"></div>
-                <div class="item-info">কত সুখে আছি আমি</div>
-            </div>
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-
-<div class="gallery-item" data-title="Hridoy Amar">
-                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
-                <div class="item-info">Hridoy Amar</div>
-            </div>
-
-            <div class="gallery-item" data-title="Ekla Cholo">
-                <div class="img-container"><img src="https://picsum.photos/id/40/600/600" alt="Song 6"></div>
-                <div class="item-info">Ekla Cholo</div>
-            </div>
+        <div class="gallery-grid" id="grid">
+            <!-- Images injected by JS -->
         </div>
     </div>
 
-    <!-- লাইটবক্স -->
-    <div class="lightbox" id="lightbox">
-        <span class="close-btn" id="closeBtn">&times;</span>
-        <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
-        <img src="" class="lightbox-img" id="lightboxImg">
-        <div class="lightbox-caption" id="lightboxCaption"></div>
-        <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
+    <div id="lightbox">
+        <div class="lb-controls">
+            <div class="control-group">
+                <button class="icon-btn" onclick="togglePlay()" id="playBtn">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button class="icon-btn" onclick="toggleFullScreen()">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+            </div>
+            <button class="icon-btn" onclick="closeLightbox()" style="background: rgba(239, 68, 68, 0.2); border-radius: 50%;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+
+        <div class="nav-side nav-left" onclick="changeImage(-1)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 40px; height: 40px;"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </div>
+
+        <div class="lb-image-container">
+            <img src="" id="lbImg">
+        </div>
+
+        <div class="nav-side nav-right" onclick="changeImage(1)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 40px; height: 40px;"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </div>
+
+        <div class="counter" id="counter">1 / 23</div>
+        <div class="progress-container">
+            <div id="progressBar"></div>
+        </div>
     </div>
 
     <script>
-        // ১. পপআপ ফাংশনালিটি
+        const totalImages = 23;
+        const grid = document.getElementById('grid');
+        const mainApp = document.getElementById('mainApp');
+        const lightbox = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lbImg');
+        const counter = document.getElementById('counter');
+        const progressBar = document.getElementById('progressBar');
+        const playBtn = document.getElementById('playBtn');
+
+        let currentIndex = 1;
+        let isPlaying = false;
+        let slideInterval;
+
+        // গ্যালারী শুরু করা
         function startApp() {
             document.getElementById('welcomePopup').classList.add('hidden');
-            // পপআপ সরানোর পর স্ক্রল এনাবল করা (ঐচ্ছিক)
+            mainApp.classList.add('visible');
+            loadGrid();
+        }
+
+        // গ্রিড লোড করা (Staggered Animation সহ)
+        function loadGrid() {
+            for (let i = 1; i <= totalImages; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<img src="image/${i}.png" loading="lazy" onerror="handleError(this)">`;
+                card.onclick = () => openLightbox(i);
+                grid.appendChild(card);
+                
+                // এন্ট্রেন্স অ্যানিমেশন ডিলে
+                setTimeout(() => card.classList.add('loaded'), i * 50);
+            }
+        }
+
+        function handleError(img) {
+            img.src = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%' height='100%' fill='%231e293b'/><text x='50%' y='50%' font-size='20' fill='white' text-anchor='middle'>Image ${img.src.split('/').pop()}</text></svg>`;
+        }
+
+        // লাইটবক্স ওপেন
+        function openLightbox(index) {
+            currentIndex = index;
+            lightbox.classList.add('active');
+            updateLightbox();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            stopSlideshow();
             document.body.style.overflow = 'auto';
         }
 
-        // শুরুতে স্ক্রল বন্ধ রাখা
-        document.body.style.overflow = 'hidden';
-
-        // ২. সার্চ সিস্টেম
-        const searchInput = document.getElementById('searchInput');
-        const galleryItems = document.querySelectorAll('.gallery-item');
-
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            galleryItems.forEach(item => {
-                const title = item.getAttribute('data-title').toLowerCase();
-                if (title.includes(query)) {
-                    item.classList.remove('hide');
-                } else {
-                    item.classList.add('hide');
-                }
-            });
-        });
-
-        // ৩. লাইটবক্স সিস্টেম
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const lightboxCaption = document.getElementById('lightboxCaption');
-        const closeBtn = document.getElementById('closeBtn');
-        
-        let currentIndex = 0;
-        let activeItems = [];
-
-        function updateLightbox(index) {
-            if (index < 0) index = activeItems.length - 1;
-            if (index >= activeItems.length) index = 0;
-            currentIndex = index;
-            
-            const targetImg = activeItems[currentIndex].querySelector('img');
-            const targetTitle = activeItems[currentIndex].getAttribute('data-title');
-            
-            lightboxImg.src = targetImg.src;
-            lightboxCaption.textContent = targetTitle;
+        function updateLightbox() {
+            lbImg.style.opacity = '0';
+            setTimeout(() => {
+                lbImg.src = `image/${currentIndex}.png`;
+                lbImg.style.opacity = '1';
+                counter.textContent = `${currentIndex} / ${totalImages}`;
+            }, 150);
         }
 
-        galleryItems.forEach(item => {
-            item.addEventListener('click', () => {
-                activeItems = Array.from(galleryItems).filter(i => !i.classList.contains('hide'));
-                currentIndex = activeItems.indexOf(item);
-                lightbox.classList.add('active');
-                updateLightbox(currentIndex);
-            });
-        });
+        function changeImage(step) {
+            currentIndex += step;
+            if (currentIndex > totalImages) currentIndex = 1;
+            if (currentIndex < 1) currentIndex = totalImages;
+            updateLightbox();
+            if (isPlaying) resetSlideshow();
+        }
 
-        document.getElementById('nextBtn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            updateLightbox(currentIndex + 1);
-        });
+        // স্লাইডশো কন্ট্রোল
+        function togglePlay() {
+            if (isPlaying) stopSlideshow();
+            else startSlideshow();
+        }
 
-        document.getElementById('prevBtn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            updateLightbox(currentIndex - 1);
-        });
+        function startSlideshow() {
+            isPlaying = true;
+            playBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+            resetSlideshow();
+        }
 
-        closeBtn.addEventListener('click', () => lightbox.classList.remove('active'));
-        lightbox.addEventListener('click', (e) => {
-            if(e.target === lightbox) lightbox.classList.remove('active');
+        function stopSlideshow() {
+            isPlaying = false;
+            playBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+            clearInterval(slideInterval);
+            progressBar.style.width = '0%';
+        }
+
+        function resetSlideshow() {
+            clearInterval(slideInterval);
+            let width = 0;
+            progressBar.style.width = '0%';
+            slideInterval = setInterval(() => {
+                width += 1;
+                progressBar.style.width = width + '%';
+                if (width >= 100) {
+                    changeImage(1);
+                }
+            }, 30); // ৩ সেকেন্ডের স্লাইডশো
+        }
+
+        // ফুলস্ক্রিন কন্ট্রোল
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // কিবোর্ড নেভিগেশন
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'ArrowRight') changeImage(1);
+            if (e.key === 'ArrowLeft') changeImage(-1);
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === ' ') togglePlay();
         });
     </script>
 </body>
