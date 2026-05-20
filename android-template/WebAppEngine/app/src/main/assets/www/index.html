@@ -3,325 +3,483 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naim's Premium Gallery</title>
+    <title>Naim's Musical Gallery</title>
+    <!-- Google Fonts for Aesthetic Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --accent-color: #38bdf8;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-light: #f8fafc;
+            --primary-color: #6c5ce7;
+            --accent-color: #a29bfe;
+            --bg-color: #f8f9fa;
+            --text-dark: #2d3436;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Hind Siliguri', 'Poppins', sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-light);
             overflow-x: hidden;
-            line-height: 1.6;
         }
 
+        /* ১. ওয়েলকাম পপআপ (Welcome Screen) */
         #welcomePopup {
             position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=2070&auto=format&fit=crop') center/cover;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 5000;
-            transition: transform 0.8s cubic-bezier(0.87, 0, 0.13, 1);
+            z-index: 3000;
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
         }
 
         #welcomePopup.hidden {
             transform: translateY(-100%);
         }
 
-        .welcome-content {
+        .welcome-card {
             text-align: center;
-            padding: 40px;
-            max-width: 450px;
-            width: 90%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            max-width: 90%;
+            padding: 30px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .welcome-img {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
+            border: 5px solid var(--accent-color);
             object-fit: cover;
-            border: 3px solid var(--accent-color);
-            padding: 5px;
-            margin-bottom: 24px;
-            filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.3));
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        .welcome-text {
+        .lyric-text {
             font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 30px;
-            background: linear-gradient(to right, #f8fafc, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            font-style: italic;
+            line-height: 1.4;
+            color: #dfe6e9;
         }
 
-        .btn-start {
-            background-color: var(--accent-color);
-            color: #000;
+        .get-started-btn {
+            background-color: var(--primary-color);
+            color: white;
             border: none;
-            padding: 16px 40px;
+            padding: 15px 40px;
             font-size: 1.1rem;
-            font-weight: 700;
-            border-radius: 50px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
-            width: 100%;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+            transition: all 0.3s ease;
         }
 
-        .btn-start:active {
-            transform: scale(0.96);
+        .get-started-btn:hover {
+            background-color: #5b4bc4;
+            transform: translateY(-3px);
         }
 
-        .main-content {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            padding-bottom: 50px;
-        }
-
-        .main-content.visible {
-            opacity: 1;
+        /* ২. মূল কন্টেন্ট (Gallery) */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         header {
-            padding: 60px 20px 30px;
             text-align: center;
+            padding: 30px 0;
         }
 
-        header h1 {
-            font-size: 2.2rem;
-            letter-spacing: -1px;
+        header h2 {
+            font-size: 2rem;
+            color: var(--text-dark);
             margin-bottom: 10px;
         }
 
+        /* সার্চ বার */
+        .search-box {
+            position: sticky;
+            top: 15px;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* গ্যালারী গ্রিড */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            padding: 0 12px;
-            max-width: 900px;
-            margin: 0 auto;
         }
 
-        .gallery-card {
-            position: relative;
-            aspect-ratio: 1/1;
-            border-radius: 16px;
+        .gallery-item {
+            background: #fff;
+            border-radius: 12px;
             overflow: hidden;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item.hide { display: none; }
+
+        .img-container {
+            aspect-ratio: 1/1;
+            overflow: hidden;
             cursor: pointer;
         }
 
-        .gallery-card img {
+        .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
         }
 
-        .gallery-card:hover img {
-            transform: scale(1.08);
+        .gallery-item:hover img { transform: scale(1.1); }
+
+        .item-info {
+            padding: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #636e72;
         }
 
-        #lightbox {
+        /* ৩. লাইটবক্স */
+        .lightbox {
             position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.98);
-            z-index: 6000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
             display: none;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
+            z-index: 4000;
         }
 
-        #lightbox.active {
-            display: flex;
+        .lightbox.active { display: flex; flex-direction: column; }
+
+        .lightbox-img {
+            max-width: 90%;
+            max-height: 70vh;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
-        .lightbox-container {
-            position: relative;
-            width: 100%;
-            height: 80vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #lightboxImg {
-            max-width: 95%;
-            max-height: 100%;
-            border-radius: 12px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
-            object-fit: contain;
+        .lightbox-caption {
+            color: #fff;
+            margin-top: 20px;
+            font-size: 1.2rem;
         }
 
         .close-btn {
             position: absolute;
-            top: 25px;
-            right: 25px;
-            font-size: 40px;
-            color: #fff;
-            cursor: pointer;
-            z-index: 6010;
+            top: 20px; right: 25px;
+            color: #fff; font-size: 40px; cursor: pointer;
         }
 
         .nav-btn {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.05);
-            border: none;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
+            top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.1);
+            color: #fff; border: none;
+            padding: 15px; border-radius: 50%; cursor: pointer;
+            font-size: 20px;
         }
 
-        .nav-btn:active { background: rgba(255, 255, 255, 0.2); }
-        .prev-btn { left: 15px; }
-        .next-btn { right: 15px; }
+        .prev-btn { left: 10px; }
+        .next-btn { right: 10px; }
 
-        .counter {
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 20px;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-        }
-
-        /* Responsive Breakpoints */
+        /* মোবাইল রেসপন্সিভনেস */
         @media (max-width: 480px) {
-            header h1 { font-size: 1.8rem; }
-            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .nav-btn { width: 50px; height: 50px; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .lyric-text { font-size: 1.2rem; }
+            header h2 { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ওয়েলকাম পপআপ -->
     <div id="welcomePopup">
-        <div class="welcome-content">
-            <img src="image/logo.png" alt="Welcome" class="welcome-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'140\' height=\'140\'><rect width=\'100%\' height=\'100%\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' font-size=\'40\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'>♪</text></svg>'">
-            <div class="welcome-text">
-                "হৃদয় জুড়ে তুমি আছো,<br>স্বপ্ন হয়ে ভালোবাসো..."
-            </div>
-            <button class="btn-start" onclick="startGallery()">Get Started</button>
+        <div class="welcome-card">
+            <!-- নাঈমের ডেমো ছবি -->
+            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop" class="welcome-img" alt="Naim">
+            <p class="lyric-text">"হৃদয় জুড়ে তুমি আছো,<br>স্বপ্ন হয়ে ভালোবাসো..."</p>
+            <button class="get-started-btn" onclick="startApp()">Get Started</button>
         </div>
     </div>
 
-    <div class="main-content" id="mainContent">
+    <!-- মূল গ্যালারী কন্টেন্ট -->
+    <div class="container">
         <header>
-            <h1>My Collection</h1>
-            <div style="width: 50px; hieght: 2px; background: var(--accent-color); margin: 0 auto; height: 3px; border-radius: 5px;"></div>
+            <h2>Naim's Song Gallery</h2>
+            <p>আপনার প্রিয় গান এবং মুহূর্তগুলো খুঁজুন</p>
         </header>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="গানের নাম বা টাইটেল দিয়ে খুঁজুন...">
+        </div>
 
-        <div class="gallery-grid" id="grid">
-            <!-- Images will be injected here by JS -->
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- ডেমো ছবিসমূহ -->
+            <div class="gallery-item" data-title="আগে কি সুন্দর দিন কাটাইতাম">
+                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiiZuxtXW4w7UeXnE8Sy3DwmMHKaC1o48rUb5Vy3jIlLUueBlnIsLxPK59TpUE0mqRtxHH-jgEHud-TZEUqjp6Hoy-iojsJfKcNlkcIUVYNdnJao6W7UUw-LGec95PyQcPCQh7PKsCenCVcVvhS77ugvqWQ120zAq01lwcZI9knAh12Kd7AB8B2BU-pcaJh/s842/age-ki-sondor-din-kataitam.png" alt="Song 1"></div>
+                <div class="item-info">আগে কি সুন্দর দিন কাটাইতাম</div>
+            </div>
+            <div class="gallery-item" data-title="প্রেম একবার এসেছিলো নীরবে">
+                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhMzvgy3BeFGIp9k9bHgti3ZQFazGGdQcLAh67bEe6jijxfhGvuFyuxHeN_4uAP3AkbP1CsI8yEj3tV8TOwSxzSXne5SclCtLtWGQeu5TE8aHKeBbsgyKjXjBpqM4BcvdAeZEfFt0iQI-WmZ_qCB5lk3DK6LrZeew4aXW0j2J_M9ZIsM_grBWdOtdPExklB/s842/%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A7%87%E0%A6%AE-%E0%A6%8F%E0%A6%95%E0%A6%AC%E0%A6%BE%E0%A6%B0-%E0%A6%8F%E0%A6%B8%E0%A7%87%E0%A6%9B%E0%A6%BF%E0%A6%B2%E0%A7%8B-%E0%A6%A8%E0%A7%80%E0%A6%B0%E0%A6%AC%E0%A7%87.png" alt="Song 2"></div>
+                <div class="item-info">প্রেম একবার এসেছিলো নীরবে</div>
+            </div>
+            <div class="gallery-item" data-title="আশা ছিলো ভালোবাসা ছিল">
+                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiC093tVdU6D_EQWwK_yhe1q8KYxtHM6xDe6szdSetFyYk3yDdoIKD4IAST_-5tlK2jUULE1DfioQ71lljY64yRMZg3mM0yD9xwHTfS9VbIjmdcMGhJpHFYIS7vbHUBI8JX8iskv8w0wwZM7O2NMYSlgsZrBuHqJH5WNr1YcHfB3oXlzxcZBtzvHnK7AdBW/s842/1.png" alt="Song 3"></div>
+                <div class="item-info">আশা ছিলো ভালোবাসা ছিল</div>
+            </div>
+            <div class="gallery-item" data-title="তুমি কি দেখেছো কভু">
+                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbDAJwFYUuZnjDG6X04wlS5Dlc54kKAWL7AtE1h4_hPmEaIzfdXEVhNSwVGVRmKlEeci5-RbSM5pt2ubMGkuFOeH8VTUHO5Bjfz5Pj3OqX3RVEIXpdr0Pmsx1a7Wjz7AW6Z6eJHMnY514v8iQMfk42LkUpXA9Y3g1Ir5-gLaCJXfkougW7jre9d06rcHpL/s842/2.png" alt="Song 4"></div>
+                <div class="item-info">তুমি কি দেখেছো কভু</div>
+            </div>
+            <div class="gallery-item" data-title="কত সুখে আছি আমি">
+                <div class="img-container"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhbgG_eN4hh18b2-YNioPT-Wo7lpaICDycZySUiGLCBxJwDPANkfclQCyXrL5XoGa7ZlHcAK0zxLuYTa1ZzdjAGwpV0rESkWYTmZH_hJNJr9l-43InDWXDEaWPqWaYWd6iz2WHGKI7O2h6ytjoLExMFhX3B3zdJs_GndcGtMFuOUQoyZzJxkuJzE7mQVbU9/s842/3.png" alt="Song 5"></div>
+                <div class="item-info">কত সুখে আছি আমি</div>
+            </div>
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+
+<div class="gallery-item" data-title="Hridoy Amar">
+                <div class="img-container"><img src="https://picsum.photos/id/30/600/600" alt="Song 5"></div>
+                <div class="item-info">Hridoy Amar</div>
+            </div>
+
+            <div class="gallery-item" data-title="Ekla Cholo">
+                <div class="img-container"><img src="https://picsum.photos/id/40/600/600" alt="Song 6"></div>
+                <div class="item-info">Ekla Cholo</div>
+            </div>
         </div>
     </div>
 
-    <div id="lightbox">
-        <span class="close-btn" onclick="closeLightbox()">&times;</span>
-        <div class="lightbox-container">
-            <button class="nav-btn prev-btn" onclick="changeImage(-1)">&#10094;</button>
-            <img src="" id="lightboxImg" alt="View">
-            <button class="nav-btn next-btn" onclick="changeImage(1)">&#10095;</button>
-        </div>
-        <div class="counter" id="imgCounter">1 / 23</div>
+    <!-- লাইটবক্স -->
+    <div class="lightbox" id="lightbox">
+        <span class="close-btn" id="closeBtn">&times;</span>
+        <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
+        <img src="" class="lightbox-img" id="lightboxImg">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+        <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
     </div>
 
     <script>
-        const totalImages = 23;
-        const grid = document.getElementById('grid');
-        const mainContent = document.getElementById('mainContent');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const imgCounter = document.getElementById('imgCounter');
-
-        let currentIndex = 1;
-
-        // গ্যালারী শুরু করার ফাংশন
-        function startGallery() {
+        // ১. পপআপ ফাংশনালিটি
+        function startApp() {
             document.getElementById('welcomePopup').classList.add('hidden');
-            mainContent.classList.add('visible');
+            // পপআপ সরানোর পর স্ক্রল এনাবল করা (ঐচ্ছিক)
             document.body.style.overflow = 'auto';
         }
 
         // শুরুতে স্ক্রল বন্ধ রাখা
         document.body.style.overflow = 'hidden';
 
-        // ১ থেকে ২৩ পর্যন্ত ইমেজ জেনারেট করা
-        for (let i = 1; i <= totalImages; i++) {
-            const card = document.createElement('div');
-            card.className = 'gallery-card';
-            card.innerHTML = `
-                <img src="image/${i}.png" alt="Memory ${i}" loading="lazy" 
-                     onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' font-size=\'10\' fill=\'%2364748b\' text-anchor=\'middle\'>Image ${i}</text></svg>'">
-            `;
-            card.onclick = () => openLightbox(i);
-            grid.appendChild(card);
-        }
+        // ২. সার্চ সিস্টেম
+        const searchInput = document.getElementById('searchInput');
+        const galleryItems = document.querySelectorAll('.gallery-item');
 
-        function openLightbox(index) {
-            currentIndex = index;
-            lightbox.classList.add('active');
-            updateLightbox();
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLightbox() {
-            lightbox.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        function updateLightbox() {
-            lightboxImg.src = `image/${currentIndex}.png`;
-            imgCounter.textContent = `${currentIndex} / ${totalImages}`;
-        }
-
-        function changeImage(step) {
-            currentIndex += step;
-            if (currentIndex > totalImages) currentIndex = 1;
-            if (currentIndex < 1) currentIndex = totalImages;
-            updateLightbox();
-        }
-
-        // কিবোর্ড সাপোর্ট
-        document.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
-            if (e.key === 'ArrowRight') changeImage(1);
-            if (e.key === 'ArrowLeft') changeImage(-1);
-            if (e.key === 'Escape') closeLightbox();
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            galleryItems.forEach(item => {
+                const title = item.getAttribute('data-title').toLowerCase();
+                if (title.includes(query)) {
+                    item.classList.remove('hide');
+                } else {
+                    item.classList.add('hide');
+                }
+            });
         });
 
-        // ইমেজের বাইরে ক্লিক করলে লাইটবক্স বন্ধ হবে
+        // ৩. লাইটবক্স সিস্টেম
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxCaption = document.getElementById('lightboxCaption');
+        const closeBtn = document.getElementById('closeBtn');
+        
+        let currentIndex = 0;
+        let activeItems = [];
+
+        function updateLightbox(index) {
+            if (index < 0) index = activeItems.length - 1;
+            if (index >= activeItems.length) index = 0;
+            currentIndex = index;
+            
+            const targetImg = activeItems[currentIndex].querySelector('img');
+            const targetTitle = activeItems[currentIndex].getAttribute('data-title');
+            
+            lightboxImg.src = targetImg.src;
+            lightboxCaption.textContent = targetTitle;
+        }
+
+        galleryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                activeItems = Array.from(galleryItems).filter(i => !i.classList.contains('hide'));
+                currentIndex = activeItems.indexOf(item);
+                lightbox.classList.add('active');
+                updateLightbox(currentIndex);
+            });
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateLightbox(currentIndex + 1);
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateLightbox(currentIndex - 1);
+        });
+
+        closeBtn.addEventListener('click', () => lightbox.classList.remove('active'));
         lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox || e.target.classList.contains('lightbox-container')) {
-                closeLightbox();
-            }
+            if(e.target === lightbox) lightbox.classList.remove('active');
         });
     </script>
 </body>
