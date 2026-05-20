@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.safearia.app"
+        applicationId = "com.naimsongs.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
