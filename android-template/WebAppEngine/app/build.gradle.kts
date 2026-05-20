@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.naimsongs.app"
+        applicationId = "com.sdfsdfsd.naim"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
