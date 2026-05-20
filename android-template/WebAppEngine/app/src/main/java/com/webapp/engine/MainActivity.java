@@ -1,5 +1,6 @@
 package com.webapp.engine;
-
+import android.view.Window;
+import android.view.WindowInsetsController;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
@@ -31,6 +32,20 @@ extends AppCompatActivity {
     ) {
 
         super.onCreate(savedInstanceState);
+
+Window window = getWindow();
+
+if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+
+    window.getInsetsController().setSystemBarsAppearance(
+
+        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+
+        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+
+    );
+
+}
 
         // NOTIFICATION PERMISSION
 
