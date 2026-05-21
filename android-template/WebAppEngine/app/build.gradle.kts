@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.calculator.app"
+        applicationId = "com.gonitai.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
