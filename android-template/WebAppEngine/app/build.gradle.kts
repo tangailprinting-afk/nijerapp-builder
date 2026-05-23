@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.gonitai.app"
+        applicationId = "com.motingsir.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
