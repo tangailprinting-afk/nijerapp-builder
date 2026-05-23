@@ -1,53 +1,238 @@
 <!DOCTYPE html>
 <html lang="bn">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>গণিত শিক্ষক AI (অফলাইন)</title>
-    <!-- MathJax for beautiful math rendering -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
-        #chat-box { height: 300px; background: white; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
-        textarea { width: 100%; height: 80px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-    </style>
+
+  <!-- ========================= -->
+  <!-- META -->
+  <!-- ========================= -->
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="
+      width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no
+    "
+  >
+
+  <title>
+
+    Bengali AI Math Teacher
+
+  </title>
+
+  <!-- ========================= -->
+  <!-- CSS -->
+  <!-- ========================= -->
+
+  <link
+    rel="stylesheet"
+    href="./assets/css/main.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="./assets/css/chat.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="./assets/css/mobile.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="./assets/css/markdown.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="./assets/css/graph.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="./assets/css/animations.css"
+  >
+
+  <!-- ========================= -->
+  <!-- KATEX -->
+  <!-- ========================= -->
+
+<link
+rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+>
+<!-- KaTeX CSS -->
+
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+/>
+
+<!-- KaTeX JS -->
+
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+></script>
+
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+></script>
+
+
 </head>
+
 <body>
 
-    <h2>প্রফেশনাল গণিত শিক্ষক AI</h2>
-    <div id="chat-box">সিস্টেম রেডি হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।</div>
-    <textarea id="userInput" placeholder="আপনার গণিত সমস্যাটি এখানে লিখুন..."></textarea><br><br>
-    <button onclick="askAI()">সমাধান করুন</button>
+  <!-- APP -->
 
-    <script type="module">
-        import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+  <div class="app">
 
-        const chatBox = document.getElementById('chat-box');
-        const model = "Qwen2.5-Math-1.5B-Instruct-q4f16_1"; // হালকা মডেল যাতে ফোনে দ্রুত চলে
-        
-        const engine = await CreateMLCEngine(model, {
-            initProgressCallback: (report) => {
-                chatBox.innerText = report.text;
-            }
-        });
+    <!-- ===================== -->
+    <!-- SIDEBAR -->
+    <!-- ===================== -->
 
-        window.askAI = async () => {
-            const input = document.getElementById('userInput').value;
-            chatBox.innerHTML += `<p><b>ছাত্র:</b> ${input}</p>`;
-            
-            const reply = await engine.chat.completions.create({
-                messages: [
-                    { role: "system", content: "তুমি একজন প্রফেশনাল গণিত শিক্ষক। বাংলা ভাষায় ধাপে ধাপে গণিত সমাধান করো।" },
-                    { role: "user", content: input }
-                ]
-            });
+    <aside class="sidebar">
 
-            const answer = reply.choices[0].message.content;
-            chatBox.innerHTML += `<p><b>শিক্ষক:</b> ${answer}</p>`;
-            MathJax.typeset(); // MathJax রেন্ডার করার জন্য
-        };
-    </script>
+      <div class="sidebar-top">
+
+        <button id="newChatBtn">
+
+          + New Chat
+
+        </button>
+
+      </div>
+
+      <div class="chat-history">
+
+        <div class="history-item">
+
+          📘 গণিত চ্যাট
+
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- ===================== -->
+    <!-- MAIN -->
+    <!-- ===================== -->
+
+    <main class="main">
+
+      <!-- ================= -->
+      <!-- TOPBAR -->
+      <!-- ================= -->
+
+      <header class="topbar">
+
+        <div class="logo">
+
+          🧠 Bengali AI Math Teacher
+
+        </div>
+
+      </header>
+
+      <!-- ================= -->
+      <!-- CHAT -->
+      <!-- ================= -->
+
+      <section
+        id="chatMessages"
+        class="chat-messages"
+      >
+
+        <!-- WELCOME -->
+
+        <div class="message ai-message">
+
+          <div class="message-content">
+
+            <h2>
+              👋 আসসালামু আলাইকুম
+            </h2>
+
+            <p>
+              আমি আপনার বাংলা AI গণিত শিক্ষক।
+            </p>
+
+            <p>
+              আপনি গণিতের যেকোন প্রশ্ন করতে পারেন।
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+<!-- ========================= -->
+<!-- GRAPH AREA -->
+<!-- ========================= -->
+
+<section
+  id="graphSection"
+  class="graph-section"
+>
+
+  <canvas
+    id="graphCanvas"
+  ></canvas>
+
+</section>
+
+      <!-- ================= -->
+      <!-- INPUT -->
+      <!-- ================= -->
+
+      <footer class="input-area">
+
+        <textarea
+          id="userInput"
+          placeholder="
+গণিতের প্রশ্ন লিখুন...
+"
+        ></textarea>
+
+        <button id="sendBtn">
+
+          ➤
+
+        </button>
+
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- LIBRARIES -->
+  <!-- ========================= -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+
+  <!-- ========================= -->
+  <!-- APP -->
+  <!-- ========================= -->
+
+  <script
+    type="module"
+    src="./assets/js/app.js"
+  ></script>
+
 </body>
 </html>
