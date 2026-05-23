@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.motingsir.app"
+        applicationId = "sir.motinsir.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
