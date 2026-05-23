@@ -1,238 +1,245 @@
 <!DOCTYPE html>
 <html lang="bn">
-
 <head>
-
-  <!-- ========================= -->
-  <!-- META -->
-  <!-- ========================= -->
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>মতিন স্যার - গণিত টুলস</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <meta
-    name="viewport"
-    content="
-      width=device-width,
-      initial-scale=1.0,
-      maximum-scale=1.0,
-      user-scalable=no
-    "
-  >
+    body {
+      font-family: 'Segoe UI', 'Noto Sans Bengali', sans-serif;
+      background: #f0f4f8;
+      color: #1e293b;
+      line-height: 1.5;
+      padding: 20px 16px 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-  <title>
+    /* পুরো পেজ মোবাইল-মতো কনটেইনার */
+    .app-container {
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+    }
 
-    Bengali AI Math Teacher
+    /* হেডার – মতিন স্যার */
+    .teacher-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
 
-  </title>
+    .teacher-img {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ffffff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      background: #cbd5e1;
+      /* যদি ইমেজ না থাকে, ব্যাকগ্রাউন্ডে placeholder */
+      display: block;
+      margin: 0 auto 12px;
+    }
 
-  <!-- ========================= -->
-  <!-- CSS -->
-  <!-- ========================= -->
+    .teacher-name {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
 
-  <link
-    rel="stylesheet"
-    href="./assets/css/main.css"
-  >
+    .teacher-title {
+      font-size: 1rem;
+      color: #475569;
+      margin-bottom: 16px;
+    }
 
-  <link
-    rel="stylesheet"
-    href="./assets/css/chat.css"
-  >
+    /* চ্যাট বাটন */
+    .chat-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
 
-  <link
-    rel="stylesheet"
-    href="./assets/css/mobile.css"
-  >
+    .chat-btn:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37,99,235,0.4);
+    }
 
-  <link
-    rel="stylesheet"
-    href="./assets/css/markdown.css"
-  >
+    .chat-icon {
+      font-size: 1.3rem;
+    }
 
-  <link
-    rel="stylesheet"
-    href="./assets/css/graph.css"
-  >
+    /* টুলস গ্রিড */
+    .tools-section {
+      margin-top: 32px;
+    }
 
-  <link
-    rel="stylesheet"
-    href="./assets/css/animations.css"
-  >
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #0f172a;
+      border-left: 4px solid #2563eb;
+      padding-left: 12px;
+    }
 
-  <!-- ========================= -->
-  <!-- KATEX -->
-  <!-- ========================= -->
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
 
-<link
-rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
->
-<!-- KaTeX CSS -->
+    @media (min-width: 420px) {
+      .tools-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
 
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-/>
+    @media (min-width: 600px) {
+      .tools-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
 
-<!-- KaTeX JS -->
+    .tool-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 8px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
 
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
-></script>
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
 
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-></script>
+    .tool-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
 
+    .tool-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.3;
+    }
 
+    .tool-desc {
+      font-size: 0.7rem;
+      color: #64748b;
+      display: none; /* ছোট কার্ডে দেখানোর দরকার নেই */
+    }
+
+    /* ফুটার */
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app-container">
+    <!-- শিক্ষক প্রোফাইল -->
+    <header class="teacher-header">
+      <!-- মতিন স্যারের ছবি – তুমি তোমার ইমেজের URL বসাবে -->
+      <img src="https://i.ibb.co/8DqJkfN/placeholder-motin-sir.png" alt="মতিন স্যার" class="teacher-img" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22110%22 height=%22110%22%3E%3Ccircle cx=%2255%22 cy=%2255%22 r=%2250%22 fill=%22%23cbd5e1%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%2364748b%22 font-size=%2220%22%3Eমতিন স্যার%3C/text%3E%3C/svg%3E';">
+      <h1 class="teacher-name">আব্দুল মতিন বিএসসি</h1>
+      <p class="teacher-title">সাবেক গণিত শিক্ষক, পাইকড়া মোসলেম উদ্দিন উচ্চ বিদ্যালয়</p>
+      <!-- চ্যাট লিংক -->
+      <a href="https://motinsir.pages.dev/" target="_blank" rel="noopener" class="chat-btn">
+        <span class="chat-icon">💬</span> মতিন স্যারের সাথে চ্যাট করুন
+      </a>
+    </header>
 
-  <!-- APP -->
-
-  <div class="app">
-
-    <!-- ===================== -->
-    <!-- SIDEBAR -->
-    <!-- ===================== -->
-
-    <aside class="sidebar">
-
-      <div class="sidebar-top">
-
-        <button id="newChatBtn">
-
-          + New Chat
-
-        </button>
-
+    <!-- টুলস সেকশন -->
+    <section class="tools-section">
+      <h2 class="section-title">গণিতের হাতিয়ার</h2>
+      <div class="tools-grid" id="toolsGrid">
+        <!-- সব কার্ড JS দিয়ে তৈরি হবে -->
       </div>
+    </section>
 
-      <div class="chat-history">
-
-        <div class="history-item">
-
-          📘 গণিত চ্যাট
-
-        </div>
-
-      </div>
-
-    </aside>
-
-    <!-- ===================== -->
-    <!-- MAIN -->
-    <!-- ===================== -->
-
-    <main class="main">
-
-      <!-- ================= -->
-      <!-- TOPBAR -->
-      <!-- ================= -->
-
-      <header class="topbar">
-
-        <div class="logo">
-
-          🧠 Bengali AI Math Teacher
-
-        </div>
-
-      </header>
-
-      <!-- ================= -->
-      <!-- CHAT -->
-      <!-- ================= -->
-
-      <section
-        id="chatMessages"
-        class="chat-messages"
-      >
-
-        <!-- WELCOME -->
-
-        <div class="message ai-message">
-
-          <div class="message-content">
-
-            <h2>
-              👋 আসসালামু আলাইকুম
-            </h2>
-
-            <p>
-              আমি আপনার বাংলা AI গণিত শিক্ষক।
-            </p>
-
-            <p>
-              আপনি গণিতের যেকোন প্রশ্ন করতে পারেন।
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-<!-- ========================= -->
-<!-- GRAPH AREA -->
-<!-- ========================= -->
-
-<section
-  id="graphSection"
-  class="graph-section"
->
-
-  <canvas
-    id="graphCanvas"
-  ></canvas>
-
-</section>
-
-      <!-- ================= -->
-      <!-- INPUT -->
-      <!-- ================= -->
-
-      <footer class="input-area">
-
-        <textarea
-          id="userInput"
-          placeholder="
-গণিতের প্রশ্ন লিখুন...
-"
-        ></textarea>
-
-        <button id="sendBtn">
-
-          ➤
-
-        </button>
-
-      </footer>
-
-    </main>
-
+    <footer class="footer">
+      <p>মতিন স্যার © ২০২৬ | তৈরি করেছেন এস. এম. ফজলে রাব্বী (ব্যাচ ২০১৫)</p>
+    </footer>
   </div>
 
-  <!-- ========================= -->
-  <!-- LIBRARIES -->
-  <!-- ========================= -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script>
+    // টুলের তালিকা – এখানে নাম, ইমোজি, এবং লিংক (আপাতত #)
+    // তুমি পরে প্রতিটির সঠিক লিংক বসিয়ে দাও
+    const tools = [
+      { name: "সায়েন্টিফিক ক্যালকুলেটর", icon: "🧮", link: "#" },
+      { name: "ভগ্নাংশ ও অনুপাত", icon: "➗", link: "#" },
+      { name: "শতকরা ক্যালকুলেটর", icon: "💯", link: "#" },
+      { name: "ইউনিট কনভার্টার", icon: "📏", link: "#" },
+      { name: "সময়-গতি-দূরত্ব", icon: "⏱️", link: "#" },
+      { name: "গ.সা.গু / ল.সা.গু", icon: "🔢", link: "#" },
+      { name: "সংখ্যা পদ্ধতি রূপান্তর", icon: "💻", link: "#" },
+      { name: "সমীকরণ সমাধান", icon: "⚖️", link: "#" },
+      { name: "গ্রাফ প্লটার", icon: "📈", link: "#" },
+      { name: "পরিসংখ্যান ক্যালকুলেটর", icon: "📊", link: "#" },
+      { name: "সম্ভাব্যতা ক্যালকুলেটর", icon: "🎲", link: "#" },
+      { name: "ম্যাট্রিক্স ক্যালকুলেটর", icon: "🟦", link: "#" },
+      { name: "ভেক্টর ক্যালকুলেটর", icon: "🧭", link: "#" },
+      { name: "ফর্মুলা লাইব্রেরি", icon: "📚", link: "#" },
+      { name: "পর্যায় সারণী", icon: "⚛️", link: "#" },
+      { name: "রাসায়নিক সমীকরণ ব্যালান্সার", icon: "🧪", link: "#" },
+      { name: "মোল ও স্টোইকিওমেট্রি", icon: "⚗️", link: "#" },
+      { name: "pH / ঘনমাত্রা ক্যালকুলেটর", icon: "🧴", link: "#" },
+      { name: "পদার্থবিজ্ঞানের ফর্মুলা প্যাক", icon: "🔬", link: "#" },
+      { name: "সায়েন্টিফিক নোটেশন", icon: "🔣", link: "#" },
+      { name: "এরর ও আনিশ্চয়তা", icon: "⚠️", link: "#" },
+      { name: "ডেটা টেবিল বিশ্লেষক", icon: "📋", link: "#" },
+      { name: "ধ্রুবক ও রেফারেন্স টেবিল", icon: "📖", link: "#" },
+      { name: "অফলাইন ল্যাব নোটবুক", icon: "📓", link: "#" }
+    ];
 
+    const grid = document.getElementById('toolsGrid');
 
-  <!-- ========================= -->
-  <!-- APP -->
-  <!-- ========================= -->
-
-  <script
-    type="module"
-    src="./assets/js/app.js"
-  ></script>
-
+    tools.forEach(tool => {
+      const card = document.createElement('a');
+      card.href = tool.link;
+      card.className = 'tool-card';
+      card.innerHTML = `
+        <span class="tool-icon">${tool.icon}</span>
+        <span class="tool-name">${tool.name}</span>
+      `;
+      // অপশনাল: টাইটেল অ্যাট্রিবিউট দিলে পুরো নাম দেখা যাবে
+      card.title = tool.name;
+      grid.appendChild(card);
+    });
+  </script>
 </body>
 </html>
