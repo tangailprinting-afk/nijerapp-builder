@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VectorLab - Physics & Algebra Studio</title>
+    <style>
+        /* Multi-Theme CSS Variable Palettes */
+        :root {
+            --bg-app: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --primary: #3b82f6;
+            --primary-light: #dbeafe;
+            --primary-hover: #2563eb;
+            --accent: #8b5cf6;
+            --accent-light: #ede9fe;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            --keyboard-bg: #e2e8f0;
+            --keyboard-btn: #ffffff;
+            --keyboard-btn-text: #0f172a;
+            --vec-a: #ef4444;
+            --vec-b: #3b82f6;
+            --vec-res: #10b981;
+        }
+
+        [data-theme="dark"] {
+            --bg-app: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-alt: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary: #60a5fa;
+            --primary-light: #1e3a8a;
+            --primary-hover: #3b82f6;
+            --accent: #a78bfa;
+            --accent-light: #4c1d95;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --keyboard-bg: #0f172a;
+            --keyboard-btn: #1e293b;
+            --keyboard-btn-text: #f8fafc;
+            --vec-a: #f87171;
+            --vec-b: #60a5fa;
+            --vec-res: #34d399;
+        }
+
+        [data-theme="amoled"] {
+            --bg-app: #000000;
+            --bg-card: #0a0a0a;
+            --bg-card-alt: #161616;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --primary: #3b82f6;
+            --primary-light: #001e3c;
+            --primary-hover: #60a5fa;
+            --accent: #8b5cf6;
+            --accent-light: #2e1065;
+            --border: #262626;
+            --shadow: none;
+            --keyboard-bg: #000000;
+            --keyboard-btn: #161616;
+            --keyboard-btn-text: #ffffff;
+            --vec-a: #ef4444;
+            --vec-b: #3b82f6;
+            --vec-res: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: var(--font-family); transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
+        body { background-color: var(--bg-app); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        
+        .app-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; padding-bottom: 350px; }
+
+        /* Navigation Header */
+        header { position: sticky; top: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+        .header-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .header-logo svg { width: 28px; height: 28px; fill: var(--primary); }
+        .header-title h1 { font-size: 1.3rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
+        .header-title span { font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; text-transform: uppercase; }
+        .header-actions { display: flex; gap: 8px; }
+        
+        .icon-btn { background: var(--bg-card-alt); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; font-weight: 900; }
+        .icon-btn:active { transform: scale(0.95); }
+
+        /* Dashboard & Menu Grid */
+        .dashboard-container { display: flex; flex-direction: column; gap: 16px; animation: fadeIn 0.3s ease; }
+        .dashboard-welcome { background: linear-gradient(135deg, var(--primary-light), var(--bg-card)); border: 1px solid var(--primary); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }
+        .dashboard-welcome h2 { font-size: 1.3rem; font-weight: 900; color: var(--primary); margin-bottom: 6px; }
+        .dashboard-welcome p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4; }
+
+        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 500px) { .calc-grid { grid-template-columns: repeat(2, 1fr); } }
+        
+        .calc-menu-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: var(--shadow); }
+        .calc-menu-card:active { transform: scale(0.97); border-color: var(--primary); }
+        .calc-card-icon { width: 46px; height: 46px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem; font-weight: 900;}
+        .calc-card-info { display: flex; flex-direction: column; gap: 2px; }
+        .calc-card-title { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); }
+        .calc-card-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Sections Framework */
+        .app-section { display: none; flex-direction: column; gap: 16px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .app-section.active { display: flex; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-header-nav { display: flex; align-items: center; margin-bottom: 4px; justify-content: space-between; }
+        .btn-back { background: transparent; border: none; color: var(--primary); font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 6px 0; }
+        
+        /* Vector Dimension Toggle */
+        .dim-toggle { display: flex; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 4px; }
+        .dim-btn { padding: 6px 12px; background: transparent; border: none; font-weight: 800; color: var(--text-secondary); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem;}
+        .dim-btn.active { background: var(--primary-light); color: var(--primary); }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .card-title { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+
+        /* Form Controls & Vectors */
+        .vector-builder { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 1.5rem; font-weight: 900; background: var(--bg-card-alt); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); overflow-x: auto;}
+        .vec-name { font-style: italic; font-family: serif; color: var(--primary); margin-right: 8px; }
+        .math-input { width: 60px; height: 45px; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-sm); text-align: center; font-size: 1.1rem; font-weight: 800; color: var(--text-primary); outline: none; transition: all 0.2s; }
+        .math-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.3); }
+        .comma { color: var(--text-secondary); padding: 0 2px; }
+        
+        .z-comp { display: none; align-items: center; gap: 4px; }
+        body.is-3d .z-comp { display: flex; }
+
+        .btn { padding: 14px 20px; border-radius: var(--radius-md); font-weight: 800; font-size: 0.95rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: var(--bg-card-alt); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-accent { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
+        
+        .op-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* Results & Steps */
+        .result-panel { background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius-md); padding: 20px; display: none; flex-direction: column; gap: 16px; }
+        .result-panel.visible { display: flex; animation: fadeIn 0.4s ease; }
+        .result-header { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .result-value { font-size: 1.6rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.5px; text-align: center; word-break: break-all;}
+        
+        .edu-panel { background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .edu-title { font-size: 0.95rem; font-weight: 900; color: var(--text-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px;}
+        .edu-step { font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); padding-left: 12px; border-left: 3px solid var(--primary); overflow-x: auto; }
+        .math-expr { background: var(--bg-card); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: 800; color: var(--primary); display: inline-block; white-space: nowrap; margin: 2px 0;}
+
+        /* Canvas Graphing Area */
+        .graph-container { width: 100%; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-md); overflow: hidden; position: relative; }
+        .graph-canvas { display: block; width: 100%; height: 300px; background: transparent; }
+        .graph-legend { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 8px; border-radius: var(--radius-sm); font-size: 0.75rem; color: #fff; font-weight: bold; pointer-events: none;}
+        .legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 50%; }
+
+        /* Custom Keypad */
+        .keypad-container { position: fixed; bottom: -400px; left: 0; right: 0; background: var(--keyboard-bg); border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.15); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; z-index: 999; transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .keypad-container.active { bottom: 0; }
+        .keypad-header { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px; }
+        .keypad-target-label { font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; }
+        .keypad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .keypad-btn { background: var(--keyboard-btn); border: none; border-radius: var(--radius-sm); padding: 16px 0; font-size: 1.3rem; font-weight: 800; color: var(--keyboard-btn-text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); user-select: none; }
+        .keypad-btn:active { background: var(--primary); color: #fff; transform: scale(0.95); }
+        .keypad-btn.action { background: var(--border); color: var(--text-primary); }
+        .keypad-btn.submit { background: var(--primary); color: white; grid-column: span 2; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text-primary); color: var(--bg-app); padding: 12px 24px; border-radius: 50px; font-weight: 800; font-size: 0.9rem; z-index: 1000; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* History */
+        .history-item { background: var(--bg-card-alt); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; }
+        .history-item:active { background: var(--border); }
+        .history-title { font-size: 0.85rem; font-weight: 800; color: var(--primary); display: flex; justify-content: space-between; }
+        .history-calc { font-family: monospace; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+        
+        .error-text { color: var(--danger); font-weight: bold; text-align: center; }
+        .warning-text { color: var(--warning); font-size: 0.85rem; font-weight: bold; text-align: center; margin-top: 10px;}
+    </style>
+</head>
+<body class="is-2d">
+
+    <header>
+        <div class="header-logo" onclick="app.showSection('dashboard')">
+            <svg viewBox="0 0 24 24"><path d="M12 2L4 7l8 5 8-5-8-5zm0 11.5l-8-5V14l8 5 8-5v-5.5l-8 5z"/></svg>
+            <div class="header-title">
+                <h1>VectorLab</h1>
+                <span>Physics & Math Studio</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="app.toggleTheme()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <!-- DASHBOARD -->
+        <main id="sec-dashboard" class="app-section active dashboard-container">
+            <div class="dashboard-welcome">
+                <h2>Vector Calculation Engine</h2>
+                <p>Perform 2D & 3D vector arithmetic, calculate dot/cross products, analyze angles, and visualize resultants completely offline.</p>
+            </div>
+
+            <div class="calc-grid">
+                <div class="calc-menu-card" onclick="app.showSection('properties')">
+                    <div class="calc-card-icon">|v|</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Properties & Unit</span>
+                        <span class="calc-card-desc">Magnitude, Unit Vector (v̂)</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('ops')">
+                    <div class="calc-card-icon">v+w</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Arithmetic Ops</span>
+                        <span class="calc-card-desc">Add, Subtract, Scalar</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('products')">
+                    <div class="calc-card-icon">v·w</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Products & Angles</span>
+                        <span class="calc-card-desc">Dot, Cross, Proj, Angles</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('viz')">
+                    <div class="calc-card-icon">↗</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">2D Visualizer</span>
+                        <span class="calc-card-desc">Plot and render vectors</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('history')">
+                    <div class="calc-card-icon">📚</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Calculation Logs</span>
+                        <span class="calc-card-desc">Review local history</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('notes')">
+                    <div class="calc-card-icon">📖</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Formula Guide</span>
+                        <span class="calc-card-desc">Vector physics & algebra</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 1: PROPERTIES (Magnitude, Unit Vector) -->
+        <main id="sec-properties" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+                <div class="dim-toggle">
+                    <button class="dim-btn active" onclick="app.setDimension(2)">2D</button>
+                    <button class="dim-btn" onclick="app.setDimension(3)">3D</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Vector Properties (v)</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-properties')" style="width:32px;height:32px;font-size:0.9rem;">⌫</button>
+                </div>
+                
+                <div class="vector-builder">
+                    <span class="vec-name">v</span> = ⟨
+                    <input type="text" id="prop-v-x" class="math-input" placeholder="x" aria-label="x component">
+                    <span class="comma">,</span>
+                    <input type="text" id="prop-v-y" class="math-input" placeholder="y" aria-label="y component">
+                    <div class="z-comp">
+                        <span class="comma">,</span>
+                        <input type="text" id="prop-v-z" class="math-input" placeholder="z" aria-label="z component">
+                    </div>
+                    ⟩
+                </div>
+
+                <div class="op-grid">
+                    <button class="btn btn-primary" onclick="app.execProp('mag')">Magnitude |v|</button>
+                    <button class="btn btn-accent" onclick="app.execProp('unit')">Unit Vector (v̂)</button>
+                </div>
+            </div>
+
+            <div id="res-properties" class="result-panel">
+                <div class="result-header">Result <button class="icon-btn" style="width:28px;height:28px" onclick="app.copyResult('res-val-prop')">📄</button></div>
+                <div class="result-value" id="res-val-prop"></div>
+                <div class="edu-panel">
+                    <div class="edu-title">Step-by-Step Breakdown</div>
+                    <div id="edu-steps-prop" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 2: ARITHMETIC OPERATIONS (Add, Sub, Scalar) -->
+        <main id="sec-ops" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+                <div class="dim-toggle">
+                    <button class="dim-btn active" onclick="app.setDimension(2)">2D</button>
+                    <button class="dim-btn" onclick="app.setDimension(3)">3D</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Vector Arithmetic</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-ops')" style="width:32px;height:32px;font-size:0.9rem;">⌫</button>
+                </div>
+                
+                <div class="vector-builder">
+                    <span class="vec-name">v</span> = ⟨
+                    <input type="text" id="ops-v-x" class="math-input" placeholder="x">
+                    <span class="comma">,</span>
+                    <input type="text" id="ops-v-y" class="math-input" placeholder="y">
+                    <div class="z-comp">
+                        <span class="comma">,</span>
+                        <input type="text" id="ops-v-z" class="math-input" placeholder="z">
+                    </div>
+                    ⟩
+                </div>
+                
+                <div class="vector-builder">
+                    <span class="vec-name">w</span> = ⟨
+                    <input type="text" id="ops-w-x" class="math-input" placeholder="x">
+                    <span class="comma">,</span>
+                    <input type="text" id="ops-w-y" class="math-input" placeholder="y">
+                    <div class="z-comp">
+                        <span class="comma">,</span>
+                        <input type="text" id="ops-w-z" class="math-input" placeholder="z">
+                    </div>
+                    ⟩
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px;">
+                    <span style="font-weight:800;">Scalar k = </span>
+                    <input type="text" id="ops-scalar" class="math-input" style="width:70px;" placeholder="2" value="2">
+                </div>
+
+                <div class="op-grid">
+                    <button class="btn btn-primary" onclick="app.execOps('add')">Add (v + w)</button>
+                    <button class="btn btn-primary" onclick="app.execOps('sub')">Subtract (v - w)</button>
+                    <button class="btn btn-secondary" onclick="app.execOps('sv')">Scalar (k·v)</button>
+                    <button class="btn btn-secondary" onclick="app.execOps('sw')">Scalar (k·w)</button>
+                </div>
+            </div>
+
+            <div id="res-ops" class="result-panel">
+                <div class="result-header">Result Vector <button class="icon-btn" style="width:28px;height:28px" onclick="app.copyResult('res-val-ops')">📄</button></div>
+                <div class="result-value" id="res-val-ops"></div>
+                <div class="edu-panel">
+                    <div class="edu-title">Step-by-Step Breakdown</div>
+                    <div id="edu-steps-ops" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 3: PRODUCTS & ANGLES -->
+        <main id="sec-products" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+                <div class="dim-toggle">
+                    <button class="dim-btn active" onclick="app.setDimension(2)">2D</button>
+                    <button class="dim-btn" onclick="app.setDimension(3)">3D</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Products & Intersections</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-products')" style="width:32px;height:32px;font-size:0.9rem;">⌫</button>
+                </div>
+                
+                <div class="vector-builder">
+                    <span class="vec-name">v</span> = ⟨
+                    <input type="text" id="prod-v-x" class="math-input" placeholder="x">
+                    <span class="comma">,</span>
+                    <input type="text" id="prod-v-y" class="math-input" placeholder="y">
+                    <div class="z-comp">
+                        <span class="comma">,</span>
+                        <input type="text" id="prod-v-z" class="math-input" placeholder="z">
+                    </div>
+                    ⟩
+                </div>
+                
+                <div class="vector-builder">
+                    <span class="vec-name">w</span> = ⟨
+                    <input type="text" id="prod-w-x" class="math-input" placeholder="x">
+                    <span class="comma">,</span>
+                    <input type="text" id="prod-w-y" class="math-input" placeholder="y">
+                    <div class="z-comp">
+                        <span class="comma">,</span>
+                        <input type="text" id="prod-w-z" class="math-input" placeholder="z">
+                    </div>
+                    ⟩
+                </div>
+
+                <div class="op-grid">
+                    <button class="btn btn-primary" onclick="app.execProd('dot')">Dot Product (v · w)</button>
+                    <button class="btn btn-accent" onclick="app.execProd('cross')">Cross Prod (v × w)</button>
+                    <button class="btn btn-secondary" onclick="app.execProd('angle')">Angle (θ)</button>
+                    <button class="btn btn-secondary" onclick="app.execProd('proj')">Proj w onto v</button>
+                </div>
+            </div>
+
+            <div id="res-products" class="result-panel">
+                <div class="result-header">Computed Result <button class="icon-btn" style="width:28px;height:28px" onclick="app.copyResult('res-val-prod')">📄</button></div>
+                <div class="result-value" id="res-val-prod"></div>
+                <div class="edu-panel">
+                    <div class="edu-title">Step-by-Step Breakdown</div>
+                    <div id="edu-steps-prod" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 4: VISUALIZER (2D Canvas) -->
+        <main id="sec-viz" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">2D Vector Plotter</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-viz')" style="width:32px;height:32px;font-size:0.9rem;">⌫</button>
+                </div>
+                
+                <div class="vector-builder" style="border-color: var(--vec-a)">
+                    <span class="vec-name" style="color:var(--vec-a)">v</span> = ⟨
+                    <input type="text" id="viz-v-x" class="math-input" placeholder="x" value="3">
+                    <span class="comma">,</span>
+                    <input type="text" id="viz-v-y" class="math-input" placeholder="y" value="4">
+                    ⟩
+                </div>
+                
+                <div class="vector-builder" style="border-color: var(--vec-b)">
+                    <span class="vec-name" style="color:var(--vec-b)">w</span> = ⟨
+                    <input type="text" id="viz-w-x" class="math-input" placeholder="x" value="-2">
+                    <span class="comma">,</span>
+                    <input type="text" id="viz-w-y" class="math-input" placeholder="y" value="2">
+                    ⟩
+                </div>
+                
+                <button class="btn btn-primary" onclick="app.drawVisualizer()">Plot Vectors</button>
+                <div class="warning-text">Note: Visualization is currently limited to 2D space.</div>
+            </div>
+
+            <div class="card" style="padding:0; overflow:hidden;">
+                <div class="graph-container">
+                    <canvas id="vectorCanvas" class="graph-canvas"></canvas>
+                    <div class="graph-legend">
+                        <div class="legend-item"><div class="legend-color" style="background:var(--vec-a)"></div> Vector v</div>
+                        <div class="legend-item"><div class="legend-color" style="background:var(--vec-b)"></div> Vector w</div>
+                        <div class="legend-item"><div class="legend-color" style="background:var(--vec-res)"></div> Resultant (v+w)</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 5: HISTORY -->
+        <main id="sec-history" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Calculation Logs</div>
+                    <button class="icon-btn" onclick="app.clearHistory()" style="color:var(--danger); border-color:var(--danger)">⌫</button>
+                </div>
+                <div id="history-container" style="display:flex; flex-direction:column;">
+                    <p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No calculations saved in offline ledger.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 6: NOTES / FORMULAS -->
+        <main id="sec-notes" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Vector Mathematics Guide</div>
+                </div>
+                <div class="edu-panel">
+                    <div class="edu-title">Magnitude & Unit Vector</div>
+                    <div class="edu-step"><b>Magnitude |v|:</b> Length of the vector.<br><span class="math-expr">|v| = &radic;(x² + y² + z²)</span></div>
+                    <div class="edu-step"><b>Unit Vector (v̂):</b> A vector of length 1 pointing in the same direction.<br><span class="math-expr">v̂ = v / |v|</span></div>
+                </div>
+                <div class="edu-panel">
+                    <div class="edu-title">Dot Product (v · w)</div>
+                    <div class="edu-step">Scalar result measuring how parallel two vectors are.</div>
+                    <div class="edu-step"><span class="math-expr">v · w = (vₓ × wₓ) + (v_y × w_y) + (v_z × w_z)</span></div>
+                    <div class="edu-step">If v · w = 0, the vectors are <b>Orthogonal (Perpendicular)</b>.</div>
+                </div>
+                <div class="edu-panel">
+                    <div class="edu-title">Cross Product (v × w)</div>
+                    <div class="edu-step">Returns a vector <b>perpendicular</b> to both v and w (3D only).</div>
+                    <div class="edu-step">Follows the Right-Hand Rule in physics for torque and magnetic force.</div>
+                </div>
+                <div class="edu-panel">
+                    <div class="edu-title">Angle Between Vectors</div>
+                    <div class="edu-step">Derived from the dot product formula:</div>
+                    <div class="edu-step"><span class="math-expr">&theta; = arccos( (v · w) / (|v| |w|) )</span></div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Virtual Numeric Keypad -->
+    <div class="keypad-container" id="mathKeypad">
+        <div class="keypad-header">
+            <span class="keypad-target-label" id="keypad-title">Numeric Input</span>
+            <button class="icon-btn" onclick="app.closeKeypad()" style="width:32px; height:32px; font-size:1rem;">&darr;</button>
+        </div>
+        <div class="keypad-grid">
+            <button class="keypad-btn" data-val="1">1</button>
+            <button class="keypad-btn" data-val="2">2</button>
+            <button class="keypad-btn" data-val="3">3</button>
+            <button class="keypad-btn action" data-val="backspace">⌫</button>
+
+            <button class="keypad-btn" data-val="4">4</button>
+            <button class="keypad-btn" data-val="5">5</button>
+            <button class="keypad-btn" data-val="6">6</button>
+            <button class="keypad-btn action" data-val="clear">C</button>
+
+            <button class="keypad-btn" data-val="7">7</button>
+            <button class="keypad-btn" data-val="8">8</button>
+            <button class="keypad-btn" data-val="9">9</button>
+            <button class="keypad-btn action" data-val="next">Next</button>
+
+            <button class="keypad-btn action" data-val="minus">-</button>
+            <button class="keypad-btn" data-val="0">0</button>
+            <button class="keypad-btn action" data-val="dot">.</button>
+            <button class="keypad-btn submit" data-val="submit">DONE</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Message</div>
+
+    <script>
+        // ==========================================
+        // VECTOR MATH ENGINE
+        // ==========================================
+        const VectorEngine = {
+            create(x, y, z = 0, is3D = false) {
+                return { x: x||0, y: y||0, z: z||0, is3D };
+            },
+            mag(v) {
+                return Math.sqrt(v.x*v.x + v.y*v.y + (v.is3D ? v.z*v.z : 0));
+            },
+            add(v, w) {
+                return this.create(v.x + w.x, v.y + w.y, v.z + w.z, v.is3D);
+            },
+            sub(v, w) {
+                return this.create(v.x - w.x, v.y - w.y, v.z - w.z, v.is3D);
+            },
+            scalar(k, v) {
+                return this.create(k * v.x, k * v.y, k * v.z, v.is3D);
+            },
+            dot(v, w) {
+                return (v.x * w.x) + (v.y * w.y) + (v.is3D ? v.z * w.z : 0);
+            },
+            cross(v, w) {
+                // Cross product strictly requires 3D
+                return this.create(
+                    (v.y * w.z) - (v.z * w.y),
+                    (v.z * w.x) - (v.x * w.z),
+                    (v.x * w.y) - (v.y * w.x),
+                    true
+                );
+            },
+            angle(v, w) {
+                const dot = this.dot(v, w);
+                const mags = this.mag(v) * this.mag(w);
+                if(mags === 0) return 0;
+                // Clamp floating point rounding errors
+                let cosTheta = dot / mags;
+                if(cosTheta > 1) cosTheta = 1;
+                if(cosTheta < -1) cosTheta = -1;
+                return Math.acos(cosTheta); // returns radians
+            },
+            proj(w, v) { // Project w onto v
+                const magV2 = Math.pow(this.mag(v), 2);
+                if(magV2 === 0) return this.create(0,0,0, v.is3D);
+                const scalar = this.dot(w, v) / magV2;
+                return this.scalar(scalar, v);
+            },
+            fmt(num) {
+                // Format decimal to max 4 places
+                let val = Number(num.toFixed(4));
+                if (val === -0) val = 0;
+                return val;
+            },
+            formatVec(v) {
+                if(v.is3D) return `⟨${this.fmt(v.x)}, ${this.fmt(v.y)}, ${this.fmt(v.z)}⟩`;
+                return `⟨${this.fmt(v.x)}, ${this.fmt(v.y)}⟩`;
+            }
+        };
+
+        // ==========================================
+        // APP LOGIC
+        // ==========================================
+        const app = {
+            focusedInput: null,
+            history: [],
+            is3D: false,
+
+            init() {
+                this.initKeypad();
+                this.loadState();
+                this.setDimension(2); // Default
+                this.drawVisualizer(); // Init canvas empty state
+            },
+
+            // --- UI & Routing ---
+            showSection(id) {
+                document.querySelectorAll('.app-section').forEach(el => el.classList.remove('active'));
+                document.getElementById('sec-' + id).classList.add('active');
+                if (id === 'history') this.renderHistory();
+                if (id === 'viz') setTimeout(() => this.drawVisualizer(), 50); // Resize canvas fixes
+                this.closeKeypad();
+                window.scrollTo(0,0);
+            },
+            toggleTheme() {
+                let current = document.documentElement.getAttribute('data-theme');
+                let next = current === 'light' ? 'dark' : current === 'dark' ? 'amoled' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('vectorlab-theme', next);
+                if(document.getElementById('sec-viz').classList.contains('active')) this.drawVisualizer();
+            },
+            showToast(msg) {
+                const t = document.getElementById('toast');
+                t.innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2000);
+            },
+            
+            // --- Dimension Toggling (2D/3D) ---
+            setDimension(dim) {
+                this.is3D = (dim === 3);
+                if(this.is3D) {
+                    document.body.classList.replace('is-2d', 'is-3d');
+                } else {
+                    document.body.classList.replace('is-3d', 'is-2d');
+                }
+
+                // Update active toggles
+                document.querySelectorAll('.dim-toggle').forEach(tg => {
+                    const btns = tg.querySelectorAll('.dim-btn');
+                    btns[0].classList.toggle('active', !this.is3D);
+                    btns[1].classList.toggle('active', this.is3D);
+                });
+            },
+
+            // --- Read Vector from Inputs ---
+            readVec(prefix) {
+                const x = parseFloat(document.getElementById(`${prefix}-x`).value) || 0;
+                const y = parseFloat(document.getElementById(`${prefix}-y`).value) || 0;
+                const z = parseFloat(document.getElementById(`${prefix}-z`).value) || 0;
+                return VectorEngine.create(x, y, z, this.is3D);
+            },
+            clearInputs(sectionId) {
+                const sec = document.getElementById(sectionId);
+                sec.querySelectorAll('.math-input').forEach(i => i.value = '');
+                const resPanel = sec.querySelector('.result-panel');
+                if(resPanel) resPanel.classList.remove('visible');
+                this.showToast("Vectors Cleared");
+            },
+            showError(msg, panelId, stepsId) {
+                const panel = document.getElementById(panelId);
+                const steps = document.getElementById(stepsId);
+                panel.classList.add('visible');
+                document.getElementById(panelId.replace('res-', 'res-val-')).innerText = 'Error';
+                steps.innerHTML = `<div class="error-text">${msg}</div>`;
+            },
+
+            // --- Keypad Logic ---
+            initKeypad() {
+                document.querySelectorAll('.math-input').forEach(input => {
+                    input.setAttribute('inputmode', 'none');
+                    input.addEventListener('focus', e => {
+                        this.focusedInput = e.target;
+                        const label = e.target.placeholder ? `Component ${e.target.placeholder.toUpperCase()}` : "Value";
+                        document.getElementById('keypad-title').innerText = label;
+                        document.getElementById('mathKeypad').classList.add('active');
+                    });
+                });
+
+                document.querySelector('.keypad-grid').addEventListener('click', e => {
+                    if(!this.focusedInput) return;
+                    const btn = e.target.closest('.keypad-btn');
+                    if(!btn) return;
+                    
+                    const val = btn.getAttribute('data-val');
+                    if(!val) return;
+
+                    let cur = this.focusedInput.value;
+                    let cursorPos = this.focusedInput.selectionStart || cur.length;
+
+                    if(val === 'backspace') {
+                        if(cursorPos > 0) {
+                            this.focusedInput.value = cur.substring(0, cursorPos - 1) + cur.substring(cursorPos);
+                        }
+                    } else if(val === 'clear') {
+                        this.focusedInput.value = '';
+                    } else if(val === 'submit') {
+                        this.closeKeypad();
+                    } else if (val === 'next') {
+                        this.cycleFocus();
+                    } else if (val === 'minus') {
+                        if (cur.startsWith('-')) this.focusedInput.value = cur.substring(1);
+                        else this.focusedInput.value = '-' + cur;
+                    } else {
+                        let insert = val === 'dot' ? '.' : val;
+                        if(insert === '.' && cur.includes('.')) return;
+                        if(cur.length < 8) this.focusedInput.value = cur.substring(0, cursorPos) + insert + cur.substring(cursorPos);
+                    }
+                });
+            },
+            closeKeypad() {
+                document.getElementById('mathKeypad').classList.remove('active');
+                if(this.focusedInput) this.focusedInput.blur();
+            },
+            cycleFocus() {
+                const activeSec = document.querySelector('.app-section.active');
+                if(!activeSec) return;
+                // Only get visible inputs (handling 2D/3D z-comp display:none)
+                const inputs = Array.from(activeSec.querySelectorAll('.math-input')).filter(el => el.offsetParent !== null);
+                const idx = inputs.indexOf(this.focusedInput);
+                if(idx > -1 && idx < inputs.length - 1) inputs[idx + 1].focus();
+                else this.closeKeypad();
+            },
+
+            // --- Operations ---
+            execProp(op) {
+                const v = this.readVec('prop-v');
+                const panel = document.getElementById('res-properties');
+                const steps = document.getElementById('edu-steps-prop');
+                const resVal = document.getElementById('res-val-prop');
+                
+                try {
+                    let stepsHTML = '';
+                    if (op === 'mag') {
+                        const m = VectorEngine.mag(v);
+                        resVal.innerText = `|v| = ${VectorEngine.fmt(m)}`;
+                        
+                        stepsHTML += `<div class="edu-step"><b>Formula:</b> <span class="math-expr">|v| = &radic;(x² + y²${v.is3D ? ' + z²' : ''})</span></div>`;
+                        stepsHTML += `<div class="edu-step">Calculation:<br>|v| = &radic;(${v.x}² + ${v.y}²${v.is3D ? ` + ${v.z}²` : ''})<br>|v| = &radic;(${v.x*v.x} + ${v.y*v.y}${v.is3D ? ` + ${v.z*v.z}` : ''})<br><b>|v| = ${VectorEngine.fmt(m)}</b></div>`;
+                        this.logHistory("Magnitude |v|", `|${VectorEngine.formatVec(v)}| = ${VectorEngine.fmt(m)}`);
+                    } else if (op === 'unit') {
+                        const m = VectorEngine.mag(v);
+                        if(m === 0) throw new Error("Cannot find unit vector of a zero vector.");
+                        const u = VectorEngine.scalar(1/m, v);
+                        resVal.innerText = `v̂ = ${VectorEngine.formatVec(u)}`;
+                        
+                        stepsHTML += `<div class="edu-step"><b>Formula:</b> <span class="math-expr">v̂ = v / |v|</span></div>`;
+                        stepsHTML += `<div class="edu-step">1. Find magnitude |v| = ${VectorEngine.fmt(m)}</div>`;
+                        stepsHTML += `<div class="edu-step">2. Divide each component by magnitude:<br>x: ${v.x} / ${VectorEngine.fmt(m)} = ${VectorEngine.fmt(u.x)}<br>y: ${v.y} / ${VectorEngine.fmt(m)} = ${VectorEngine.fmt(u.y)} ${v.is3D ? `<br>z: ${v.z} / ${VectorEngine.fmt(m)} = ${VectorEngine.fmt(u.z)}` : ''}</div>`;
+                        this.logHistory("Unit Vector v̂", `${VectorEngine.formatVec(v)} &rarr; ${VectorEngine.formatVec(u)}`);
+                    }
+                    
+                    steps.innerHTML = stepsHTML;
+                    panel.classList.add('visible');
+                    this.closeKeypad();
+                } catch(e) {
+                    this.showError(e.message, 'res-properties', 'edu-steps-prop');
+                }
+            },
+
+            execOps(op) {
+                const v = this.readVec('ops-v');
+                const w = this.readVec('ops-w');
+                const k = parseFloat(document.getElementById('ops-scalar').value) || 0;
+                const panel = document.getElementById('res-ops');
+                const steps = document.getElementById('edu-steps-ops');
+                const resVal = document.getElementById('res-val-ops');
+
+                let res, stepsHTML = '';
+                if(op === 'add') {
+                    res = VectorEngine.add(v, w);
+                    resVal.innerText = VectorEngine.formatVec(res);
+                    stepsHTML += `<div class="edu-step"><b>Addition Rule:</b> Add corresponding components.</div>`;
+                    stepsHTML += `<div class="edu-step">x = ${v.x} + ${w.x} = ${res.x}<br>y = ${v.y} + ${w.y} = ${res.y}${v.is3D ? `<br>z = ${v.z} + ${w.z} = ${res.z}` : ''}</div>`;
+                    this.logHistory("Addition (v + w)", `${VectorEngine.formatVec(v)} + ${VectorEngine.formatVec(w)} = ${VectorEngine.formatVec(res)}`);
+                } else if(op === 'sub') {
+                    res = VectorEngine.sub(v, w);
+                    resVal.innerText = VectorEngine.formatVec(res);
+                    stepsHTML += `<div class="edu-step"><b>Subtraction Rule:</b> Subtract corresponding components.</div>`;
+                    stepsHTML += `<div class="edu-step">x = ${v.x} - ${w.x} = ${res.x}<br>y = ${v.y} - ${w.y} = ${res.y}${v.is3D ? `<br>z = ${v.z} - ${w.z} = ${res.z}` : ''}</div>`;
+                    this.logHistory("Subtraction (v - w)", `${VectorEngine.formatVec(v)} - ${VectorEngine.formatVec(w)} = ${VectorEngine.formatVec(res)}`);
+                } else if(op === 'sv') {
+                    res = VectorEngine.scalar(k, v);
+                    resVal.innerText = VectorEngine.formatVec(res);
+                    stepsHTML += `<div class="edu-step"><b>Scalar Multiplication:</b> Multiply each component of v by k=${k}.</div>`;
+                    stepsHTML += `<div class="edu-step">x = ${k} × ${v.x} = ${res.x}<br>y = ${k} × ${v.y} = ${res.y}${v.is3D ? `<br>z = ${k} × ${v.z} = ${res.z}` : ''}</div>`;
+                    this.logHistory("Scalar (k·v)", `${k} × ${VectorEngine.formatVec(v)} = ${VectorEngine.formatVec(res)}`);
+                } else if(op === 'sw') {
+                    res = VectorEngine.scalar(k, w);
+                    resVal.innerText = VectorEngine.formatVec(res);
+                    stepsHTML += `<div class="edu-step"><b>Scalar Multiplication:</b> Multiply each component of w by k=${k}.</div>`;
+                    stepsHTML += `<div class="edu-step">x = ${k} × ${w.x} = ${res.x}<br>y = ${k} × ${w.y} = ${res.y}${w.is3D ? `<br>z = ${k} × ${w.z} = ${res.z}` : ''}</div>`;
+                    this.logHistory("Scalar (k·w)", `${k} × ${VectorEngine.formatVec(w)} = ${VectorEngine.formatVec(res)}`);
+                }
+
+                steps.innerHTML = stepsHTML;
+                panel.classList.add('visible');
+                this.closeKeypad();
+            },
+
+            execProd(op) {
+                const v = this.readVec('prod-v');
+                const w = this.readVec('prod-w');
+                const panel = document.getElementById('res-products');
+                const steps = document.getElementById('edu-steps-prod');
+                const resVal = document.getElementById('res-val-prod');
+
+                try {
+                    let stepsHTML = '';
+                    if(op === 'dot') {
+                        const d = VectorEngine.dot(v, w);
+                        resVal.innerText = `v · w = ${VectorEngine.fmt(d)}`;
+                        stepsHTML += `<div class="edu-step"><b>Dot Product Formula:</b> <span class="math-expr">x₁x₂ + y₁y₂${v.is3D ? ' + z₁z₂' : ''}</span></div>`;
+                        stepsHTML += `<div class="edu-step">Calculation:<br>(${v.x} × ${w.x}) + (${v.y} × ${w.y})${v.is3D ? ` + (${v.z} × ${w.z})` : ''}<br>${v.x*w.x} + ${v.y*w.y}${v.is3D ? ` + ${v.z*w.z}` : ''} = <b>${VectorEngine.fmt(d)}</b></div>`;
+                        if(d === 0 && (VectorEngine.mag(v)>0 && VectorEngine.mag(w)>0)) stepsHTML += `<div class="edu-step" style="border-color:var(--success)"><b>Note:</b> Dot product is 0. Vectors are <b>Orthogonal</b>.</div>`;
+                        this.logHistory("Dot Product", `v · w = ${VectorEngine.fmt(d)}`);
+                    } else if(op === 'cross') {
+                        if(!this.is3D) throw new Error("Cross Product is only defined for 3D vectors. Please switch to 3D mode.");
+                        const res = VectorEngine.cross(v, w);
+                        resVal.innerText = `v × w = ${VectorEngine.formatVec(res)}`;
+                        stepsHTML += `<div class="edu-step"><b>Determinant Expansion (i, j, k):</b></div>`;
+                        stepsHTML += `<div class="edu-step"><b>i</b> (y₁z₂ - z₁y₂) = (${v.y}×${w.z}) - (${v.z}×${w.y}) = ${res.x}</div>`;
+                        stepsHTML += `<div class="edu-step"><b>-j</b> (x₁z₂ - z₁x₂) = -( (${v.x}×${w.z}) - (${v.z}×${w.x}) ) = ${res.y}</div>`;
+                        stepsHTML += `<div class="edu-step"><b>k</b> (x₁y₂ - y₁x₂) = (${v.x}×${w.y}) - (${v.y}×${w.x}) = ${res.z}</div>`;
+                        this.logHistory("Cross Product", `v × w = ${VectorEngine.formatVec(res)}`);
+                    } else if(op === 'angle') {
+                        const rad = VectorEngine.angle(v, w);
+                        const deg = rad * (180 / Math.PI);
+                        resVal.innerText = `θ = ${VectorEngine.fmt(deg)}°`;
+                        stepsHTML += `<div class="edu-step"><b>Formula:</b> <span class="math-expr">θ = arccos((v · w) / (|v||w|))</span></div>`;
+                        const dot = VectorEngine.dot(v, w);
+                        const mv = VectorEngine.mag(v);
+                        const mw = VectorEngine.mag(w);
+                        stepsHTML += `<div class="edu-step">1. Dot Product (v · w) = ${VectorEngine.fmt(dot)}<br>2. |v| = ${VectorEngine.fmt(mv)}, |w| = ${VectorEngine.fmt(mw)}<br>3. cos(θ) = ${VectorEngine.fmt(dot)} / ${VectorEngine.fmt(mv*mw)} = ${VectorEngine.fmt(dot/(mv*mw))}</div>`;
+                        stepsHTML += `<div class="edu-step">Result: <b>${VectorEngine.fmt(rad)} radians</b></div>`;
+                        this.logHistory("Angle Between", `θ = ${VectorEngine.fmt(deg)}°`);
+                    } else if(op === 'proj') {
+                        const res = VectorEngine.proj(w, v); // w onto v
+                        resVal.innerText = `Proj = ${VectorEngine.formatVec(res)}`;
+                        stepsHTML += `<div class="edu-step"><b>Vector Projection Formula:</b> Projection of w onto v. <br><span class="math-expr">proj_v(w) = ( (w · v) / |v|² ) × v</span></div>`;
+                        const dot = VectorEngine.dot(w, v);
+                        const mv2 = Math.pow(VectorEngine.mag(v), 2);
+                        stepsHTML += `<div class="edu-step">1. Dot Product (w · v) = ${VectorEngine.fmt(dot)}<br>2. |v|² = ${VectorEngine.fmt(mv2)}<br>3. Scalar ratio = ${VectorEngine.fmt(dot)} / ${VectorEngine.fmt(mv2)} = ${VectorEngine.fmt(dot/mv2)}</div>`;
+                        stepsHTML += `<div class="edu-step">4. Multiply vector v by scalar ratio.</div>`;
+                        this.logHistory("Vector Projection", `Proj_v(w) = ${VectorEngine.formatVec(res)}`);
+                    }
+
+                    steps.innerHTML = stepsHTML;
+                    panel.classList.add('visible');
+                    this.closeKeypad();
+                } catch(e) {
+                    this.showError(e.message, 'res-products', 'edu-steps-prod');
+                }
+            },
+
+            // --- 2D Canvas Visualizer ---
+            drawVisualizer() {
+                const canvas = document.getElementById('vectorCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Get vector inputs
+                const v = this.readVec('viz-v');
+                const w = this.readVec('viz-w');
+                const res = VectorEngine.add(v, w);
+
+                const rect = canvas.parentElement.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = rect.width * dpr;
+                canvas.height = 300 * dpr;
+                ctx.scale(dpr, dpr);
+
+                const width = rect.width;
+                const height = 300;
+                
+                ctx.clearRect(0, 0, width, height);
+
+                // Find auto-scale
+                const maxVal = Math.max(
+                    Math.abs(v.x), Math.abs(v.y),
+                    Math.abs(w.x), Math.abs(w.y),
+                    Math.abs(res.x), Math.abs(res.y),
+                    5 // minimum scale
+                );
+                
+                const padding = 20;
+                const scale = Math.min((width/2 - padding) / maxVal, (height/2 - padding) / maxVal);
+                
+                const origX = width / 2;
+                const origY = height / 2;
+
+                // Draw Grid & Axes
+                const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
+                const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+                
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for(let i=0; i<width/2; i+=scale) {
+                    ctx.moveTo(origX + i, 0); ctx.lineTo(origX + i, height);
+                    ctx.moveTo(origX - i, 0); ctx.lineTo(origX - i, height);
+                }
+                for(let i=0; i<height/2; i+=scale) {
+                    ctx.moveTo(0, origY + i); ctx.lineTo(width, origY + i);
+                    ctx.moveTo(0, origY - i); ctx.lineTo(width, origY - i);
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = axisColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, origY); ctx.lineTo(width, origY);
+                ctx.moveTo(origX, 0); ctx.lineTo(origX, height);
+                ctx.stroke();
+
+                // Draw Arrow Function
+                const drawArrow = (fromX, fromY, toX, toY, color, width) => {
+                    const headLen = 10; 
+                    const dx = toX - fromX;
+                    const dy = toY - fromY;
+                    const angle = Math.atan2(dy, dx);
+                    
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = width;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(fromX, fromY);
+                    ctx.lineTo(toX, toY);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(toX, toY);
+                    ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+                    ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+                    ctx.lineTo(toX, toY);
+                    ctx.fill();
+                };
+
+                const px = (val) => origX + val * scale;
+                const py = (val) => origY - val * scale; // Inverted Y for math coords
+
+                const cVecA = getComputedStyle(document.documentElement).getPropertyValue('--vec-a').trim();
+                const cVecB = getComputedStyle(document.documentElement).getPropertyValue('--vec-b').trim();
+                const cVecRes = getComputedStyle(document.documentElement).getPropertyValue('--vec-res').trim();
+
+                // Draw Resultant Vector
+                drawArrow(origX, origY, px(res.x), py(res.y), cVecRes, 3);
+                
+                // Draw Vector v
+                drawArrow(origX, origY, px(v.x), py(v.y), cVecA, 2.5);
+                
+                // Draw Vector w (starting from tip of v to show addition geometrically)
+                drawArrow(px(v.x), py(v.y), px(res.x), py(res.y), cVecB, 2.5);
+                
+                // Draw Vector w from origin as well (dotted)
+                ctx.setLineDash([5, 5]);
+                drawArrow(origX, origY, px(w.x), py(w.y), cVecB, 1.5);
+                ctx.setLineDash([]);
+            },
+
+            // --- History System ---
+            logHistory(title, calc) {
+                if(this.history.length > 0 && this.history[0].title === title && this.history[0].calc === calc) return;
+                
+                this.history.unshift({
+                    id: Date.now(),
+                    title: title,
+                    calc: calc,
+                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+                if(this.history.length > 20) this.history.pop();
+                localStorage.setItem('vectorlab-history', JSON.stringify(this.history));
+            },
+            renderHistory() {
+                const container = document.getElementById('history-container');
+                if(this.history.length === 0) {
+                    container.innerHTML = `<p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No calculations saved in offline ledger.</p>`;
+                    return;
+                }
+                container.innerHTML = this.history.map(h => `
+                    <div class="history-item">
+                        <div class="history-title"><span>${h.title}</span><span class="history-time" style="font-size:0.7rem; color:var(--text-secondary)">${h.time}</span></div>
+                        <div class="history-calc">${h.calc}</div>
+                    </div>
+                `).join('');
+            },
+            clearHistory() {
+                this.history = [];
+                localStorage.removeItem('vectorlab-history');
+                this.renderHistory();
+                this.showToast("Ledger cache cleared");
+            },
+
+            // --- Utilities ---
+            copyResult(elId) {
+                const txt = document.getElementById(elId).innerText;
+                const ta = document.createElement('textarea');
+                ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                this.showToast("Copied to clipboard!");
+            },
+
+            loadState() {
+                const t = localStorage.getItem('vectorlab-theme');
+                if(t) {
+                    document.documentElement.setAttribute('data-theme', t);
+                }
+                const h = localStorage.getItem('vectorlab-history');
+                if(h) {
+                    try { this.history = JSON.parse(h); } catch(e){}
+                }
+            }
+        };
+
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
