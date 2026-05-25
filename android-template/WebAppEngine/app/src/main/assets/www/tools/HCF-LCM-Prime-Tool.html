@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MathCore - HCF, LCM & Primes Educator</title>
+    <style>
+        /* CSS Variables for Multi-Theme System */
+        :root {
+            --bg-app: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --primary: #6366f1;
+            --primary-light: #e0e7ff;
+            --primary-hover: #4f46e5;
+            --accent: #f59e0b;
+            --accent-light: #fef3c7;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --border: #cbd5e1;
+            --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            --keyboard-bg: #e2e8f0;
+            --keyboard-btn: #ffffff;
+            --keyboard-btn-text: #0f172a;
+            --chip-prime: #f59e0b;
+            --chip-comp: #3b82f6;
+        }
+
+        [data-theme="dark"] {
+            --bg-app: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-alt: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary: #818cf8;
+            --primary-light: #1e1b4b;
+            --primary-hover: #6366f1;
+            --accent: #fbbf24;
+            --accent-light: #78350f;
+            --success: #34d399;
+            --success-light: #064e3b;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --keyboard-bg: #1e293b;
+            --keyboard-btn: #334155;
+            --keyboard-btn-text: #f8fafc;
+            --chip-prime: #fbbf24;
+            --chip-comp: #60a5fa;
+        }
+
+        [data-theme="amoled"] {
+            --bg-app: #000000;
+            --bg-card: #0a0a0a;
+            --bg-card-alt: #161616;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --primary: #4f46e5;
+            --primary-light: #0c0a20;
+            --primary-hover: #6366f1;
+            --accent: #f59e0b;
+            --accent-light: #302000;
+            --success: #10b981;
+            --success-light: #00301a;
+            --border: #262626;
+            --shadow: none;
+            --keyboard-bg: #0f172a;
+            --keyboard-btn: #161616;
+            --keyboard-btn-text: #ffffff;
+            --chip-prime: #f59e0b;
+            --chip-comp: #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: var(--font-family); transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
+        body { background-color: var(--bg-app); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; font-size: 16px; }
+
+        .app-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; padding-bottom: 340px; }
+
+        /* Top Navigation Header */
+        header { position: sticky; top: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+        .header-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .header-logo svg { width: 34px; height: 34px; fill: var(--primary); }
+        .header-title h1 { font-size: 1.25rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
+        .header-title span { font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; text-transform: uppercase; }
+        .header-actions { display: flex; gap: 8px; }
+
+        .icon-btn { background: var(--bg-card-alt); border: 1px solid var(--border); color: var(--text-primary); width: 42px; height: 42px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .icon-btn:active { transform: scale(0.95); }
+
+        /* Dashboard View */
+        .dashboard-container { display: flex; flex-direction: column; gap: 16px; animation: fadeIn 0.3s ease; }
+        .dashboard-welcome { background: linear-gradient(135deg, var(--primary-light), var(--bg-card)); border: 1px solid var(--primary); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }
+        .dashboard-welcome h2 { font-size: 1.3rem; font-weight: 900; color: var(--primary); margin-bottom: 6px; }
+        .dashboard-welcome p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4; }
+
+        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 450px) { .calc-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .calc-menu-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: var(--shadow); }
+        .calc-menu-card:active { transform: scale(0.97); border-color: var(--primary); }
+        .calc-card-icon { width: 46px; height: 46px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .calc-card-icon svg { width: 24px; height: 24px; fill: currentColor; }
+        .calc-card-info { display: flex; flex-direction: column; gap: 2px; }
+        .calc-card-title { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); }
+        .calc-card-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Tool Sections */
+        .calc-section { display: none; flex-direction: column; gap: 16px; }
+        .calc-section.active { display: flex; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-header-nav { display: flex; align-items: center; margin-bottom: 4px; }
+        .btn-back { background: transparent; border: none; color: var(--primary); font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 6px 0; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .card-title { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        .card-title svg { width: 20px; height: 20px; fill: var(--primary); }
+
+        /* Inputs */
+        .input-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        .input-label { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .math-input-wrap { position: relative; display: flex; align-items: center; }
+        .math-input { width: 100%; background: var(--bg-card-alt); border: 2px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); outline: none; }
+        .math-input:focus { border-color: var(--primary); }
+        .hint-text { font-size: 0.75rem; color: var(--text-secondary); margin-top: -2px; }
+
+        /* Buttons */
+        .btn { padding: 14px 20px; border-radius: var(--radius-md); font-weight: 800; font-size: 1rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; position: relative; overflow: hidden; }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: var(--bg-card-alt); color: var(--text-primary); border: 1px solid var(--border); }
+
+        /* Results & Learning Panels */
+        .result-panel { background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius-md); padding: 20px; display: none; flex-direction: column; gap: 16px; }
+        .result-panel.visible { display: flex; animation: fadeIn 0.4s ease; }
+        .result-header { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--primary); display: flex; justify-content: space-between; align-items: center;}
+        
+        .props-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .prop-box { background: var(--bg-card); border: 1px solid var(--border); padding: 12px; border-radius: var(--radius-sm); text-align: center; }
+        .prop-val { font-size: 1.2rem; font-weight: 900; color: var(--primary); }
+        .prop-lbl { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; }
+
+        .steps-container { background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; }
+        .steps-title { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; display:flex; align-items:center; gap:8px; }
+        .steps-list { display: flex; flex-direction: column; gap: 12px; }
+        .step-item { display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; line-height: 1.45; border-left: 3px solid var(--primary); padding-left: 12px; }
+        .step-num { font-weight: 800; color: var(--primary); font-size: 0.75rem; text-transform: uppercase; }
+        
+        .math-expr { background: var(--bg-card); border: 1px solid var(--border); padding: 2px 6px; border-radius: var(--radius-sm); font-family: monospace; font-weight: 700; color: var(--primary); display: inline-block; }
+
+        /* Chips & Visuals */
+        .chip-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .chip { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); }
+        .chip.prime { background: var(--accent-light); color: var(--chip-prime); border-color: var(--chip-prime); }
+        .chip.common { background: var(--success-light); color: var(--success); border-color: var(--success); }
+
+        /* Virtual Keypad */
+        .keypad-container { position: fixed; bottom: -360px; left: 0; right: 0; background: var(--keyboard-bg); border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.15); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; z-index: 999; transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .keypad-container.active { bottom: 0; }
+        .keypad-header { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px; }
+        .keypad-target-label { font-size: 0.82rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; }
+        .keypad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .keypad-btn { background: var(--keyboard-btn); border: none; border-radius: var(--radius-sm); padding: 16px 0; font-size: 1.35rem; font-weight: 800; color: var(--keyboard-btn-text); cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+        .keypad-btn:active { background: var(--primary); color: #fff; transform: scale(0.95); }
+        .keypad-btn.action { background: var(--border); color: var(--text-primary); }
+        .keypad-btn.submit { background: var(--primary); color: white; }
+        .keypad-btn.special { background: var(--accent); color: #fff; font-size: 1.5rem; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text-primary); color: var(--bg-app); padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; z-index: 1000; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none;}
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* History */
+        .history-item { background: var(--bg-card-alt); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; }
+        .history-item:active { background: var(--border); }
+        .history-header { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px; }
+        .history-desc { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+
+        /* Factor Tree Visualization */
+        .factor-tree { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px; font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--text-primary); background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border); overflow-x: auto;}
+        .tree-row { display: flex; gap: 16px; justify-content: center; position: relative; }
+        .tree-node { padding: 4px 12px; border: 2px solid var(--primary); border-radius: 8px; background: var(--primary-light); color: var(--primary); position: relative;}
+        .tree-node.prime { border-color: var(--chip-prime); background: var(--accent-light); color: var(--chip-prime); }
+        .tree-branch { width: 2px; height: 16px; background: var(--border); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-logo" onclick="app.showDashboard()" aria-label="Home">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2zm0 2.83l5 5V18h-2v-6H9v6H7v-8.17l5-5z"/></svg>
+            <div class="header-title">
+                <h1>MathCore</h1>
+                <span>HCF, LCM & Primes</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="app.toggleTheme()" aria-label="Toggle Theme">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="app-container">
+        
+        <!-- DASHBOARD -->
+        <main id="dashboard" class="dashboard-container">
+            <div class="dashboard-welcome">
+                <h2>Number Theory Studio</h2>
+                <p>An interactive utility for learning Prime Factorization, HCF, LCM, and Number Properties with step-by-step visual explanations.</p>
+            </div>
+
+            <div class="calc-grid">
+                <!-- Prime Checker -->
+                <div class="calc-menu-card" onclick="app.showSection('prime-check')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 8.98-7 10.12-3.87-1.14-7-5.45-7-10.12V6.3l7-3.12zm-1 5.82v4H8v2h3v4h2v-4h3v-2h-3v-4h-2z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Number Explorer</span>
+                        <span class="calc-card-desc">Prime check & properties</span>
+                    </div>
+                </div>
+                <!-- Factorization -->
+                <div class="calc-menu-card" onclick="app.showSection('factors')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M19.5 3.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5zM19 19.5l-1.5-1.5L16 19.5l-1.5-1.5L13 19.5l-1.5-1.5L10 19.5 8.5 18 7 19.5 5.5 18 4 19.5V4.5L5.5 6 7 4.5 8.5 6 10 4.5 11.5 6 13 4.5 14.5 6 16 4.5 17.5 6 19 4.5v15zM11 7h2v2h-2zm0 4h2v6h-2z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Factorization</span>
+                        <span class="calc-card-desc">Prime factors & factor tree</span>
+                    </div>
+                </div>
+                <!-- HCF & LCM -->
+                <div class="calc-menu-card" onclick="app.showSection('hcf-lcm')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M15 4H5v16h14V8h-4V4zM3 2.99C3 2.44 3.46 2 4.01 2h10.97l5.02 5v14.99A1.01 1.01 0 0 1 18.99 23H4.01A1.01 1.01 0 0 1 3 21.99V2.99zM7 11h10v2H7v-2zm0 4h10v2H7v-2z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">HCF & LCM Calculator</span>
+                        <span class="calc-card-desc">GCD, LCM & common factors</span>
+                    </div>
+                </div>
+                <!-- Multiples -->
+                <div class="calc-menu-card" onclick="app.showSection('multiples')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M4 10h3v7H4zM10.5 10h3v7h-3zM2 19h20v3H2zM17 10h3v7h-3zM12 2L2 7l10 5 10-5-10-5z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Multiples Generator</span>
+                        <span class="calc-card-desc">Times tables & sequences</span>
+                    </div>
+                </div>
+                <!-- History -->
+                <div class="calc-menu-card" onclick="app.showSection('history')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">History Logs</span>
+                        <span class="calc-card-desc">Recent math calculations</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 1: NUMBER EXPLORER -->
+        <section id="sec-prime-check" class="calc-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showDashboard()">&larr; Back</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Number Explorer</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-prime-check')">⌫</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Enter a Number</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="inp-explore" class="math-input single-num" placeholder="e.g. 29" maxlength="12">
+                    </div>
+                    <p class="hint-text">Check if prime, even/odd, perfect square, etc.</p>
+                </div>
+                <button class="btn btn-primary" onclick="app.exploreNumber()">Analyze Number</button>
+                
+                <div id="res-explore" class="result-panel">
+                    <div class="result-header">Number Properties <button class="icon-btn" style="width:24px;height:24px" onclick="app.copy('explore-val')">📄</button></div>
+                    <div class="result-value" id="explore-val" style="font-size: 1.5rem; color: var(--primary)"></div>
+                    
+                    <div class="props-grid" id="explore-props"></div>
+
+                    <div class="steps-container">
+                        <div class="steps-title">Prime Reasoning (Divisibility)</div>
+                        <div class="steps-list" id="explore-steps"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEC 2: FACTORIZATION & FACTORS -->
+        <section id="sec-factors" class="calc-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showDashboard()">&larr; Back</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Prime Factorization</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-factors')">⌫</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Enter a Number</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="inp-factorize" class="math-input single-num" placeholder="e.g. 60" maxlength="10">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="app.calculateFactors()">Generate Factors</button>
+                
+                <div id="res-factors" class="result-panel">
+                    <div class="result-header">Exponential Form</div>
+                    <div class="result-value" id="factorize-val" style="font-size: 1.8rem;"></div>
+                    
+                    <div class="steps-container">
+                        <div class="steps-title">Prime Factor Tree</div>
+                        <div id="factor-tree-container" class="factor-tree"></div>
+                    </div>
+
+                    <div class="steps-container">
+                        <div class="steps-title" id="all-factors-title">All Factors</div>
+                        <div class="chip-container" id="all-factors-chips"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEC 3: HCF & LCM -->
+        <section id="sec-hcf-lcm" class="calc-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showDashboard()">&larr; Back</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">HCF & LCM Calculator</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-hcf-lcm')">⌫</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Enter Numbers (Comma separated)</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="inp-hcflcm" class="math-input multi-num" placeholder="e.g. 12, 18, 24" maxlength="30">
+                    </div>
+                    <p class="hint-text">Use the comma [,] button to separate numbers.</p>
+                </div>
+                <button class="btn btn-primary" onclick="app.calculateHcfLcm()">Calculate HCF & LCM</button>
+                
+                <div id="res-hcflcm" class="result-panel">
+                    <div class="props-grid">
+                        <div class="prop-box">
+                            <div class="prop-lbl">Highest Common Factor</div>
+                            <div class="prop-val" id="hcf-val">0</div>
+                        </div>
+                        <div class="prop-box">
+                            <div class="prop-lbl">Least Common Multiple</div>
+                            <div class="prop-val" id="lcm-val">0</div>
+                        </div>
+                    </div>
+
+                    <div class="steps-container" id="common-factors-container">
+                        <div class="steps-title">Shared Common Factors</div>
+                        <div class="chip-container" id="common-factors-chips"></div>
+                    </div>
+
+                    <div class="steps-container">
+                        <div class="steps-title">Step-by-Step Solution</div>
+                        <div class="steps-list" id="hcflcm-steps"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEC 4: MULTIPLES -->
+        <section id="sec-multiples" class="calc-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showDashboard()">&larr; Back</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Multiples Generator</div>
+                    <button class="icon-btn" onclick="app.clearInputs('sec-multiples')">⌫</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex:2">
+                        <label class="input-label">Number</label>
+                        <div class="math-input-wrap">
+                            <input type="text" id="inp-mult-base" class="math-input single-num" placeholder="e.g. 7" maxlength="6">
+                        </div>
+                    </div>
+                    <div class="input-group" style="flex:1">
+                        <label class="input-label">Count</label>
+                        <div class="math-input-wrap">
+                            <input type="text" id="inp-mult-count" class="math-input single-num" value="10" maxlength="3">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="app.generateMultiples()">Generate Sequence</button>
+                
+                <div id="res-multiples" class="result-panel">
+                    <div class="result-header">Multiplication Table</div>
+                    <div class="steps-container">
+                        <div class="steps-list" id="mult-list" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEC 5: HISTORY -->
+        <section id="sec-history" class="calc-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showDashboard()">&larr; Back</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Recent Calculations</div>
+                    <button class="icon-btn" onclick="app.clearHistory()" style="color:var(--danger); border-color:var(--danger)">⌫</button>
+                </div>
+                <div id="history-container" style="display: flex; flex-direction: column;">
+                    <p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No history available.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Virtual Numeric Keypad -->
+    <div class="keypad-container" id="calculator-keypad">
+        <div class="keypad-header">
+            <span class="keypad-target-label" id="keypad-focused-title">Enter Number(s)</span>
+            <button class="icon-btn" onclick="app.closeKeypad()" style="width:32px; height:32px;">&darr;</button>
+        </div>
+        <div class="keypad-grid">
+            <button class="keypad-btn" data-val="1">1</button>
+            <button class="keypad-btn" data-val="2">2</button>
+            <button class="keypad-btn" data-val="3">3</button>
+            <button class="keypad-btn action" data-val="backspace">⌫</button>
+
+            <button class="keypad-btn" data-val="4">4</button>
+            <button class="keypad-btn" data-val="5">5</button>
+            <button class="keypad-btn" data-val="6">6</button>
+            <button class="keypad-btn action" data-val="clear">C</button>
+
+            <button class="keypad-btn" data-val="7">7</button>
+            <button class="keypad-btn" data-val="8">8</button>
+            <button class="keypad-btn" data-val="9">9</button>
+            <button class="keypad-btn special" data-val="comma">,</button>
+
+            <button class="keypad-btn action" style="opacity: 0.5" disabled></button>
+            <button class="keypad-btn" data-val="0">0</button>
+            <button class="keypad-btn action" data-val="next">Next</button>
+            <button class="keypad-btn submit" data-val="submit">OK</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Message</div>
+
+    <script>
+        const app = {
+            focusedInput: null,
+            history: [],
+
+            init() {
+                this.initKeypad();
+                this.loadState();
+            },
+
+            // --- Navigation & UI ---
+            showDashboard() {
+                document.querySelectorAll('.calc-section').forEach(el => el.classList.remove('active'));
+                document.getElementById('dashboard').style.display = 'flex';
+                this.closeKeypad();
+                window.scrollTo(0, 0);
+            },
+            showSection(id) {
+                document.getElementById('dashboard').style.display = 'none';
+                document.querySelectorAll('.calc-section').forEach(el => el.classList.remove('active'));
+                document.getElementById('sec-' + id).classList.add('active');
+                if (id === 'history') this.renderHistory();
+                window.scrollTo(0, 0);
+            },
+            toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme');
+                let next = 'light';
+                if (current === 'light') next = 'dark';
+                else if (current === 'dark') next = 'amoled';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('mathcore-theme', next);
+                this.showToast(`Theme set to ${next}`);
+            },
+            showToast(msg) {
+                const t = document.getElementById('toast');
+                t.textContent = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2500);
+            },
+            copy(elementId) {
+                const txt = document.getElementById(elementId).innerText;
+                const ta = document.createElement('textarea');
+                ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                this.showToast("Copied to clipboard!");
+            },
+            clearInputs(sectionId) {
+                document.getElementById(sectionId).querySelectorAll('.math-input').forEach(i => i.value = '');
+                const panel = document.getElementById(sectionId).querySelector('.result-panel');
+                if(panel) panel.classList.remove('visible');
+                this.showToast("Inputs cleared");
+            },
+
+            // --- Keypad Logic ---
+            initKeypad() {
+                document.querySelectorAll('.math-input').forEach(input => {
+                    input.setAttribute('inputmode', 'none'); // Block native keyboard
+                    input.addEventListener('focus', (e) => {
+                        this.focusedInput = e.target;
+                        
+                        // Disable comma button if input is single-num
+                        const isMulti = e.target.classList.contains('multi-num');
+                        const commaBtn = document.querySelector('.keypad-btn[data-val="comma"]');
+                        if (isMulti) {
+                            commaBtn.style.opacity = '1';
+                            commaBtn.disabled = false;
+                        } else {
+                            commaBtn.style.opacity = '0.3';
+                            commaBtn.disabled = true;
+                        }
+
+                        document.getElementById('calculator-keypad').classList.add('active');
+                    });
+                });
+
+                document.querySelector('.keypad-grid').addEventListener('click', (e) => {
+                    if(!this.focusedInput) return;
+                    const btn = e.target.closest('.keypad-btn');
+                    if(!btn || btn.disabled) return;
+                    
+                    const val = btn.getAttribute('data-val');
+                    if(!val) return;
+
+                    let cur = this.focusedInput.value;
+                    const maxLen = parseInt(this.focusedInput.getAttribute('maxlength')) || 20;
+
+                    if(val === 'backspace') {
+                        this.focusedInput.value = cur.slice(0, -1);
+                    } else if(val === 'clear') {
+                        this.focusedInput.value = '';
+                    } else if(val === 'comma') {
+                        // Prevent consecutive commas or comma at start
+                        if (cur.length > 0 && !cur.endsWith(', ') && !cur.endsWith(',')) {
+                            this.focusedInput.value += ', ';
+                        }
+                    } else if(val === 'next') {
+                        this.cycleFocus();
+                    } else if(val === 'submit') {
+                        this.closeKeypad();
+                        this.triggerCalcByInput(this.focusedInput.id);
+                    } else {
+                        if (cur.length < maxLen) {
+                            this.focusedInput.value += val;
+                        }
+                    }
+                });
+            },
+            closeKeypad() {
+                document.getElementById('calculator-keypad').classList.remove('active');
+                if(this.focusedInput) this.focusedInput.blur();
+            },
+            cycleFocus() {
+                const visibleInputs = Array.from(document.querySelectorAll('.calc-section.active .math-input'));
+                const idx = visibleInputs.indexOf(this.focusedInput);
+                if(idx > -1 && idx < visibleInputs.length - 1) visibleInputs[idx + 1].focus();
+                else {
+                    this.triggerCalcByInput(this.focusedInput.id);
+                    this.closeKeypad();
+                }
+            },
+            triggerCalcByInput(id) {
+                if(id === 'inp-explore') this.exploreNumber();
+                else if(id === 'inp-factorize') this.calculateFactors();
+                else if(id === 'inp-hcflcm') this.calculateHcfLcm();
+                else if(id === 'inp-mult-base' || id === 'inp-mult-count') this.generateMultiples();
+            },
+
+            // --- Math Utilities ---
+            isPrime(n) {
+                if (n <= 1) return false;
+                if (n <= 3) return true;
+                if (n % 2 === 0 || n % 3 === 0) return false;
+                for (let i = 5; i * i <= n; i += 6) {
+                    if (n % i === 0 || n % (i + 2) === 0) return false;
+                }
+                return true;
+            },
+            getPrimeFactors(n) {
+                const factors = [];
+                while (n % 2 === 0) { factors.push(2); n = n / 2; }
+                for (let i = 3; i * i <= n; i += 2) {
+                    while (n % i === 0) { factors.push(i); n = n / i; }
+                }
+                if (n > 2) factors.push(n);
+                return factors;
+            },
+            getAllFactors(n) {
+                const factors = new Set();
+                for(let i = 1; i * i <= n; i++) {
+                    if(n % i === 0) {
+                        factors.add(i);
+                        factors.add(n / i);
+                    }
+                }
+                return Array.from(factors).sort((a,b) => a - b);
+            },
+            gcd(a, b) {
+                while(b) { let t = b; b = a % b; a = t; }
+                return a;
+            },
+            lcm(a, b) {
+                if (a === 0 || b === 0) return 0;
+                return Math.abs(a * b) / this.gcd(a, b);
+            },
+            parseMultiInput(str) {
+                return str.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+            },
+            formatExponential(factors) {
+                if (factors.length === 0) return "None";
+                const counts = {};
+                factors.forEach(f => counts[f] = (counts[f] || 0) + 1);
+                const parts = [];
+                for(let prime in counts) {
+                    if(counts[prime] > 1) parts.push(`${prime}<sup>${counts[prime]}</sup>`);
+                    else parts.push(`${prime}`);
+                }
+                return parts.join(' &times; ');
+            },
+
+            // --- Core Features ---
+
+            // 1. Explore Number
+            exploreNumber() {
+                const val = parseInt(document.getElementById('inp-explore').value);
+                if (isNaN(val) || val < 0) return this.showToast("Please enter a valid positive number.");
+                if (val > 999999999999) return this.showToast("Number is too large.");
+
+                const isPrime = this.isPrime(val);
+                const isEven = val % 2 === 0;
+                const isPerfSquare = Math.sqrt(val) % 1 === 0;
+                
+                // Divisibility string
+                let divRules = [];
+                if(val % 2 === 0) divRules.push("2 (ends in even)");
+                const digitSum = val.toString().split('').reduce((acc, d) => acc + parseInt(d), 0);
+                if(digitSum % 3 === 0) divRules.push(`3 (sum is ${digitSum})`);
+                if(val % 5 === 0) divRules.push("5 (ends in 0 or 5)");
+
+                document.getElementById('explore-val').innerText = val;
+                
+                let propsHTML = `
+                    <div class="prop-box">
+                        <div class="prop-lbl">Classification</div>
+                        <div class="prop-val" style="color: ${isPrime ? 'var(--chip-prime)' : (val<=1 ? 'var(--text-secondary)' : 'var(--chip-comp)')}">${val <= 1 ? 'Neither' : (isPrime ? 'Prime' : 'Composite')}</div>
+                    </div>
+                    <div class="prop-box">
+                        <div class="prop-lbl">Parity</div>
+                        <div class="prop-val">${isEven ? 'Even' : 'Odd'}</div>
+                    </div>
+                    <div class="prop-box">
+                        <div class="prop-lbl">Perfect Square?</div>
+                        <div class="prop-val">${isPerfSquare ? 'Yes' : 'No'}</div>
+                    </div>
+                    <div class="prop-box">
+                        <div class="prop-lbl">Digit Sum</div>
+                        <div class="prop-val">${digitSum}</div>
+                    </div>
+                `;
+                document.getElementById('explore-props').innerHTML = propsHTML;
+
+                let stepsHTML = '';
+                if (val <= 1) {
+                    stepsHTML = `<div class="step-item"><span class="step-num">Rule</span><p>${val} is defined as neither prime nor composite.</p></div>`;
+                } else if (isPrime) {
+                    stepsHTML = `
+                        <div class="step-item"><span class="step-num">Prime Property</span><p>${val} has exactly two distinct positive divisors: 1 and ${val}.</p></div>
+                        <div class="step-item"><span class="step-num">Check</span><p>It cannot be divided evenly by any integer from 2 up to its square root (${Math.floor(Math.sqrt(val))}).</p></div>
+                    `;
+                } else {
+                    const factors = this.getPrimeFactors(val);
+                    stepsHTML = `
+                        <div class="step-item"><span class="step-num">Composite Property</span><p>${val} has more than two divisors.</p></div>
+                        <div class="step-item"><span class="step-num">Divisibility</span><p>It is divisible by ${factors[0]}. (${factors[0]} × ${val/factors[0]} = ${val})</p></div>
+                    `;
+                }
+
+                if (divRules.length > 0) {
+                    stepsHTML += `<div class="step-item"><span class="step-num">Divisibility Shortcuts</span><p>Divisible by: ${divRules.join(', ')}</p></div>`;
+                }
+
+                document.getElementById('explore-steps').innerHTML = stepsHTML;
+                document.getElementById('res-explore').classList.add('visible');
+                
+                this.logHistory("Number Explorer", `${val} &rarr; ${isPrime ? 'Prime' : 'Composite'}`);
+                this.closeKeypad();
+            },
+
+            // 2. Factorization
+            calculateFactors() {
+                const val = parseInt(document.getElementById('inp-factorize').value);
+                if (isNaN(val) || val <= 0) return this.showToast("Please enter a positive integer.");
+                if (val > 9999999999) return this.showToast("Number is too large for visual tree.");
+
+                const primeFactors = this.getPrimeFactors(val);
+                const expHTML = this.formatExponential(primeFactors);
+                
+                document.getElementById('factorize-val').innerHTML = `${val} = <span style="color:var(--primary)">${expHTML}</span>`;
+
+                // Build Factor Tree Visualization
+                let treeHTML = '';
+                let current = val;
+                
+                if (val <= 1) {
+                    treeHTML = `<div class="tree-node">${val}</div><p style="font-size:0.8rem; margin-top:10px;">Does not have prime factors.</p>`;
+                } else if (primeFactors.length === 1) {
+                    treeHTML = `<div class="tree-node prime">${val} (Prime)</div>`;
+                } else {
+                    treeHTML += `<div class="tree-row"><div class="tree-node">${current}</div></div>`;
+                    for(let i = 0; i < primeFactors.length - 1; i++) {
+                        let p = primeFactors[i];
+                        current = current / p;
+                        treeHTML += `
+                            <div class="tree-row">
+                                <div class="tree-branch" style="transform: rotate(30deg); margin-right: 20px;"></div>
+                                <div class="tree-branch" style="transform: rotate(-30deg); margin-left: 20px;"></div>
+                            </div>
+                            <div class="tree-row">
+                                <div class="tree-node prime">${p}</div>
+                                <div class="tree-node ${i === primeFactors.length - 2 ? 'prime' : ''}">${current}</div>
+                            </div>
+                        `;
+                    }
+                }
+                document.getElementById('factor-tree-container').innerHTML = treeHTML;
+
+                // All factors
+                const allFactors = this.getAllFactors(val);
+                document.getElementById('all-factors-title').innerText = `All Factors (${allFactors.length})`;
+                document.getElementById('all-factors-chips').innerHTML = allFactors.map(f => {
+                    const isP = this.isPrime(f);
+                    return `<span class="chip ${isP ? 'prime' : ''}">${f}</span>`;
+                }).join('');
+
+                document.getElementById('res-factors').classList.add('visible');
+                this.logHistory("Factorization", `${val} = ${expHTML.replace(/<[^>]*>?/gm, '')}`);
+                this.closeKeypad();
+            },
+
+            // 3. HCF & LCM
+            calculateHcfLcm() {
+                const nums = this.parseMultiInput(document.getElementById('inp-hcflcm').value);
+                if (nums.length < 2) return this.showToast("Please enter at least two valid numbers separated by commas.");
+                if (nums.some(n => n > 9999999)) return this.showToast("Numbers must be under 10 million.");
+
+                let hcfResult = nums[0];
+                let lcmResult = nums[0];
+                for(let i=1; i<nums.length; i++) {
+                    hcfResult = this.gcd(hcfResult, nums[i]);
+                    lcmResult = this.lcm(lcmResult, nums[i]);
+                }
+
+                document.getElementById('hcf-val').innerText = hcfResult;
+                document.getElementById('lcm-val').innerText = lcmResult;
+
+                // Find Common Factors
+                const cfContainer = document.getElementById('common-factors-container');
+                if (nums.length <= 5 && nums.every(n => n <= 100000)) {
+                    let commonFactors = this.getAllFactors(nums[0]);
+                    for(let i=1; i<nums.length; i++) {
+                        const setB = new Set(this.getAllFactors(nums[i]));
+                        commonFactors = commonFactors.filter(f => setB.has(f));
+                    }
+                    document.getElementById('common-factors-chips').innerHTML = commonFactors.map(f => 
+                        `<span class="chip ${f === hcfResult ? 'common' : ''}">${f}</span>`
+                    ).join('');
+                    cfContainer.style.display = 'block';
+                } else {
+                    cfContainer.style.display = 'none'; // Too heavy to compute/show
+                }
+
+                // Educational Steps
+                let stepsHTML = `<div class="step-item"><span class="step-num">Step 1: Input Sequence</span><p>Numbers: ${nums.join(', ')}</p></div>`;
+                
+                // Show prime factorization for the first two numbers as an example
+                const pf1 = this.formatExponential(this.getPrimeFactors(nums[0]));
+                const pf2 = this.formatExponential(this.getPrimeFactors(nums[1]));
+                stepsHTML += `<div class="step-item"><span class="step-num">Step 2: Prime Factorization (First 2)</span>
+                              <p>${nums[0]} = ${pf1}<br>${nums[1]} = ${pf2}</p></div>`;
+                
+                stepsHTML += `<div class="step-item"><span class="step-num">HCF (Highest Common Factor)</span>
+                              <p>The largest number that divides all inputs exactly is <b>${hcfResult}</b>.</p></div>`;
+                
+                stepsHTML += `<div class="step-item"><span class="step-num">LCM (Least Common Multiple)</span>
+                              <p>The smallest number that is a multiple of all inputs is <b>${lcmResult}</b>.</p></div>`;
+
+                document.getElementById('hcflcm-steps').innerHTML = stepsHTML;
+                document.getElementById('res-hcflcm').classList.add('visible');
+
+                this.logHistory("HCF & LCM", `HCF(${nums.join(',')}) = ${hcfResult}, LCM = ${lcmResult}`);
+                this.closeKeypad();
+            },
+
+            // 4. Multiples
+            generateMultiples() {
+                const base = parseInt(document.getElementById('inp-mult-base').value);
+                const count = parseInt(document.getElementById('inp-mult-count').value) || 10;
+                
+                if(isNaN(base) || base <= 0) return this.showToast("Enter a valid positive number.");
+                if(count <= 0 || count > 100) return this.showToast("Count should be between 1 and 100.");
+
+                let html = '';
+                for(let i = 1; i <= count; i++) {
+                    html += `
+                        <div class="step-item" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                            <span>${base} &times; ${i}</span>
+                            <span class="math-expr" style="font-size:1.1rem">${base * i}</span>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('mult-list').innerHTML = html;
+                document.getElementById('res-multiples').classList.add('visible');
+                
+                this.logHistory("Multiples", `First ${count} multiples of ${base}`);
+                this.closeKeypad();
+            },
+
+            // --- History System ---
+            logHistory(title, detail) {
+                const item = { title, detail, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
+                // avoid duplicate consecutive history
+                if(this.history.length > 0 && this.history[0].detail === detail) return;
+                
+                this.history.unshift(item);
+                if(this.history.length > 25) this.history.pop();
+                localStorage.setItem('mathcore-history', JSON.stringify(this.history));
+            },
+            renderHistory() {
+                const container = document.getElementById('history-container');
+                if(this.history.length === 0) {
+                    container.innerHTML = `<p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No history available.</p>`;
+                    return;
+                }
+                container.innerHTML = this.history.map(h => `
+                    <div class="history-item">
+                        <div class="history-header">${h.time} &bull; ${h.title}</div>
+                        <div class="history-desc">${h.detail}</div>
+                    </div>
+                `).join('');
+            },
+            clearHistory() {
+                this.history = [];
+                localStorage.removeItem('mathcore-history');
+                this.renderHistory();
+                this.showToast("History Cleared");
+            },
+
+            // --- Initialization ---
+            loadState() {
+                const savedTheme = localStorage.getItem('mathcore-theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                
+                const hist = localStorage.getItem('mathcore-history');
+                if(hist) {
+                    try { this.history = JSON.parse(hist); } catch(e) {}
+                }
+            }
+        };
+
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
