@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProbabLab - Probability & Statistics Studio</title>
+    <style>
+        /* CSS Variables & Multi-Theme System */
+        :root {
+            --bg-app: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-hover: #4338ca;
+            --accent: #f43f5e;
+            --accent-light: #ffe4e6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            --keyboard-bg: #e2e8f0;
+            --keyboard-btn: #ffffff;
+            --keyboard-btn-text: #0f172a;
+            --viz-bar: #4f46e5;
+        }
+
+        [data-theme="dark"] {
+            --bg-app: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-alt: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary: #818cf8;
+            --primary-light: #1e1b4b;
+            --primary-hover: #6366f1;
+            --accent: #fb7185;
+            --accent-light: #4c1d95;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --keyboard-bg: #0f172a;
+            --keyboard-btn: #1e293b;
+            --keyboard-btn-text: #f8fafc;
+            --viz-bar: #818cf8;
+        }
+
+        [data-theme="amoled"] {
+            --bg-app: #000000;
+            --bg-card: #0a0a0a;
+            --bg-card-alt: #161616;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --primary: #4f46e5;
+            --primary-light: #0a0520;
+            --primary-hover: #6366f1;
+            --accent: #f43f5e;
+            --accent-light: #33001b;
+            --border: #262626;
+            --shadow: none;
+            --keyboard-bg: #000000;
+            --keyboard-btn: #161616;
+            --keyboard-btn-text: #ffffff;
+            --viz-bar: #4f46e5;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: var(--font-family); transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
+        body { background-color: var(--bg-app); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        
+        .app-container { width: 100%; max-width: 700px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; padding-bottom: 350px; }
+
+        /* Navigation Header */
+        header { position: sticky; top: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+        .header-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .header-logo svg { width: 28px; height: 28px; fill: var(--primary); }
+        .header-title h1 { font-size: 1.3rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
+        .header-title span { font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; text-transform: uppercase; }
+        .header-actions { display: flex; gap: 8px; }
+        
+        .icon-btn { background: var(--bg-card-alt); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; }
+        .icon-btn:active { transform: scale(0.95); }
+
+        /* Dashboard & Menu Grid */
+        .dashboard-container { display: flex; flex-direction: column; gap: 16px; animation: fadeIn 0.3s ease; }
+        .dashboard-welcome { background: linear-gradient(135deg, var(--primary-light), var(--bg-card)); border: 1px solid var(--primary); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }
+        .dashboard-welcome h2 { font-size: 1.3rem; font-weight: 900; color: var(--primary); margin-bottom: 6px; }
+        .dashboard-welcome p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4; }
+
+        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 500px) { .calc-grid { grid-template-columns: repeat(2, 1fr); } }
+        
+        .calc-menu-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: var(--shadow); }
+        .calc-menu-card:active { transform: scale(0.97); border-color: var(--primary); }
+        .calc-card-icon { width: 46px; height: 46px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.4rem; font-weight: 900;}
+        .calc-card-info { display: flex; flex-direction: column; gap: 2px; }
+        .calc-card-title { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); }
+        .calc-card-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Sections Framework */
+        .app-section { display: none; flex-direction: column; gap: 16px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .app-section.active { display: flex; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-header-nav { display: flex; align-items: center; margin-bottom: 4px; }
+        .btn-back { background: transparent; border: none; color: var(--primary); font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 6px 0; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .card-title { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+
+        /* Forms & Inputs */
+        .input-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        .input-label { font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .math-input-wrap { position: relative; display: flex; align-items: center; }
+        .math-input { width: 100%; background: var(--bg-card-alt); border: 2px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; font-size: 1.25rem; font-weight: 800; color: var(--text-primary); outline: none; }
+        .math-input:focus { border-color: var(--primary); background: var(--bg-card); }
+        .math-input.error { border-color: var(--danger); background: rgba(239, 68, 68, 0.05); }
+
+        .toggle-group { display: flex; background: var(--bg-card-alt); border-radius: var(--radius-md); padding: 4px; border: 1px solid var(--border); gap: 4px;}
+        .toggle-btn { flex: 1; padding: 10px; border: none; background: transparent; border-radius: var(--radius-sm); font-weight: 700; color: var(--text-secondary); cursor: pointer; font-size: 0.85rem;}
+        .toggle-btn.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow); }
+
+        .btn { padding: 14px 20px; border-radius: var(--radius-md); font-weight: 800; font-size: 0.95rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: var(--bg-card-alt); color: var(--text-primary); border: 1px solid var(--border); }
+        
+        /* Stats & Result Panels */
+        .result-panel { background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius-md); padding: 20px; display: none; flex-direction: column; gap: 16px; }
+        .result-panel.visible { display: flex; animation: fadeIn 0.4s ease; }
+        .result-header { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .result-main { display: flex; flex-direction: column; gap: 8px; }
+        .result-value { font-size: 2rem; font-weight: 900; color: var(--text-primary); letter-spacing: -1px; display: flex; align-items: center; gap: 12px;}
+        .result-sub { font-size: 1rem; color: var(--text-secondary); font-weight: 700; display: flex; gap: 12px;}
+
+        /* Math Fractions */
+        .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; padding: 0 4px; font-size: 0.9em; }
+        .numerator { border-bottom: 2px solid currentColor; padding: 0 4px 2px 4px; }
+        .denominator { padding: 2px 4px 0 4px; }
+
+        /* Step-by-Step Panels */
+        .edu-panel { background: var(--accent-light); border: 1px solid var(--accent); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .edu-title { font-size: 1rem; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        .edu-step { font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); padding-left: 12px; border-left: 3px solid var(--accent); }
+        .math-expr { background: var(--bg-card); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: 800; color: var(--primary); display: inline-block; }
+
+        /* CSS Visualizations */
+        .viz-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 16px; overflow: hidden; }
+        
+        /* Dice Visualization */
+        .dice { width: 80px; height: 80px; background: var(--bg-card-alt); border: 2px solid var(--border); border-radius: 12px; position: relative; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 8px; gap: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+        .dot { width: 14px; height: 14px; background: var(--primary); border-radius: 50%; margin: auto; display: none; }
+        .dice.roll-anim { animation: diceRoll 0.6s ease-out; }
+        @keyframes diceRoll { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(1); } }
+        
+        /* Coin Visualization */
+        .coin { width: 80px; height: 80px; background: radial-gradient(circle, var(--accent) 0%, var(--accent-light) 100%); border: 3px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; color: var(--text-primary); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); perspective: 1000px; transform-style: preserve-3d; }
+        .coin.flip-anim { animation: coinFlip 0.6s ease-out; }
+        @keyframes coinFlip { 0% { transform: rotateY(0deg) scale(1); } 50% { transform: rotateY(540deg) scale(1.2); } 100% { transform: rotateY(1080deg) scale(1); } }
+
+        /* Custom Keypad */
+        .keypad-container { position: fixed; bottom: -400px; left: 0; right: 0; background: var(--keyboard-bg); border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.15); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; z-index: 999; transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .keypad-container.active { bottom: 0; }
+        .keypad-header { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px; }
+        .keypad-target-label { font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; }
+        .keypad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .keypad-btn { background: var(--keyboard-btn); border: none; border-radius: var(--radius-sm); padding: 16px 0; font-size: 1.3rem; font-weight: 800; color: var(--keyboard-btn-text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); user-select: none; }
+        .keypad-btn:active { background: var(--primary); color: #fff; transform: scale(0.95); }
+        .keypad-btn.action { background: var(--border); color: var(--text-primary); }
+        .keypad-btn.submit { background: var(--primary); color: white; grid-column: span 2; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text-primary); color: var(--bg-app); padding: 12px 24px; border-radius: 50px; font-weight: 800; font-size: 0.9rem; z-index: 1000; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Quiz UI */
+        .quiz-box { background: var(--bg-card-alt); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 12px; }
+        .quiz-q { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); line-height: 1.4; }
+        .quiz-opts { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .quiz-opt { background: var(--bg-card); border: 2px solid var(--border); padding: 12px; border-radius: var(--radius-sm); font-weight: 700; text-align: left; cursor: pointer; color: var(--text-primary); }
+        .quiz-opt:active { transform: scale(0.98); }
+        .quiz-opt.correct { border-color: var(--success); background: var(--success-light); color: var(--success); }
+        .quiz-opt.wrong { border-color: var(--danger); background: rgba(239, 68, 68, 0.05); color: var(--danger); }
+        
+        /* History Items */
+        .history-item { background: var(--bg-card-alt); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; }
+        .history-item:active { background: var(--border); }
+        .history-title { font-size: 0.85rem; font-weight: 800; color: var(--primary); display: flex; justify-content: space-between; }
+        .history-calc { font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-logo" onclick="app.showSection('dashboard')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
+            <div class="header-title">
+                <h1>ProbabLab</h1>
+                <span>Probability Studio</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="app.toggleTheme()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <!-- DASHBOARD HUB -->
+        <main id="sec-dashboard" class="app-section active dashboard-container">
+            <div class="dashboard-welcome">
+                <h2>Probability & Stats Engine</h2>
+                <p>Calculate events, combinations, and conditional probabilities. Visualize coin tosses and dice rolls with interactive offline tools.</p>
+            </div>
+
+            <div class="calc-grid">
+                <div class="calc-menu-card" onclick="app.showSection('basic')">
+                    <div class="calc-card-icon">%</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Basic Probability</span>
+                        <span class="calc-card-desc">Favorable ÷ Total outcomes</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('event')">
+                    <div class="calc-card-icon">∪</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Event Probability</span>
+                        <span class="calc-card-desc">Union, Intersection, P(A or B)</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('conditional')">
+                    <div class="calc-card-icon">|</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Conditional Prob.</span>
+                        <span class="calc-card-desc">Calculate P(A|B) Bayes</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('combo')">
+                    <div class="calc-card-icon">!</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Permute & Combo</span>
+                        <span class="calc-card-desc">nCr, nPr and Factorials</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('dice')">
+                    <div class="calc-card-icon">🎲</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Dice Simulator</span>
+                        <span class="calc-card-desc">Simulate & analyze dice rolls</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('coin')">
+                    <div class="calc-card-icon">🪙</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Coin Toss Lab</span>
+                        <span class="calc-card-desc">Heads, Tails, sequences</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('cards')">
+                    <div class="calc-card-icon">♠️</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Playing Cards</span>
+                        <span class="calc-card-desc">Deck probability analysis</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('quiz')">
+                    <div class="calc-card-icon">🧠</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Practice Quiz</span>
+                        <span class="calc-card-desc">Test your math skills</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('history')">
+                    <div class="calc-card-icon">📚</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Calculations History</span>
+                        <span class="calc-card-desc">Review local storage logs</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('notes')">
+                    <div class="calc-card-icon">📖</div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Formula Guide</span>
+                        <span class="calc-card-desc">Definitions & math rules</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 1: BASIC PROBABILITY -->
+        <main id="sec-basic" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Basic Probability P(A)</div>
+                    <button class="icon-btn" onclick="app.clearSection('sec-basic')">⌫</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Favorable Outcomes</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="bas-fav" class="math-input" placeholder="e.g. 3">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Total Possible Outcomes</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="bas-tot" class="math-input" placeholder="e.g. 10">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="app.calcBasic()">Calculate Probability</button>
+
+                <div id="res-basic" class="result-panel">
+                    <div class="result-header">Probability Output <button class="icon-btn" style="width:28px;height:28px" onclick="app.copy('val-bas')">📄</button></div>
+                    <div class="result-main">
+                        <div class="result-value" id="val-bas">0</div>
+                        <div class="result-sub" id="val-bas-sub">Decimal: 0 | 0%</div>
+                    </div>
+                    <div class="edu-panel">
+                        <div class="edu-title">Theoretical Derivation</div>
+                        <div class="edu-step"><b>Formula:</b> <span class="math-expr">P(A) = Favorable / Total Outcomes</span></div>
+                        <div class="edu-step" id="edu-bas-step"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 2: EVENT PROBABILITY -->
+        <main id="sec-event" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Event Probability</div>
+                    <button class="icon-btn" onclick="app.clearSection('sec-event')">⌫</button>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Event Relationship</label>
+                    <div class="toggle-group" id="evt-type">
+                        <button class="toggle-btn active" data-val="mut">Mutually Exclusive</button>
+                        <button class="toggle-btn" data-val="ind">Independent</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Probability of A - P(A)</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="evt-pa" class="math-input" placeholder="e.g. 0.4">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Probability of B - P(B)</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="evt-pb" class="math-input" placeholder="e.g. 0.3">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="app.calcEvent()">Calculate Union & Intersection</button>
+
+                <div id="res-event" class="result-panel">
+                    <div class="result-header">Analysis Results</div>
+                    <div class="result-main">
+                        <div style="font-size:0.9rem; font-weight:800; color:var(--text-secondary)">Intersection P(A ∩ B) [A AND B]:</div>
+                        <div class="result-value" id="val-evt-int" style="font-size:1.5rem; color:var(--accent)">0</div>
+                        <div style="font-size:0.9rem; font-weight:800; color:var(--text-secondary); margin-top:8px;">Union P(A ∪ B) [A OR B]:</div>
+                        <div class="result-value" id="val-evt-uni" style="font-size:1.5rem">0</div>
+                    </div>
+                    <div class="edu-panel">
+                        <div class="edu-title">Logical Steps</div>
+                        <div class="edu-step" id="edu-evt-int"></div>
+                        <div class="edu-step" id="edu-evt-uni"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 3: CONDITIONAL PROBABILITY -->
+        <main id="sec-conditional" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Conditional P(A|B)</div>
+                    <button class="icon-btn" onclick="app.clearSection('sec-conditional')">⌫</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Intersection P(A ∩ B)</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="cond-int" class="math-input" placeholder="e.g. 0.2">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Probability of condition B - P(B)</label>
+                    <div class="math-input-wrap">
+                        <input type="text" id="cond-pb" class="math-input" placeholder="e.g. 0.5">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="app.calcCond()">Calculate P(A|B)</button>
+
+                <div id="res-cond" class="result-panel">
+                    <div class="result-header">Conditional Probability <button class="icon-btn" style="width:28px;height:28px" onclick="app.copy('val-cond')">📄</button></div>
+                    <div class="result-main">
+                        <div class="result-value" id="val-cond">0</div>
+                    </div>
+                    <div class="edu-panel">
+                        <div class="edu-title">Bayesian Logic</div>
+                        <div class="edu-step"><b>Formula:</b> <span class="math-expr">P(A|B) = P(A ∩ B) / P(B)</span></div>
+                        <div class="edu-step" id="edu-cond-step"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 4: PERMUTATIONS & COMBINATIONS -->
+        <main id="sec-combo" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Combinatorics (nCr & nPr)</div>
+                    <button class="icon-btn" onclick="app.clearSection('sec-combo')">⌫</button>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div class="input-group">
+                        <label class="input-label">Total Items (n)</label>
+                        <div class="math-input-wrap">
+                            <input type="text" id="cmb-n" class="math-input" placeholder="e.g. 5">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Chosen (r)</label>
+                        <div class="math-input-wrap">
+                            <input type="text" id="cmb-r" class="math-input" placeholder="e.g. 2">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="app.calcCombo()">Calculate Combinatorics</button>
+
+                <div id="res-combo" class="result-panel">
+                    <div class="result-header">Factorial Results</div>
+                    <div class="result-main">
+                        <div style="font-size:0.9rem; font-weight:800; color:var(--text-secondary)">Combinations (nCr) [Order doesn't matter]:</div>
+                        <div class="result-value" id="val-cmb-c" style="font-size:1.6rem; color:var(--accent)">0</div>
+                        <div style="font-size:0.9rem; font-weight:800; color:var(--text-secondary); margin-top:8px;">Permutations (nPr) [Order matters]:</div>
+                        <div class="result-value" id="val-cmb-p" style="font-size:1.6rem">0</div>
+                    </div>
+                    <div class="edu-panel">
+                        <div class="edu-title">Factorial Math Steps</div>
+                        <div class="edu-step" id="edu-cmb-c"></div>
+                        <div class="edu-step" id="edu-cmb-p"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 5: DICE SIMULATOR -->
+        <main id="sec-dice" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Standard 6-Sided Dice Roll</div>
+                </div>
+                
+                <div class="viz-box">
+                    <div class="dice" id="dice-element">
+                        <!-- Dots rendered via JS -->
+                        <div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+                        <div class="dot" id="d4"></div><div class="dot" id="d5"></div><div class="dot" id="d6"></div>
+                        <div class="dot" id="d7"></div><div class="dot" id="d8"></div><div class="dot" id="d9"></div>
+                    </div>
+                    <div style="font-size: 2rem; font-weight: 900; color: var(--primary);" id="dice-res-val">?</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="app.rollDice()">Roll Dice</button>
+
+                <div class="edu-panel" style="margin-top: 10px;">
+                    <div class="edu-title">Sample Space Analysis</div>
+                    <div class="edu-step"><b>Sample Space (S):</b> {1, 2, 3, 4, 5, 6}. Total outcomes = 6.</div>
+                    <div class="edu-step">Probability of any single number: <span class="math-expr">1/6 &approx; 16.67%</span></div>
+                    <div class="edu-step">Probability of Even (2,4,6): <span class="math-expr">3/6 = 1/2 = 50%</span></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 6: COIN TOSS SIMULATOR -->
+        <main id="sec-coin" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Coin Flip Simulator</div>
+                </div>
+                
+                <div class="viz-box">
+                    <div class="coin" id="coin-element">?</div>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: var(--primary);" id="coin-res-val">Flip to start</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="app.flipCoin()">Flip Coin</button>
+
+                <div class="edu-panel" style="margin-top: 10px;">
+                    <div class="edu-title">Sample Space Analysis</div>
+                    <div class="edu-step"><b>Sample Space (S):</b> {Heads, Tails}. Total outcomes = 2.</div>
+                    <div class="edu-step">Probability of Heads: <span class="math-expr">1/2 = 50%</span></div>
+                    <div class="edu-step">Law of Large Numbers: Over many flips, the ratio of Heads to Tails approaches 50/50.</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 7: PLAYING CARDS -->
+        <main id="sec-cards" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">52-Card Deck Analysis</div>
+                </div>
+                
+                <div class="edu-panel" style="background:var(--bg-card); border-color:var(--border);">
+                    <div class="edu-step" style="border-left-color:var(--primary)"><b>Total Cards:</b> 52</div>
+                    <div class="edu-step" style="border-left-color:var(--danger)"><b>Red Cards (Hearts, Diamonds):</b> 26 <br>P(Red) = 26/52 = 1/2 (50%)</div>
+                    <div class="edu-step" style="border-left-color:var(--text-primary)"><b>Black Cards (Spades, Clubs):</b> 26 <br>P(Black) = 26/52 = 1/2 (50%)</div>
+                    <div class="edu-step" style="border-left-color:var(--accent)"><b>Face Cards (J, Q, K):</b> 12 (3 per suit) <br>P(Face) = 12/52 = 3/13 (&approx;23.08%)</div>
+                    <div class="edu-step" style="border-left-color:var(--warning)"><b>Aces:</b> 4 (1 per suit) <br>P(Ace) = 4/52 = 1/13 (&approx;7.69%)</div>
+                    <div class="edu-step" style="border-left-color:var(--success)"><b>Any Specific Suit (e.g. Hearts):</b> 13 <br>P(Suit) = 13/52 = 1/4 (25%)</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 8: PRACTICE QUIZ -->
+        <main id="sec-quiz" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Probability Quiz Mode</div>
+                    <div style="font-weight: 900; color: var(--success); font-size: 1.1rem;">Score: <span id="quiz-score">0</span></div>
+                </div>
+
+                <div class="quiz-box">
+                    <div class="quiz-q" id="quiz-question-txt">Loading question...</div>
+                    <div class="quiz-opts" id="quiz-options-grid"></div>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="app.genQuiz()">Skip / Next Question</button>
+            </div>
+        </main>
+
+        <!-- SEC 9: HISTORY -->
+        <main id="sec-history" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Calculations History</div>
+                    <button class="icon-btn" onclick="app.clearHistory()" style="color:var(--danger); border-color:var(--danger)">⌫</button>
+                </div>
+                <div id="history-container" style="display:flex; flex-direction:column;">
+                    <p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No calculations saved in offline ledger.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 10: NOTES / FORMULAS -->
+        <main id="sec-notes" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Dashboard</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Educational Formula Guide</div>
+                </div>
+                <div class="edu-panel">
+                    <div class="edu-title">Types of Events</div>
+                    <div class="edu-step"><b>Independent Events:</b> The outcome of A does not affect B. <span class="math-expr">P(A ∩ B) = P(A) × P(B)</span></div>
+                    <div class="edu-step"><b>Mutually Exclusive:</b> A and B cannot happen at the same time. <span class="math-expr">P(A ∩ B) = 0</span></div>
+                </div>
+                <div class="edu-panel">
+                    <div class="edu-title">Addition Rule (Union)</div>
+                    <div class="edu-step"><b>General:</b> <span class="math-expr">P(A ∪ B) = P(A) + P(B) - P(A ∩ B)</span></div>
+                    <div class="edu-step"><b>If Mutually Exclusive:</b> <span class="math-expr">P(A ∪ B) = P(A) + P(B)</span></div>
+                </div>
+                <div class="edu-panel">
+                    <div class="edu-title">Combinatorics</div>
+                    <div class="edu-step"><b>Factorial (n!):</b> Product of all positive integers less than or equal to n. e.g., 4! = 4×3×2×1 = 24.</div>
+                    <div class="edu-step"><b>Permutations (nPr):</b> Ordered arrangements. <span class="math-expr">n! / (n - r)!</span></div>
+                    <div class="edu-step"><b>Combinations (nCr):</b> Unordered selections. <span class="math-expr">n! / [r! × (n - r)!]</span></div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Virtual Math Keypad -->
+    <div class="keypad-container" id="mathKeypad">
+        <div class="keypad-header">
+            <span class="keypad-target-label" id="keypad-title">Numeric Input</span>
+            <button class="icon-btn" onclick="app.closeKeypad()" style="width:32px; height:32px; font-size:1rem;">&darr;</button>
+        </div>
+        <div class="keypad-grid">
+            <button class="keypad-btn" data-val="1">1</button>
+            <button class="keypad-btn" data-val="2">2</button>
+            <button class="keypad-btn" data-val="3">3</button>
+            <button class="keypad-btn action" data-val="backspace">⌫</button>
+
+            <button class="keypad-btn" data-val="4">4</button>
+            <button class="keypad-btn" data-val="5">5</button>
+            <button class="keypad-btn" data-val="6">6</button>
+            <button class="keypad-btn action" data-val="clear">C</button>
+
+            <button class="keypad-btn" data-val="7">7</button>
+            <button class="keypad-btn" data-val="8">8</button>
+            <button class="keypad-btn" data-val="9">9</button>
+            <button class="keypad-btn action" data-val="next">Next</button>
+
+            <button class="keypad-btn" data-val="0" style="grid-column: span 2;">0</button>
+            <button class="keypad-btn action" data-val="dot">.</button>
+            <button class="keypad-btn submit" data-val="submit">DONE</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Message</div>
+
+    <script>
+        // ==========================================
+        // MATH UTILITIES
+        // ==========================================
+        const MathUtils = {
+            gcd(a, b) {
+                a = Math.abs(a); b = Math.abs(b);
+                while (b) { let temp = b; b = a % b; a = temp; }
+                return a;
+            },
+            fact(n) {
+                if (n < 0n) return 0n;
+                if (n === 0n || n === 1n) return 1n;
+                let res = 1n;
+                for (let i = 2n; i <= n; i++) res *= i;
+                return res;
+            },
+            nPr(n, r) {
+                if (r > n || n < 0n || r < 0n) return 0n;
+                return this.fact(n) / this.fact(n - r);
+            },
+            nCr(n, r) {
+                if (r > n || n < 0n || r < 0n) return 0n;
+                return this.fact(n) / (this.fact(r) * this.fact(n - r));
+            }
+        };
+
+        // ==========================================
+        // APP LOGIC
+        // ==========================================
+        const app = {
+            focusedInput: null,
+            history: [],
+            quizAnswerIndex: -1,
+
+            init() {
+                this.initKeypad();
+                this.loadState();
+                this.bindToggles();
+                this.genQuiz();
+            },
+
+            // --- UI & Routing ---
+            showSection(id) {
+                document.querySelectorAll('.app-section').forEach(el => el.classList.remove('active'));
+                document.getElementById('sec-' + id).classList.add('active');
+                if (id === 'history') this.renderHistory();
+                this.closeKeypad();
+                window.scrollTo(0,0);
+            },
+            toggleTheme() {
+                let current = document.documentElement.getAttribute('data-theme');
+                let next = current === 'light' ? 'dark' : current === 'dark' ? 'amoled' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('probablab-theme', next);
+            },
+            showToast(msg) {
+                const t = document.getElementById('toast');
+                t.innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2000);
+            },
+            copy(elementId) {
+                const el = document.getElementById(elementId);
+                const ta = document.createElement('textarea');
+                ta.value = el.innerText.replace(/\n\n/g, '\n');
+                document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                this.showToast("Copied to clipboard!");
+            },
+            clearSection(sectionId) {
+                document.getElementById(sectionId).querySelectorAll('.math-input').forEach(i => i.value = '');
+                const rp = document.getElementById(sectionId).querySelector('.result-panel');
+                if(rp) rp.classList.remove('visible');
+                this.showToast("Inputs cleared");
+            },
+            bindToggles() {
+                document.querySelectorAll('.toggle-group').forEach(group => {
+                    const btns = group.querySelectorAll('.toggle-btn');
+                    btns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            btns.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            // Auto calc if inside event section
+                            if(group.id === 'evt-type') this.calcEvent();
+                        });
+                    });
+                });
+            },
+
+            // --- Keypad Logic ---
+            initKeypad() {
+                document.querySelectorAll('.math-input').forEach(input => {
+                    input.setAttribute('inputmode', 'none');
+                    input.addEventListener('focus', e => {
+                        this.focusedInput = e.target;
+                        document.getElementById('keypad-title').innerText = e.target.placeholder || 'Numeric Input';
+                        document.getElementById('mathKeypad').classList.add('active');
+                    });
+                });
+
+                document.querySelector('.keypad-grid').addEventListener('click', e => {
+                    if(!this.focusedInput) return;
+                    const btn = e.target.closest('.keypad-btn');
+                    if(!btn) return;
+                    
+                    const val = btn.getAttribute('data-val');
+                    if(!val) return;
+
+                    let cur = this.focusedInput.value;
+                    let cursorPos = this.focusedInput.selectionStart;
+
+                    if(val === 'backspace') {
+                        if(cursorPos > 0) {
+                            this.focusedInput.value = cur.substring(0, cursorPos - 1) + cur.substring(cursorPos);
+                            this.focusedInput.setSelectionRange(cursorPos - 1, cursorPos - 1);
+                        }
+                    } else if(val === 'clear') {
+                        this.focusedInput.value = '';
+                    } else if(val === 'submit') {
+                        this.closeKeypad();
+                    } else if (val === 'next') {
+                        this.cycleFocus();
+                    } else {
+                        let insert = val === 'dot' ? '.' : val;
+                        // Prevent multiple dots
+                        if(insert === '.' && cur.includes('.')) return;
+                        
+                        this.focusedInput.value = cur.substring(0, cursorPos) + insert + cur.substring(cursorPos);
+                        this.focusedInput.setSelectionRange(cursorPos + 1, cursorPos + 1);
+                    }
+                    this.focusedInput.dispatchEvent(new Event('input'));
+                });
+            },
+            closeKeypad() {
+                document.getElementById('mathKeypad').classList.remove('active');
+                if(this.focusedInput) this.focusedInput.blur();
+            },
+            cycleFocus() {
+                const activeSec = document.querySelector('.app-section.active');
+                if(!activeSec) return;
+                const inputs = Array.from(activeSec.querySelectorAll('.math-input'));
+                const idx = inputs.indexOf(this.focusedInput);
+                if(idx > -1 && idx < inputs.length - 1) inputs[idx + 1].focus();
+                else this.closeKeypad();
+            },
+
+            // --- Calculators ---
+            calcBasic() {
+                const fav = parseFloat(document.getElementById('bas-fav').value);
+                const tot = parseFloat(document.getElementById('bas-tot').value);
+
+                if (isNaN(fav) || isNaN(tot) || tot === 0) return this.showToast("Enter valid numbers. Total > 0.");
+                if (fav < 0 || tot < 0) return this.showToast("Outcomes cannot be negative.");
+                if (fav > tot) return this.showToast("Favorable outcomes cannot exceed total outcomes.");
+
+                const decimal = fav / tot;
+                const percent = (decimal * 100).toFixed(2);
+                
+                let fracStr = `${fav}/${tot}`;
+                if (Number.isInteger(fav) && Number.isInteger(tot)) {
+                    const divisor = MathUtils.gcd(fav, tot);
+                    if (divisor > 1) {
+                        fracStr = `
+                            <span class="fraction">
+                                <span class="numerator">${fav/divisor}</span>
+                                <span class="denominator">${tot/divisor}</span>
+                            </span>
+                        `;
+                    } else {
+                        fracStr = `
+                            <span class="fraction">
+                                <span class="numerator">${fav}</span>
+                                <span class="denominator">${tot}</span>
+                            </span>
+                        `;
+                    }
+                }
+
+                document.getElementById('val-bas').innerHTML = fracStr;
+                document.getElementById('val-bas-sub').innerText = `Decimal: ${decimal.toFixed(4)} | ${percent}%`;
+                
+                document.getElementById('edu-bas-step').innerHTML = `
+                    <p>Divide Favorable (${fav}) by Total (${tot}).</p>
+                    <p>Result simplifies to decimal: <b>${decimal.toFixed(4)}</b></p>
+                    <p>Percentage = Decimal × 100 = <b>${percent}%</b></p>
+                `;
+                
+                document.getElementById('res-basic').classList.add('visible');
+                this.logHistory("Basic Probability", `Fav: ${fav}, Tot: ${tot} &rarr; ${percent}%`);
+                this.closeKeypad();
+            },
+
+            calcEvent() {
+                const pa = parseFloat(document.getElementById('evt-pa').value);
+                const pb = parseFloat(document.getElementById('evt-pb').value);
+                const type = document.querySelector('#evt-type .active').getAttribute('data-val');
+
+                if(isNaN(pa) || isNaN(pb)) return;
+                if(pa < 0 || pa > 1 || pb < 0 || pb > 1) return this.showToast("Probabilities must be between 0 and 1.");
+
+                let int, uni, intStep, uniStep;
+
+                if (type === 'mut') { // Mutually Exclusive
+                    int = 0;
+                    uni = pa + pb;
+                    if(uni > 1) return this.showToast("Union cannot exceed 1. Check inputs.");
+                    
+                    intStep = `<b>Mutually Exclusive Rule:</b> Events cannot occur together.<br><span class="math-expr">P(A ∩ B) = 0</span>`;
+                    uniStep = `<b>Addition Rule:</b><br><span class="math-expr">P(A ∪ B) = P(A) + P(B)</span><br>P(A ∪ B) = ${pa} + ${pb} = <b>${uni.toFixed(4)}</b>`;
+                } else { // Independent
+                    int = pa * pb;
+                    uni = pa + pb - int;
+                    
+                    intStep = `<b>Multiplication Rule (Independent):</b><br><span class="math-expr">P(A ∩ B) = P(A) × P(B)</span><br>P(A ∩ B) = ${pa} × ${pb} = <b>${int.toFixed(4)}</b>`;
+                    uniStep = `<b>General Addition Rule:</b><br><span class="math-expr">P(A ∪ B) = P(A) + P(B) - P(A ∩ B)</span><br>P(A ∪ B) = ${pa} + ${pb} - ${int.toFixed(4)} = <b>${uni.toFixed(4)}</b>`;
+                }
+
+                document.getElementById('val-evt-int').innerText = int.toFixed(4);
+                document.getElementById('val-evt-uni').innerText = uni.toFixed(4);
+                document.getElementById('edu-evt-int').innerHTML = intStep;
+                document.getElementById('edu-evt-uni').innerHTML = uniStep;
+
+                document.getElementById('res-event').classList.add('visible');
+                this.logHistory("Event Probability", `${type==='mut'?'Mut. Excl':'Independent'} P(A)=${pa}, P(B)=${pb}`);
+                this.closeKeypad();
+            },
+
+            calcCond() {
+                const int = parseFloat(document.getElementById('cond-int').value);
+                const pb = parseFloat(document.getElementById('cond-pb').value);
+
+                if(isNaN(int) || isNaN(pb) || pb === 0) return this.showToast("Valid numbers required. P(B) > 0.");
+                if(int < 0 || pb < 0 || int > 1 || pb > 1) return this.showToast("Values must be between 0 and 1.");
+                if(int > pb) return this.showToast("Intersection cannot be greater than P(B).");
+
+                const cond = int / pb;
+                document.getElementById('val-cond').innerText = cond.toFixed(4);
+                document.getElementById('edu-cond-step').innerHTML = `
+                    <p>Divide Intersection (${int}) by Probability of B (${pb}).</p>
+                    <p>Result: <b>${cond.toFixed(4)}</b></p>
+                `;
+                document.getElementById('res-cond').classList.add('visible');
+                this.logHistory("Conditional P(A|B)", `P(A∩B)=${int}, P(B)=${pb} &rarr; ${cond.toFixed(4)}`);
+                this.closeKeypad();
+            },
+
+            calcCombo() {
+                const n = document.getElementById('cmb-n').value;
+                const r = document.getElementById('cmb-r').value;
+
+                if(!n || !r) return;
+                const nInt = BigInt(n);
+                const rInt = BigInt(r);
+
+                if(nInt < 0n || rInt < 0n) return this.showToast("Numbers must be positive.");
+                if(nInt > 150n) return this.showToast("n is too large (max 150) for this app.");
+                if(rInt > nInt) return this.showToast("r cannot be greater than n.");
+
+                const c = MathUtils.nCr(nInt, rInt);
+                const p = MathUtils.nPr(nInt, rInt);
+
+                document.getElementById('val-cmb-c').innerText = c.toString();
+                document.getElementById('val-cmb-p').innerText = p.toString();
+
+                document.getElementById('edu-cmb-c').innerHTML = `<b>Combinations (nCr):</b> <span class="math-expr">${n}! / (${r}! × (${n}-${r})!)</span> = <b>${c.toString()}</b>`;
+                document.getElementById('edu-cmb-p').innerHTML = `<b>Permutations (nPr):</b> <span class="math-expr">${n}! / (${n}-${r})!</span> = <b>${p.toString()}</b>`;
+
+                document.getElementById('res-combo').classList.add('visible');
+                this.logHistory("Combinatorics", `n=${n}, r=${r} &rarr; nCr=${c.toString()}`);
+                this.closeKeypad();
+            },
+
+            // --- Simulators ---
+            rollDice() {
+                const dice = document.getElementById('dice-element');
+                const valEl = document.getElementById('dice-res-val');
+                const dots = dice.querySelectorAll('.dot');
+                
+                dice.classList.remove('roll-anim');
+                void dice.offsetWidth; // Trigger reflow
+                dice.classList.add('roll-anim');
+                valEl.innerText = "?";
+                dots.forEach(d => d.style.display = 'none');
+
+                setTimeout(() => {
+                    const result = Math.floor(Math.random() * 6) + 1;
+                    valEl.innerText = result;
+                    
+                    // Show dots based on result layout in 3x3 grid
+                    // Grid mapping: 
+                    // 1 2 3
+                    // 4 5 6
+                    // 7 8 9
+                    const show = (ids) => ids.forEach(id => document.getElementById(id).style.display = 'block');
+                    if(result === 1) show(['d5']);
+                    if(result === 2) show(['d1', 'd9']);
+                    if(result === 3) show(['d1', 'd5', 'd9']);
+                    if(result === 4) show(['d1', 'd3', 'd7', 'd9']);
+                    if(result === 5) show(['d1', 'd3', 'd5', 'd7', 'd9']);
+                    if(result === 6) show(['d1', 'd3', 'd4', 'd6', 'd7', 'd9']);
+
+                    this.logHistory("Dice Roll", `Rolled a ${result}`);
+                }, 600);
+            },
+
+            flipCoin() {
+                const coin = document.getElementById('coin-element');
+                const valEl = document.getElementById('coin-res-val');
+                
+                coin.classList.remove('flip-anim');
+                void coin.offsetWidth;
+                coin.classList.add('flip-anim');
+                
+                setTimeout(() => {
+                    const isHeads = Math.random() < 0.5;
+                    const resultText = isHeads ? 'H' : 'T';
+                    coin.innerText = resultText;
+                    valEl.innerText = isHeads ? "Heads" : "Tails";
+                    this.logHistory("Coin Flip", `Flipped ${valEl.innerText}`);
+                }, 300); // Change text halfway through animation
+            },
+
+            // --- Quiz Engine ---
+            genQuiz() {
+                const types = [
+                    {
+                        q: "A single standard die is rolled. What is the probability of rolling a number greater than 4?",
+                        opts: ["1/3", "1/2", "1/6", "2/3"],
+                        ans: 0 // "1/3" (which is 2/6 for rolling 5 or 6)
+                    },
+                    {
+                        q: "In a standard deck of 52 cards, what is the probability of drawing a Queen?",
+                        opts: ["1/13", "1/4", "1/52", "4/13"],
+                        ans: 0 // "1/13" (which is 4/52)
+                    },
+                    {
+                        q: "A bag contains 3 red marbles and 5 blue marbles. What is the probability of drawing a red marble?",
+                        opts: ["3/8", "5/8", "3/5", "1/8"],
+                        ans: 0 // 3/8
+                    },
+                    {
+                        q: "If P(A) = 0.5 and P(B) = 0.4, and A and B are mutually exclusive, what is P(A ∪ B)?",
+                        opts: ["0.9", "0.2", "0.1", "1.0"],
+                        ans: 0 // 0.9
+                    },
+                    {
+                        q: "A coin is flipped twice. What is the probability of getting exactly two Heads?",
+                        opts: ["1/4", "1/2", "3/4", "1"],
+                        ans: 0 // 1/4
+                    }
+                ];
+
+                const sel = types[Math.floor(Math.random() * types.length)];
+                document.getElementById('quiz-question-txt').innerText = sel.q;
+                this.quizAnswerIndex = sel.ans;
+
+                // Shuffle options for rendering, keep track of right answer text
+                const correctText = sel.opts[sel.ans];
+                const shuffledOpts = [...sel.opts].sort(() => Math.random() - 0.5);
+
+                const grid = document.getElementById('quiz-options-grid');
+                grid.innerHTML = '';
+                shuffledOpts.forEach(optText => {
+                    const btn = document.createElement('div');
+                    btn.className = 'quiz-opt';
+                    btn.innerText = optText;
+                    btn.onclick = () => this.checkQuiz(btn, optText === correctText);
+                    grid.appendChild(btn);
+                });
+            },
+
+            checkQuiz(btn, isCorrect) {
+                // Prevent multiple clicks
+                if(btn.parentNode.querySelector('.correct')) return;
+
+                let score = parseInt(document.getElementById('quiz-score').innerText);
+                if(isCorrect) {
+                    btn.classList.add('correct');
+                    score += 10;
+                    this.showToast("Correct! +10 Points");
+                } else {
+                    btn.classList.add('wrong');
+                    score = Math.max(0, score - 5);
+                    // highlight correct
+                    Array.from(btn.parentNode.children).forEach(b => {
+                        // We would need to pass correct text, but since we rely on CSS, we find it.
+                        // Simple hack: if click is wrong, we just show wrong. Next skip reveals new q.
+                    });
+                    this.showToast("Incorrect! -5 Points");
+                }
+                document.getElementById('quiz-score').innerText = score;
+                setTimeout(() => this.genQuiz(), 1500);
+            },
+
+            // --- History System ---
+            logHistory(title, calc) {
+                if(this.history.length > 0 && this.history[0].calc === calc) return; // limit dupes
+                
+                this.history.unshift({
+                    id: Date.now(),
+                    title: title,
+                    calc: calc,
+                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+                if(this.history.length > 20) this.history.pop();
+                localStorage.setItem('probablab-history', JSON.stringify(this.history));
+            },
+            renderHistory() {
+                const container = document.getElementById('history-container');
+                if(this.history.length === 0) {
+                    container.innerHTML = `<p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No calculations saved in offline ledger.</p>`;
+                    return;
+                }
+                container.innerHTML = this.history.map(h => `
+                    <div class="history-item">
+                        <div class="history-title"><span>${h.title}</span><span>${h.time}</span></div>
+                        <div class="history-calc">${h.calc}</div>
+                    </div>
+                `).join('');
+            },
+            clearHistory() {
+                this.history = [];
+                localStorage.removeItem('probablab-history');
+                this.renderHistory();
+            },
+            loadState() {
+                const t = localStorage.getItem('probablab-theme');
+                if(t) {
+                    document.documentElement.setAttribute('data-theme', t);
+                }
+                const h = localStorage.getItem('probablab-history');
+                if(h) {
+                    try { this.history = JSON.parse(h); } catch(e){}
+                }
+            }
+        };
+
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
