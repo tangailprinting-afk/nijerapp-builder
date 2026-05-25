@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GraphX - Advanced Plotting Studio</title>
+    <style>
+        /* Multi-Theme CSS Variables */
+        :root {
+            --bg-app: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --primary: #3b82f6;
+            --primary-light: #dbeafe;
+            --primary-hover: #2563eb;
+            --accent: #10b981;
+            --accent-light: #d1fae5;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --keyboard-bg: #e2e8f0;
+            --keyboard-btn: #ffffff;
+            --keyboard-btn-text: #0f172a;
+            --canvas-bg: #ffffff;
+            --grid-line: #e2e8f0;
+            --axis-line: #0f172a;
+        }
+
+        [data-theme="dark"] {
+            --bg-app: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-alt: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary: #60a5fa;
+            --primary-light: #1e3a8a;
+            --primary-hover: #3b82f6;
+            --accent: #34d399;
+            --accent-light: #064e3b;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --keyboard-bg: #0f172a;
+            --keyboard-btn: #1e293b;
+            --keyboard-btn-text: #f8fafc;
+            --canvas-bg: #1e293b;
+            --grid-line: #334155;
+            --axis-line: #cbd5e1;
+        }
+
+        [data-theme="amoled"] {
+            --bg-app: #000000;
+            --bg-card: #0a0a0a;
+            --bg-card-alt: #161616;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --primary: #3b82f6;
+            --primary-light: #001e3c;
+            --primary-hover: #60a5fa;
+            --accent: #10b981;
+            --accent-light: #002e1a;
+            --border: #262626;
+            --shadow: none;
+            --keyboard-bg: #000000;
+            --keyboard-btn: #161616;
+            --keyboard-btn-text: #ffffff;
+            --canvas-bg: #000000;
+            --grid-line: #1a1a1a;
+            --axis-line: #737373;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: var(--font-family); transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+        body { background-color: var(--bg-app); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        
+        .app-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; padding-bottom: 350px; }
+
+        /* Navigation Header */
+        header { position: sticky; top: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+        .header-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .header-logo svg { width: 28px; height: 28px; fill: var(--primary); }
+        .header-title h1 { font-size: 1.3rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
+        .header-actions { display: flex; gap: 8px; }
+        
+        .icon-btn { background: var(--bg-card-alt); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .icon-btn:active { transform: scale(0.95); }
+
+        /* Menu Grid */
+        .dashboard-container { display: flex; flex-direction: column; gap: 16px; animation: fadeIn 0.3s ease; }
+        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 500px) { .calc-grid { grid-template-columns: repeat(2, 1fr); } }
+        .calc-menu-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: var(--shadow); }
+        .calc-menu-card:active { transform: scale(0.97); border-color: var(--primary); }
+        .calc-card-icon { width: 46px; height: 46px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .calc-card-icon svg { width: 22px; height: 22px; fill: currentColor; }
+        .calc-card-info { display: flex; flex-direction: column; gap: 2px; }
+        .calc-card-title { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); }
+        .calc-card-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Main App Sections */
+        .app-section { display: none; flex-direction: column; gap: 16px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .app-section.active { display: flex; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-header-nav { display: flex; align-items: center; margin-bottom: 4px; }
+        .btn-back { background: transparent; border: none; color: var(--primary); font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 6px 0; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .card-title { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+
+        /* Canvas Graphing Area */
+        .graph-wrapper {
+            position: relative; width: 100%; border: 2px solid var(--border); border-radius: var(--radius-md); overflow: hidden; background: var(--canvas-bg);
+            touch-action: none; /* Crucial for custom pinch/pan handling */
+        }
+        .graph-canvas { display: block; width: 100%; height: 350px; background: transparent; cursor: crosshair; }
+        .graph-controls {
+            position: absolute; bottom: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .graph-btn {
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold; font-size: 1.2rem;
+        }
+        .graph-btn:active { background: var(--primary-light); color: var(--primary); transform: scale(0.9); }
+        .coord-display { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+        .coord-display.visible { opacity: 1; }
+
+        /* Function Inputs */
+        .function-list { display: flex; flex-direction: column; gap: 10px; }
+        .function-row { display: flex; align-items: center; gap: 8px; background: var(--bg-card-alt); padding: 8px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .color-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; cursor: pointer; border: 2px solid rgba(0,0,0,0.1); }
+        .math-input-wrapper { display: flex; align-items: center; flex-grow: 1; gap: 4px; }
+        .fx-label { font-weight: 800; font-family: monospace; color: var(--text-primary); }
+        .math-input { width: 100%; background: transparent; border: none; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); outline: none; font-family: monospace; }
+        .math-input.error { color: var(--danger); }
+        .btn-remove-fn { background: transparent; border: none; color: var(--danger); font-size: 1.2rem; cursor: pointer; padding: 4px; }
+        
+        .btn { padding: 12px 16px; border-radius: var(--radius-md); font-weight: 800; font-size: 0.95rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: var(--bg-card-alt); color: var(--text-primary); border: 1px solid var(--border); }
+
+        /* Analysis Panel */
+        .analysis-panel { background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius-md); padding: 16px; display: none; flex-direction: column; gap: 12px; }
+        .analysis-panel.visible { display: flex; animation: fadeIn 0.4s ease; }
+        .analysis-title { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--primary); border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 4px; }
+        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .analysis-box { background: var(--bg-card); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+        .analysis-val { font-family: monospace; font-weight: 800; font-size: 1rem; color: var(--text-primary); }
+        .analysis-lbl { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
+        
+        /* Table Data Plotter */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; }
+        .data-table th { background: var(--bg-card-alt); padding: 8px; border: 1px solid var(--border); font-size: 0.85rem; }
+        .data-table td { border: 1px solid var(--border); padding: 4px; }
+        .table-input { width: 100%; background: transparent; border: none; text-align: center; font-size: 1rem; font-weight: 700; color: var(--text-primary); outline: none; }
+        .table-input:focus { background: var(--primary-light); }
+
+        /* Educational Steps & Formulas */
+        .edu-card { background: var(--accent-light); border: 1px solid var(--accent); padding: 16px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 8px; }
+        .edu-title { font-weight: 800; color: var(--text-primary); font-size: 1rem; }
+        .edu-text { font-size: 0.85rem; line-height: 1.5; color: var(--text-primary); }
+        .formula-chip { background: var(--bg-card); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-family: monospace; font-weight: 700; display: inline-block; margin: 2px; }
+
+        /* Scientific Math Keypad */
+        .keypad-container { position: fixed; bottom: -400px; left: 0; right: 0; background: var(--keyboard-bg); border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.15); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; z-index: 999; transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .keypad-container.active { bottom: 0; }
+        .keypad-header { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px; }
+        .keypad-target-label { font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; }
+        .keypad-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .keypad-btn { background: var(--keyboard-btn); border: none; border-radius: var(--radius-sm); padding: 12px 0; font-size: 1.1rem; font-weight: 700; color: var(--keyboard-btn-text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); user-select: none; }
+        .keypad-btn:active { background: var(--primary); color: #fff; transform: scale(0.95); }
+        .keypad-btn.action { background: var(--border); color: var(--text-primary); }
+        .keypad-btn.submit { background: var(--primary); color: white; }
+        .keypad-btn.func-btn { font-size: 0.85rem; font-family: monospace; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text-primary); color: var(--bg-app); padding: 10px 20px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; z-index: 1000; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* History */
+        .history-item { background: var(--bg-card-alt); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;}
+        .history-item:active { background: var(--border); }
+        .history-formula { font-family: monospace; font-size: 1rem; font-weight: 800; color: var(--primary); }
+        .history-time { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-logo" onclick="app.showSection('dashboard')" aria-label="Home Dashboard">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h18v-2H5V3H3zm6 14l-3-3 1.41-1.41L9 14.17l5.59-5.59L18 5l2 2-11 10z"/></svg>
+            <div class="header-title">
+                <h1>GraphX</h1>
+                <span>Plotting Studio</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="app.toggleTheme()" aria-label="Toggle Theme">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <!-- DASHBOARD HUB -->
+        <main id="sec-dashboard" class="app-section active dashboard-container">
+            <div class="dashboard-welcome">
+                <h2>Advanced Coordinate Grapher</h2>
+                <p>Plot mathematical curves, analyze intercepts, render tabular data, and explore function transformations offline.</p>
+            </div>
+
+            <div class="calc-grid">
+                <div class="calc-menu-card" onclick="app.showSection('plotter')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Function Grapher</span>
+                        <span class="calc-card-desc">Plot polynomials & trig curves</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('table')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h4v4H7V7zm6 0h4v4h-4V7zM7 13h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Table to Graph</span>
+                        <span class="calc-card-desc">Scatter plots from coordinates</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('education')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Formula Guide</span>
+                        <span class="calc-card-desc">Learn graph transformations</span>
+                    </div>
+                </div>
+                <div class="calc-menu-card" onclick="app.showSection('history')">
+                    <div class="calc-card-icon"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg></div>
+                    <div class="calc-card-info">
+                        <span class="calc-card-title">Saved Equations</span>
+                        <span class="calc-card-desc">View recent plotted graphs</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 1: MAIN PLOTTER -->
+        <main id="sec-plotter" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Back to Home</button>
+            </div>
+            
+            <div class="card" style="padding: 0; overflow: hidden; border: none; box-shadow: none;">
+                <!-- Canvas Area -->
+                <div class="graph-wrapper" id="graphWrapper">
+                    <canvas id="mainCanvas" class="graph-canvas"></canvas>
+                    <div class="coord-display" id="coordTracker">x: 0, y: 0</div>
+                    <div class="graph-controls">
+                        <button class="graph-btn" onclick="app.graph.zoomIn()" aria-label="Zoom In">+</button>
+                        <button class="graph-btn" onclick="app.graph.zoomOut()" aria-label="Zoom Out">-</button>
+                        <button class="graph-btn" onclick="app.graph.resetView()" aria-label="Reset View">⌂</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Functions</div>
+                    <button class="icon-btn" style="border:none" onclick="app.addFunctionRow()" aria-label="Add Function">➕</button>
+                </div>
+                
+                <div class="function-list" id="functionList">
+                    <!-- Dynamic Function Rows injected here -->
+                </div>
+
+                <div class="analysis-panel" id="analysisPanel">
+                    <div class="analysis-title">Curve Analysis (Visible Domain)</div>
+                    <div class="analysis-grid" id="analysisGrid">
+                        <!-- Data injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 2: TABLE TO GRAPH -->
+        <main id="sec-table" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Back to Home</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Coordinate Data Plotter</div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="icon-btn" onclick="app.tablePlotter.addRow()">➕</button>
+                        <button class="icon-btn" onclick="app.tablePlotter.clearTable()">⌫</button>
+                    </div>
+                </div>
+                
+                <table class="data-table">
+                    <thead><tr><th>X Coordinate</th><th>Y Coordinate</th><th>Act</th></tr></thead>
+                    <tbody id="tableBody">
+                        <!-- Rows injected -->
+                    </tbody>
+                </table>
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <button class="btn btn-secondary" onclick="app.tablePlotter.plotData('scatter')">Plot Scatter</button>
+                    <button class="btn btn-primary" onclick="app.tablePlotter.plotData('line')">Plot Line Graph</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 3: FORMULA GUIDE -->
+        <main id="sec-education" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Back to Home</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Graphing Reference Guide</div>
+                </div>
+                
+                <div class="edu-card">
+                    <div class="edu-title">Standard Syntax</div>
+                    <div class="edu-text">Use valid mathematical operators for rendering:</div>
+                    <div>
+                        <span class="formula-chip">x^2</span>
+                        <span class="formula-chip">sin(x)</span>
+                        <span class="formula-chip">sqrt(x)</span>
+                        <span class="formula-chip">abs(x)</span>
+                        <span class="formula-chip">log(x)</span>
+                        <span class="formula-chip">2*x + 1</span>
+                    </div>
+                </div>
+
+                <div class="edu-card">
+                    <div class="edu-title">Function Transformations</div>
+                    <div class="edu-text">
+                        <b>y = f(x) + c</b> : Shifts the graph vertically.<br>
+                        <b>y = f(x - c)</b> : Shifts the graph horizontally.<br>
+                        <b>y = -f(x)</b> : Reflects graph across the X-axis.<br>
+                        <b>y = c * f(x)</b> : Vertically stretches or compresses.
+                    </div>
+                </div>
+                
+                <div class="edu-card">
+                    <div class="edu-title">Curve Analysis Concepts</div>
+                    <div class="edu-text">
+                        <b>Roots (X-Intercepts)</b>: Coordinates where the curve crosses the X-axis (y = 0).<br>
+                        <b>Y-Intercept</b>: Coordinate where curve crosses the Y-axis (x = 0).
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SEC 4: HISTORY -->
+        <main id="sec-history" class="app-section">
+            <div class="section-header-nav">
+                <button class="btn-back" onclick="app.showSection('dashboard')">&larr; Back to Home</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Equation History</div>
+                    <button class="icon-btn" onclick="app.clearHistory()" style="color:var(--danger); border-color:var(--danger)">⌫</button>
+                </div>
+                <div id="history-container" style="display:flex; flex-direction:column;">
+                    <p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No equations saved in offline ledger.</p>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Virtual Math Keyboard -->
+    <div class="keypad-container" id="mathKeypad">
+        <div class="keypad-header">
+            <span class="keypad-target-label" id="keypadTitle">Function Input</span>
+            <button class="icon-btn" onclick="app.closeKeypad()" style="width:32px; height:32px;">&darr;</button>
+        </div>
+        <div class="keypad-grid">
+            <button class="keypad-btn func-btn" data-val="sin(">sin</button>
+            <button class="keypad-btn func-btn" data-val="cos(">cos</button>
+            <button class="keypad-btn func-btn" data-val="tan(">tan</button>
+            <button class="keypad-btn action" data-val="(">(</button>
+            <button class="keypad-btn action" data-val=")">)</button>
+            
+            <button class="keypad-btn func-btn" data-val="sqrt(">sqrt</button>
+            <button class="keypad-btn func-btn" data-val="log(">log</button>
+            <button class="keypad-btn" data-val="^">^</button>
+            <button class="keypad-btn action" data-val="backspace">⌫</button>
+            <button class="keypad-btn action" data-val="clear">C</button>
+
+            <button class="keypad-btn" data-val="7">7</button>
+            <button class="keypad-btn" data-val="8">8</button>
+            <button class="keypad-btn" data-val="9">9</button>
+            <button class="keypad-btn action" data-val="/">/</button>
+            <button class="keypad-btn action" data-val="*">*</button>
+
+            <button class="keypad-btn" data-val="4">4</button>
+            <button class="keypad-btn" data-val="5">5</button>
+            <button class="keypad-btn" data-val="6">6</button>
+            <button class="keypad-btn action" data-val="-">-</button>
+            <button class="keypad-btn action" data-val="+">+</button>
+
+            <button class="keypad-btn" data-val="1">1</button>
+            <button class="keypad-btn" data-val="2">2</button>
+            <button class="keypad-btn" data-val="3">3</button>
+            <button class="keypad-btn" data-val=".">.</button>
+            <button class="keypad-btn submit" style="background:var(--accent); grid-row: span 2;" data-val="x">x</button>
+            
+            <button class="keypad-btn" data-val="0" style="grid-column: span 2;">0</button>
+            <button class="keypad-btn func-btn" data-val="pi">&pi;</button>
+            <button class="keypad-btn submit" data-val="submit">OK</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Graph Updated!</div>
+
+    <script>
+        // ==========================================
+        // SAFE MATHEMATICAL PARSER (Shunting-Yard)
+        // No eval() used. Offline secure string parser.
+        // ==========================================
+        const MathParser = {
+            operators: {
+                '+': { prec: 1, assoc: 'L', exec: (a, b) => a + b },
+                '-': { prec: 1, assoc: 'L', exec: (a, b) => a - b },
+                '*': { prec: 2, assoc: 'L', exec: (a, b) => a * b },
+                '/': { prec: 2, assoc: 'L', exec: (a, b) => a / b },
+                '^': { prec: 3, assoc: 'R', exec: (a, b) => Math.pow(a, b) }
+            },
+            functions: {
+                'sin': Math.sin, 'cos': Math.cos, 'tan': Math.tan,
+                'asin': Math.asin, 'acos': Math.acos, 'atan': Math.atan,
+                'sqrt': Math.sqrt, 'log': Math.log10, 'ln': Math.log,
+                'abs': Math.abs
+            },
+            constants: {
+                'pi': Math.PI, 'e': Math.E
+            },
+
+            formatExpression(expr) {
+                let s = expr.toLowerCase().replace(/\s+/g, '');
+                // Handle implicit multiplication (e.g., 2x -> 2*x, xsin -> x*sin, )( -> )*()
+                s = s.replace(/(\d)([x\(\)]|[a-z]{2,})/g, '$1*$2');
+                s = s.replace(/([x\)])(\d|[a-z]{2,}|\()/g, '$1*$2');
+                // Handle negative numbers at start or after parenthesis/operator
+                s = s.replace(/(^|[\(\+\-\*\/\^])-/g, '$1~'); // use ~ for unary minus
+                return s;
+            },
+
+            tokenize(expr) {
+                const regex = /([~+\-*/^()])|([a-z]+)|(\d+\.\d+|\d+)/g;
+                let tokens = [];
+                let match;
+                while ((match = regex.exec(expr)) !== null) {
+                    tokens.push(match[0]);
+                }
+                return tokens;
+            },
+
+            toPostfix(tokens) {
+                let output = [];
+                let opStack = [];
+
+                for (let t of tokens) {
+                    if (!isNaN(parseFloat(t))) {
+                        output.push(parseFloat(t));
+                    } else if (t === 'x' || this.constants[t]) {
+                        output.push(t);
+                    } else if (this.functions[t]) {
+                        opStack.push(t);
+                    } else if (t === '~') { // Unary minus
+                        opStack.push(t);
+                    } else if (this.operators[t]) {
+                        const o1 = t;
+                        let o2 = opStack[opStack.length - 1];
+                        while (
+                            o2 && 
+                            o2 !== '(' &&
+                            (this.functions[o2] || o2 === '~' ||
+                            (this.operators[o2] && 
+                                ((this.operators[o1].assoc === 'L' && this.operators[o1].prec <= this.operators[o2].prec) ||
+                                (this.operators[o1].assoc === 'R' && this.operators[o1].prec < this.operators[o2].prec))
+                            ))
+                        ) {
+                            output.push(opStack.pop());
+                            o2 = opStack[opStack.length - 1];
+                        }
+                        opStack.push(o1);
+                    } else if (t === '(') {
+                        opStack.push(t);
+                    } else if (t === ')') {
+                        while (opStack.length > 0 && opStack[opStack.length - 1] !== '(') {
+                            output.push(opStack.pop());
+                        }
+                        if (opStack[opStack.length - 1] === '(') {
+                            opStack.pop();
+                        }
+                    }
+                }
+                while (opStack.length > 0) {
+                    output.push(opStack.pop());
+                }
+                return output;
+            },
+
+            compile(expression) {
+                try {
+                    const formatted = this.formatExpression(expression);
+                    const tokens = this.tokenize(formatted);
+                    const postfix = this.toPostfix(tokens);
+                    // Test evaluation with x=1 to catch syntax errors
+                    this.evaluate(postfix, 1);
+                    return { valid: true, postfix: postfix };
+                } catch (err) {
+                    return { valid: false, error: err.message };
+                }
+            },
+
+            evaluate(postfix, xValue) {
+                let stack = [];
+                for (let t of postfix) {
+                    if (typeof t === 'number') {
+                        stack.push(t);
+                    } else if (t === 'x') {
+                        stack.push(xValue);
+                    } else if (this.constants[t]) {
+                        stack.push(this.constants[t]);
+                    } else if (t === '~') {
+                        const a = stack.pop();
+                        if(a === undefined) throw new Error("Syntax Error");
+                        stack.push(-a);
+                    } else if (this.functions[t]) {
+                        const a = stack.pop();
+                        if(a === undefined) throw new Error("Syntax Error");
+                        stack.push(this.functions[t](a));
+                    } else if (this.operators[t]) {
+                        const b = stack.pop();
+                        const a = stack.pop();
+                        if(a === undefined || b === undefined) throw new Error("Syntax Error");
+                        stack.push(this.operators[t].exec(a, b));
+                    }
+                }
+                if (stack.length !== 1) throw new Error("Syntax Error");
+                return stack[0];
+            }
+        };
+
+        // ==========================================
+        // MAIN APPLICATION LOGIC
+        // ==========================================
+        const app = {
+            focusedInput: null,
+            theme: 'light',
+            history: [],
+            colors: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'],
+            functions: [], // Array of { id, expr, postfix, color, valid }
+            plotMode: 'functions', // 'functions' or 'table'
+            
+            // Grapher State
+            graph: {
+                canvas: null, ctx: null,
+                width: 0, height: 0,
+                offsetX: 0, offsetY: 0, // Translation origin
+                scaleX: 40, scaleY: 40, // Pixels per math unit
+                isDragging: false,
+                lastTouchDist: 0,
+                
+                init() {
+                    this.canvas = document.getElementById('mainCanvas');
+                    this.ctx = this.canvas.getContext('2d');
+                    this.resize();
+                    window.addEventListener('resize', () => this.resize());
+                    this.bindEvents();
+                },
+                resize() {
+                    const wrapper = document.getElementById('graphWrapper');
+                    const rect = wrapper.getBoundingClientRect();
+                    const dpr = window.devicePixelRatio || 1;
+                    this.width = rect.width;
+                    this.height = rect.height || 350;
+                    this.canvas.width = this.width * dpr;
+                    this.canvas.height = this.height * dpr;
+                    this.ctx.scale(dpr, dpr);
+                    
+                    if(this.offsetX === 0 && this.offsetY === 0){
+                        this.offsetX = this.width / 2;
+                        this.offsetY = this.height / 2;
+                    }
+                    this.draw();
+                },
+                mathToPx(mx, my) {
+                    return { px: this.offsetX + mx * this.scaleX, py: this.offsetY - my * this.scaleY };
+                },
+                pxToMath(px, py) {
+                    return { mx: (px - this.offsetX) / this.scaleX, my: (this.offsetY - py) / this.scaleY };
+                },
+                draw() {
+                    this.ctx.clearRect(0, 0, this.width, this.height);
+                    this.drawGrid();
+                    this.drawAxes();
+                    if(app.plotMode === 'functions') {
+                        app.functions.forEach(f => {
+                            if(f.valid && f.postfix) this.plotFunction(f);
+                        });
+                        app.analyzeVisibleGraph();
+                    } else if (app.plotMode === 'table') {
+                        app.tablePlotter.drawTableData(this);
+                    }
+                },
+                drawGrid() {
+                    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid-line').trim();
+                    this.ctx.lineWidth = 1;
+                    
+                    // Determine step size based on scale
+                    let step = 1;
+                    if(this.scaleX > 100) step = 0.5;
+                    if(this.scaleX < 20) step = 5;
+                    if(this.scaleX < 5) step = 20;
+
+                    const startX = this.pxToMath(0, 0).mx;
+                    const endX = this.pxToMath(this.width, 0).mx;
+                    const startY = this.pxToMath(0, this.height).my;
+                    const endY = this.pxToMath(0, 0).my;
+
+                    this.ctx.beginPath();
+                    for(let x = Math.floor(startX / step) * step; x <= endX; x += step) {
+                        const px = this.mathToPx(x, 0).px;
+                        this.ctx.moveTo(px, 0); this.ctx.lineTo(px, this.height);
+                    }
+                    for(let y = Math.floor(startY / step) * step; y <= endY; y += step) {
+                        const py = this.mathToPx(0, y).py;
+                        this.ctx.moveTo(0, py); this.ctx.lineTo(this.width, py);
+                    }
+                    this.ctx.stroke();
+                },
+                drawAxes() {
+                    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--axis-line').trim();
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    // X-axis
+                    if(this.offsetY > 0 && this.offsetY < this.height) {
+                        this.ctx.moveTo(0, this.offsetY); this.ctx.lineTo(this.width, this.offsetY);
+                    }
+                    // Y-axis
+                    if(this.offsetX > 0 && this.offsetX < this.width) {
+                        this.ctx.moveTo(this.offsetX, 0); this.ctx.lineTo(this.offsetX, this.height);
+                    }
+                    this.ctx.stroke();
+
+                    // Basic origin label
+                    this.ctx.fillStyle = this.ctx.strokeStyle;
+                    this.ctx.font = "12px monospace";
+                    this.ctx.fillText("0", this.offsetX + 5, this.offsetY + 15);
+                },
+                plotFunction(funcObj) {
+                    this.ctx.strokeStyle = funcObj.color;
+                    this.ctx.lineWidth = 2.5;
+                    this.ctx.beginPath();
+                    
+                    let firstPoint = true;
+                    const stepPx = 2; // Performance: Draw every 2 pixels
+
+                    for(let px = 0; px <= this.width; px += stepPx) {
+                        const mx = this.pxToMath(px, 0).mx;
+                        const my = MathParser.evaluate(funcObj.postfix, mx);
+                        
+                        // Handle undefined, NaN, Infinity
+                        if(isNaN(my) || !isFinite(my)) {
+                            firstPoint = true;
+                            continue;
+                        }
+
+                        const py = this.mathToPx(0, my).py;
+
+                        // Asymptote detection (e.g. tan(x) or 1/x)
+                        if(!firstPoint) {
+                            const prevPx = px - stepPx;
+                            const prevMx = this.pxToMath(prevPx, 0).mx;
+                            const prevMy = MathParser.evaluate(funcObj.postfix, prevMx);
+                            const prevPy = this.mathToPx(0, prevMy).py;
+                            
+                            // If vertical jump is massive relative to math scale, it's likely an asymptote break
+                            if(Math.abs(prevPy - py) > this.height) {
+                                firstPoint = true;
+                            }
+                        }
+
+                        if(firstPoint) {
+                            this.ctx.moveTo(px, py);
+                            firstPoint = false;
+                        } else {
+                            this.ctx.lineTo(px, py);
+                        }
+                    }
+                    this.ctx.stroke();
+                },
+                bindEvents() {
+                    const canvas = this.canvas;
+                    let lastX, lastY;
+
+                    // Mouse Drag
+                    canvas.addEventListener('mousedown', e => {
+                        this.isDragging = true;
+                        lastX = e.clientX; lastY = e.clientY;
+                    });
+                    window.addEventListener('mouseup', () => this.isDragging = false);
+                    window.addEventListener('mousemove', e => {
+                        if(this.isDragging) {
+                            this.offsetX += (e.clientX - lastX);
+                            this.offsetY += (e.clientY - lastY);
+                            lastX = e.clientX; lastY = e.clientY;
+                            this.draw();
+                        }
+                    });
+
+                    // Touch Drag & Pinch Zoom
+                    canvas.addEventListener('touchstart', e => {
+                        e.preventDefault(); // prevent scrolling
+                        if(e.touches.length === 1) {
+                            this.isDragging = true;
+                            lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+                        } else if(e.touches.length === 2) {
+                            this.isDragging = false;
+                            this.lastTouchDist = Math.hypot(
+                                e.touches[0].clientX - e.touches[1].clientX,
+                                e.touches[0].clientY - e.touches[1].clientY
+                            );
+                        }
+                    }, {passive: false});
+                    
+                    canvas.addEventListener('touchend', () => this.isDragging = false);
+                    
+                    canvas.addEventListener('touchmove', e => {
+                        e.preventDefault();
+                        if(e.touches.length === 1 && this.isDragging) {
+                            this.offsetX += (e.touches[0].clientX - lastX);
+                            this.offsetY += (e.touches[0].clientY - lastY);
+                            lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+                            this.draw();
+                        } else if(e.touches.length === 2) {
+                            const dist = Math.hypot(
+                                e.touches[0].clientX - e.touches[1].clientX,
+                                e.touches[0].clientY - e.touches[1].clientY
+                            );
+                            const scaleFactor = dist / this.lastTouchDist;
+                            this.lastTouchDist = dist;
+                            
+                            // Zoom around center
+                            this.scaleX = Math.max(5, Math.min(500, this.scaleX * scaleFactor));
+                            this.scaleY = this.scaleX;
+                            this.draw();
+                        }
+                    }, {passive: false});
+
+                    // Wheel Zoom
+                    canvas.addEventListener('wheel', e => {
+                        e.preventDefault();
+                        const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                        
+                        // Zoom targeted around mouse pointer
+                        const mouseMx = this.pxToMath(e.offsetX, e.offsetY).mx;
+                        const mouseMy = this.pxToMath(e.offsetX, e.offsetY).my;
+                        
+                        this.scaleX = Math.max(5, Math.min(500, this.scaleX * zoomFactor));
+                        this.scaleY = this.scaleX;
+                        
+                        // Adjust translation to keep mouse point fixed
+                        this.offsetX = e.offsetX - mouseMx * this.scaleX;
+                        this.offsetY = e.offsetY + mouseMy * this.scaleY;
+                        
+                        this.draw();
+                    }, {passive: false});
+
+                    // Coordinate Tracking
+                    const coordTracker = document.getElementById('coordTracker');
+                    canvas.addEventListener('mousemove', e => {
+                        if(!this.isDragging) {
+                            const mathPt = this.pxToMath(e.offsetX, e.offsetY);
+                            coordTracker.innerText = `x: ${mathPt.mx.toFixed(2)}, y: ${mathPt.my.toFixed(2)}`;
+                            coordTracker.classList.add('visible');
+                        }
+                    });
+                    canvas.addEventListener('mouseleave', () => coordTracker.classList.remove('visible'));
+                },
+                zoomIn() { this.scaleX *= 1.2; this.scaleY *= 1.2; this.draw(); },
+                zoomOut() { this.scaleX *= 0.8; this.scaleY *= 0.8; this.draw(); },
+                resetView() { 
+                    this.scaleX = 40; this.scaleY = 40; 
+                    this.offsetX = this.width / 2; this.offsetY = this.height / 2;
+                    this.draw();
+                }
+            },
+
+            // Data Table Plotter State
+            tablePlotter: {
+                data: [{x: 0, y: 0}, {x: 1, y: 2}, {x: -1, y: -2}, {x: 2, y: 4}],
+                render() {
+                    const tbody = document.getElementById('tableBody');
+                    tbody.innerHTML = '';
+                    this.data.forEach((pt, i) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><input type="number" class="table-input" value="${pt.x}" onchange="app.tablePlotter.update(${i}, 'x', this.value)"></td>
+                            <td><input type="number" class="table-input" value="${pt.y}" onchange="app.tablePlotter.update(${i}, 'y', this.value)"></td>
+                            <td><button class="icon-btn" style="width:28px;height:28px;margin:0 auto;color:var(--danger)" onclick="app.tablePlotter.remove(${i})">⌫</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                },
+                addRow() { this.data.push({x: 0, y: 0}); this.render(); },
+                remove(i) { this.data.splice(i, 1); this.render(); },
+                update(i, axis, val) { this.data[i][axis] = parseFloat(val) || 0; },
+                clearTable() { this.data = [{x:0, y:0}]; this.render(); },
+                plotData(type) {
+                    app.plotMode = 'table';
+                    app.showSection('plotter');
+                    app.graph.plotType = type; // scatter or line
+                    app.graph.draw();
+                },
+                drawTableData(graph) {
+                    const ctx = graph.ctx;
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+                    ctx.strokeStyle = ctx.fillStyle;
+                    ctx.lineWidth = 2;
+
+                    const sortedData = [...this.data].sort((a,b) => a.x - b.x);
+
+                    if(app.graph.plotType === 'line' && sortedData.length > 0) {
+                        ctx.beginPath();
+                        sortedData.forEach((pt, i) => {
+                            const coords = graph.mathToPx(pt.x, pt.y);
+                            if(i===0) ctx.moveTo(coords.px, coords.py);
+                            else ctx.lineTo(coords.px, coords.py);
+                        });
+                        ctx.stroke();
+                    }
+
+                    // Always draw dots
+                    sortedData.forEach(pt => {
+                        const coords = graph.mathToPx(pt.x, pt.y);
+                        ctx.beginPath();
+                        ctx.arc(coords.px, coords.py, 4, 0, Math.PI*2);
+                        ctx.fill();
+                    });
+                }
+            },
+
+            init() {
+                this.loadState();
+                this.graph.init();
+                this.tablePlotter.render();
+                this.initKeyboard();
+                this.addFunctionRow("x^2 - 4"); // Default starter graph
+            },
+
+            showSection(id) {
+                document.querySelectorAll('.app-section').forEach(el => el.classList.remove('active'));
+                document.getElementById('sec-' + id).classList.add('active');
+                if(id === 'dashboard') {
+                    app.plotMode = 'functions';
+                }
+                if(id === 'plotter') {
+                    setTimeout(() => this.graph.resize(), 50);
+                }
+                if(id === 'history') this.renderHistory();
+                this.closeKeypad();
+                window.scrollTo(0,0);
+            },
+
+            toggleTheme() {
+                let current = document.documentElement.getAttribute('data-theme');
+                let next = current === 'light' ? 'dark' : current === 'dark' ? 'amoled' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('graphx-theme', next);
+                this.graph.draw();
+            },
+
+            showToast(msg) {
+                const t = document.getElementById('toast');
+                t.innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2000);
+            },
+
+            // --- Function Manager ---
+            addFunctionRow(defaultExpr = '') {
+                const id = Date.now().toString();
+                const color = this.colors[this.functions.length % this.colors.length];
+                this.functions.push({ id, expr: defaultExpr, postfix: null, color, valid: true });
+                this.renderFunctionList();
+                if(defaultExpr) this.updateFunction(id, defaultExpr);
+            },
+
+            removeFunction(id) {
+                this.functions = this.functions.filter(f => f.id !== id);
+                this.renderFunctionList();
+                this.graph.draw();
+            },
+
+            updateFunction(id, expr) {
+                const fn = this.functions.find(f => f.id === id);
+                if(!fn) return;
+                fn.expr = expr;
+                
+                if(expr.trim() === '') {
+                    fn.valid = true; fn.postfix = null;
+                } else {
+                    const compileResult = MathParser.compile(expr);
+                    fn.valid = compileResult.valid;
+                    fn.postfix = compileResult.postfix;
+                }
+                
+                const inputEl = document.getElementById(`input-${id}`);
+                if(inputEl) {
+                    if(!fn.valid) inputEl.classList.add('error');
+                    else inputEl.classList.remove('error');
+                }
+
+                this.graph.draw();
+                if(fn.valid && expr.trim() !== '') {
+                    this.logHistory(expr);
+                }
+            },
+
+            renderFunctionList() {
+                const list = document.getElementById('functionList');
+                list.innerHTML = '';
+                this.functions.forEach((f, i) => {
+                    const row = document.createElement('div');
+                    row.className = 'function-row';
+                    row.innerHTML = `
+                        <div class="color-dot" style="background:${f.color}"></div>
+                        <div class="math-input-wrapper">
+                            <span class="fx-label">f${i+1}(x)=</span>
+                            <input type="text" id="input-${f.id}" class="math-input" value="${f.expr}" placeholder="e.g. sin(x)" oninput="app.updateFunction('${f.id}', this.value)" aria-label="Function input">
+                        </div>
+                        <button class="btn-remove-fn" onclick="app.removeFunction('${f.id}')">⌫</button>
+                    `;
+                    list.appendChild(row);
+
+                    // Re-bind custom keypad
+                    const inputEl = row.querySelector(`#input-${f.id}`);
+                    inputEl.setAttribute('inputmode', 'none');
+                    inputEl.addEventListener('focus', e => {
+                        this.focusedInput = e.target;
+                        document.getElementById('keypadTitle').innerText = `Editing f${i+1}(x)`;
+                        document.getElementById('mathKeypad').classList.add('active');
+                    });
+                });
+            },
+
+            // --- Analysis Engine (Roots, Intercepts via Bisection) ---
+            analyzeVisibleGraph() {
+                const panel = document.getElementById('analysisPanel');
+                const grid = document.getElementById('analysisGrid');
+                const activeFn = this.functions.find(f => f.valid && f.postfix && f.expr.trim() !== '');
+
+                if(!activeFn) {
+                    panel.classList.remove('visible');
+                    return;
+                }
+
+                // Analyze the first active function in the visible domain
+                const startX = this.graph.pxToMath(0, 0).mx;
+                const endX = this.graph.pxToMath(this.graph.width, 0).mx;
+                
+                let yIntercept = MathParser.evaluate(activeFn.postfix, 0);
+                if(Math.abs(yIntercept) > 1e6) yIntercept = NaN;
+
+                // Find a root in visible domain via scanning & bisection
+                let root = "None in view";
+                const steps = 100;
+                const dx = (endX - startX) / steps;
+                
+                for(let i=0; i<steps; i++) {
+                    const x1 = startX + i*dx;
+                    const x2 = startX + (i+1)*dx;
+                    const y1 = MathParser.evaluate(activeFn.postfix, x1);
+                    const y2 = MathParser.evaluate(activeFn.postfix, x2);
+                    
+                    if(y1 * y2 <= 0 && !isNaN(y1) && !isNaN(y2)) {
+                        // Crossing found, bisect
+                        let a = x1, b = x2;
+                        for(let j=0; j<20; j++) {
+                            let mid = (a+b)/2;
+                            let yMid = MathParser.evaluate(activeFn.postfix, mid);
+                            if(y1 * yMid <= 0) b = mid;
+                            else a = mid;
+                        }
+                        // Ignore asymptotes (steep jumps masquerading as roots)
+                        if(Math.abs(MathParser.evaluate(activeFn.postfix, (a+b)/2)) < 1) {
+                            root = ((a+b)/2).toFixed(3);
+                            break;
+                        }
+                    }
+                }
+
+                grid.innerHTML = `
+                    <div class="analysis-box">
+                        <div class="analysis-lbl">Y-Intercept</div>
+                        <div class="analysis-val">${isNaN(yIntercept) ? 'Undefined' : yIntercept.toFixed(3)}</div>
+                    </div>
+                    <div class="analysis-box">
+                        <div class="analysis-lbl">Visible Root (X-Int)</div>
+                        <div class="analysis-val">${root}</div>
+                    </div>
+                `;
+                panel.classList.add('visible');
+            },
+
+            // --- Custom Math Keypad ---
+            initKeyboard() {
+                document.querySelector('.keypad-grid').addEventListener('click', e => {
+                    if(!this.focusedInput) return;
+                    const btn = e.target.closest('.keypad-btn');
+                    if(!btn) return;
+                    
+                    const val = btn.getAttribute('data-val');
+                    if(!val) return;
+
+                    let cur = this.focusedInput.value;
+                    let cursorPos = this.focusedInput.selectionStart;
+
+                    if(val === 'backspace') {
+                        if(cursorPos > 0) {
+                            this.focusedInput.value = cur.substring(0, cursorPos - 1) + cur.substring(cursorPos);
+                            this.focusedInput.setSelectionRange(cursorPos - 1, cursorPos - 1);
+                        }
+                    } else if(val === 'clear') {
+                        this.focusedInput.value = '';
+                    } else if(val === 'submit') {
+                        this.closeKeypad();
+                    } else {
+                        // Insert at cursor
+                        this.focusedInput.value = cur.substring(0, cursorPos) + val + cur.substring(cursorPos);
+                        this.focusedInput.setSelectionRange(cursorPos + val.length, cursorPos + val.length);
+                    }
+                    
+                    // Trigger update via dispatch
+                    this.focusedInput.dispatchEvent(new Event('input'));
+                });
+            },
+            closeKeypad() {
+                document.getElementById('mathKeypad').classList.remove('active');
+                if(this.focusedInput) this.focusedInput.blur();
+            },
+
+            // --- History System ---
+            logHistory(expr) {
+                // Avoid logging duplicates sequentially
+                if(this.history.length > 0 && this.history[0].expr === expr) return;
+                
+                this.history.unshift({
+                    id: Date.now(),
+                    expr: expr,
+                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+                if(this.history.length > 20) this.history.pop();
+                localStorage.setItem('graphx-history', JSON.stringify(this.history));
+            },
+            renderHistory() {
+                const container = document.getElementById('history-container');
+                if(this.history.length === 0) {
+                    container.innerHTML = `<p style="text-align:center; color:var(--text-secondary); font-size:0.9rem;">No equations saved.</p>`;
+                    return;
+                }
+                container.innerHTML = this.history.map(h => `
+                    <div class="history-item" onclick="app.loadFromHistory('${h.expr}')">
+                        <div class="history-formula">f(x) = ${h.expr}</div>
+                        <div class="history-time">${h.time}</div>
+                    </div>
+                `).join('');
+            },
+            clearHistory() {
+                this.history = [];
+                localStorage.removeItem('graphx-history');
+                this.renderHistory();
+            },
+            loadFromHistory(expr) {
+                this.showSection('plotter');
+                if(this.functions.length === 0) this.addFunctionRow();
+                const firstId = this.functions[0].id;
+                document.getElementById(`input-${firstId}`).value = expr;
+                this.updateFunction(firstId, expr);
+            },
+
+            loadState() {
+                const t = localStorage.getItem('graphx-theme');
+                if(t) {
+                    document.documentElement.setAttribute('data-theme', t);
+                    this.theme = t;
+                }
+                const h = localStorage.getItem('graphx-history');
+                if(h) {
+                    try { this.history = JSON.parse(h); } catch(e){}
+                }
+            }
+        };
+
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
