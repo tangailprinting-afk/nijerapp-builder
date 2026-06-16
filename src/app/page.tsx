@@ -281,6 +281,9 @@ if(downloadData.success){
         {status}
 
       </p>
+      <p>
+        In the installed Android app, `window.print()` can be routed to the native printer bridge.
+      </p>
 {
 
 downloadUrl && (

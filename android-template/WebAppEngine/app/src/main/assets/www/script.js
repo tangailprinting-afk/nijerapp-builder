@@ -440,6 +440,53 @@ window.printMemoFromDetail = () => {
   if (!currentViewMemoId) return;
   const m = allMemos.find((m) => m.id === currentViewMemoId);
   if (!m) return;
+  const printableHtml = `
+    <html><head><title>মেমো</title>
+    <style>body{font-family:'Segoe UI',sans-serif;padding:30px;} table{width:100%;border-collapse:collapse;margin:20px 0;} th,td{border:1px solid #ddd;padding:8px;}</style>
+    </head><body>
+      <h2>মেমো</h2>
+      <p><strong>কাস্টমার:</strong> ${m.customerName}</p>
+      <table><tr><th>পণ্য</th><th>পরিমাণ</th><th>একক মূল্য</th><th>মোট</th></tr>
+        ${m.items.map((i) => `<tr><td>${i.productName}</td><td>${i.quantity}</td><td>${i.unitPrice}</td><td>${i.total}</td></tr>`).join("")}
+      </table>
+      <p>সাবটোটাল: ${m.subtotal.toFixed(2)} টাকা</p>
+      <p>ডিসকাউন্ট: ${m.discount.toFixed(2)} টাকা</p>
+      <p>মোট: ${m.total.toFixed(2)} টাকা</p>
+      <p>জমা: ${m.paid.toFixed(2)} টাকা</p>
+      <p style="color:#ef4444;">বাকি: ${m.due.toFixed(2)} টাকা</p>
+      <p>তারিখ: ${new Date(m.date).toLocaleString("bn-BD")}</p>
+    </body></html>
+  `;
+  const printableText = [
+    "মেমো",
+    `কাস্টমার: ${m.customerName}`,
+    ...m.items.map(
+      (i) =>
+        `${i.productName} x ${i.quantity} = ${i.total}`
+    ),
+    `সাবটোটাল: ${m.subtotal.toFixed(2)} টাকা`,
+    `ডিসকাউন্ট: ${m.discount.toFixed(2)} টাকা`,
+    `মোট: ${m.total.toFixed(2)} টাকা`,
+    `জমা: ${m.paid.toFixed(2)} টাকা`,
+    `বাকি: ${m.due.toFixed(2)} টাকা`,
+    `তারিখ: ${new Date(m.date).toLocaleString("bn-BD")}`,
+  ].join("\n");
+  const nativePrinter =
+    window.NijerAppPrinter || window.AndroidPrinter;
+  if (
+    nativePrinter &&
+    typeof nativePrinter.printDocument === "function"
+  ) {
+    nativePrinter.printDocument(
+      JSON.stringify({
+        title: "মেমো",
+        html: printableHtml,
+        text: printableText,
+        url: window.location.href,
+      })
+    );
+    return;
+  }
   const w = window.open("", "_blank", "width=800,height=600");
   w.document.write(`
     <html><head><title>মেমো</title>

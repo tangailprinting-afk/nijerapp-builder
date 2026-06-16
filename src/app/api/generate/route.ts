@@ -2,6 +2,12 @@ import AdmZip from "adm-zip";
 
 import sharp from "sharp";
 
+import { readFile }
+from "node:fs/promises";
+
+import { join }
+from "node:path";
+
 import { NextResponse }
 from "next/server";
 
@@ -293,6 +299,31 @@ ${appName}
       strings,
 
       "updated strings"
+
+    );
+
+    await updateGitHubFile(
+
+"android-template/WebAppEngine/app/src/main/java/com/webapp/engine/MainActivity.java",
+
+      await readFile(
+        join(
+          process.cwd(),
+          "android-template",
+          "WebAppEngine",
+          "app",
+          "src",
+          "main",
+          "java",
+          "com",
+          "webapp",
+          "engine",
+          "MainActivity.java"
+        ),
+        "utf8"
+      ),
+
+      "updated main activity"
 
     );
 
