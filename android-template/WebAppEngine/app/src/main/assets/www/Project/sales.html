@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Entry | Sultan Digital Sign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="common.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #eef2ff;
+            --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-secondary: #64748b; --text-muted: #94a3b8;
+            --border: #e2e8f0; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 6px rgba(0,0,0,0.05); --shadow-lg: 0 10px 25px rgba(0,0,0,0.06); --shadow-xl: 0 20px 40px rgba(0,0,0,0.08);
+            --radius-xs: 6px; --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --transition: all 0.2s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        .navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 50; gap: 16px; flex-wrap: wrap; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .navbar-brand img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+        .navbar-brand .brand-icon-fallback { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .navbar-brand .brand-text { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
+        .navbar-brand .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+        .navbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; } .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: white; color: var(--text); border: 1.5px solid var(--border); } .btn-outline:hover { background: #f8fafc; }
+        .btn-ghost { background: transparent; color: var(--text-secondary); } .btn-ghost:hover { background: #f1f5f9; }
+        .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: var(--radius-xs); } .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .main-container { max-width: 1300px; margin: 0 auto; padding: 24px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; } .subtitle { font-size: 13px; color: var(--text-secondary); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow); }
+        .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .stat-value { font-size: 26px; font-weight: 900; }
+
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fafbfc; }
+        .card-header h3 { font-size: 14px; font-weight: 700; } .card-body { padding: 20px; } .card-body.no-padding { padding: 0; overflow-x: auto; }
+
+        .search-box { display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 25px; padding: 0 16px; }
+        .search-box input { border: none; background: transparent; padding: 9px 0; outline: none; font-size: 13px; width: 200px; font-family: inherit; }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; } table thead { background: #f8fafc; }
+        table th { padding: 11px 16px; text-align: left; font-weight: 700; color: var(--text-secondary); font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); }
+        table td { padding: 11px 16px; border-bottom: 1px solid #f1f5f9; } table tbody tr:hover { background: #f8fafc; }
+        .cname { font-weight: 600; } .amount { font-weight: 700; } .amount.green { color: #10b981; } .amount.red { color: #ef4444; }
+        .badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        .badge-success { background: #d1fae5; color: #065f46; } .badge-warning { background: #fef3c7; color: #92400e; } .badge-danger { background: #fee2e2; color: #991b1b; } .badge-info { background: #dbeafe; color: #1e40af; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); } .empty-state p { font-size: 13px; }
+
+        .sale-entry-card { background: linear-gradient(135deg, #fafbfc 0%, #f0f4ff 100%); border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        .form-group { margin-bottom: 12px; } .form-group.full { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; outline: none; background: #fafbfc; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(99,102,241,0.06); }
+        .form-group textarea { resize: vertical; min-height: 60px; } .input-hint { font-size: 10px; color: var(--text-muted); }
+
+        .searchable-select { position: relative; }
+        .searchable-select .select-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; outline: none; background: #fafbfc; }
+        .searchable-select .select-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.06); background: white; }
+
+        /* FIXED: Dropdown now uses position:fixed to escape all overflow containers */
+        .product-card-dropdown {
+            display: none;
+            position: fixed;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            max-height: 260px;
+            overflow-y: auto;
+            z-index: 99999;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            min-width: 300px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .product-card-dropdown::-webkit-scrollbar { display: none; }
+        .product-card-dropdown.show { display: block; }
+        .product-card-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: var(--transition); }
+        .product-card-item:hover { background: var(--primary-light); }
+        .product-card-item:last-child { border-bottom: none; }
+        .product-card-item .prod-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); background: linear-gradient(135deg, #eef2ff, #e0e7ff); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .product-card-item .prod-info { flex: 1; min-width: 0; }
+        .product-card-item .prod-info .prod-name { font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-card-item .prod-info .prod-name .highlight { background: #fef08a; padding: 0 2px; border-radius: 2px; }
+        .product-card-item .prod-info .prod-meta { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+        .product-card-item .prod-price-tag { font-weight: 800; font-size: 14px; color: var(--primary); white-space: nowrap; flex-shrink: 0; }
+        .product-card-item.add-new-item { background: #fafaff; border-top: 2px solid var(--primary-light); }
+        .product-card-item.add-new-item .prod-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-size: 14px; }
+        .product-card-item.add-new-item .prod-price-tag { color: #10b981; font-size: 11px; }
+        .no-product-found { padding: 12px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
+        .customer-card-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: var(--transition); }
+        .customer-card-item:hover { background: var(--primary-light); }
+        .customer-card-item .cust-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+        .customer-card-item .cust-info { flex: 1; min-width: 0; }
+        .customer-card-item .cust-info .cust-name { font-weight: 700; font-size: 13px; color: var(--text); }
+        .customer-card-item .cust-info .cust-mobile { font-size: 10px; color: var(--text-muted); }
+
+        .items-table td { padding: 8px 10px; border: 1px solid var(--border); vertical-align: top; position: relative; }
+        .items-table input, .items-table textarea { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-xs); font-size: 12px; font-family: inherit; outline: none; }
+        .items-table input:focus, .items-table textarea:focus { border-color: var(--primary); }
+        .items-table textarea { min-height: 32px; height: 36px; resize: vertical; }
+        .items-table .item-total { font-weight: 700; text-align: right; min-width: 80px; background: #fafbfc; padding: 8px 10px; }
+        .items-table thead th { background: #f1f5f9; padding: 10px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); border: 1px solid var(--border); }
+        .items-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+
+        .discount-section { display: flex; align-items: center; margin-top: 12px; background: white; border-radius: var(--radius-sm); overflow: hidden; border: 2px solid var(--border); }
+        .discount-section:focus-within { border-color: var(--primary); }
+        .discount-section .discount-label { padding: 12px 16px; background: #f1f5f9; font-weight: 700; font-size: 12px; white-space: nowrap; border-right: 1px solid var(--border); }
+        .discount-section input { flex: 1; border: none; padding: 12px; font-size: 14px; font-family: inherit; outline: none; text-align: center; font-weight: 600; }
+        .discount-section select { border: none; padding: 12px 14px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer; background: #fafbfc; font-weight: 600; border-left: 1px solid var(--border); }
+
+        .summary-box { background: white; padding: 16px 20px; border-radius: var(--radius-sm); margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: center; border: 1px solid var(--border); }
+        .summary-item { text-align: center; } .summary-item .s-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; } .summary-item .s-value { font-size: 20px; font-weight: 800; }
+        .payment-row { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .payment-row select { padding: 8px 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 12px; font-family: inherit; font-weight: 600; }
+        .payment-row input { width: 100px; text-align: center; font-size: 16px; font-weight: 700; padding: 8px; border: 2px solid var(--border); border-radius: 8px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.5); z-index: 200; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: var(--radius-lg); width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); animation: slideUp 0.25s ease; }
+        .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 1; }
+        .modal-header h3 { font-size: 16px; font-weight: 700; } .btn-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); } .btn-close:hover { background: #f1f5f9; }
+        .modal-body { padding: 20px 22px; } .modal-footer { padding: 14px 22px; border-top: 1px solid(var(--border)); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .navbar { height: auto; padding: 12px 16px; } .navbar-actions { width: 100%; } .navbar-actions .btn { flex: 1; justify-content: center; }
+            .form-grid { grid-template-columns: 1fr; } .main-container { padding: 16px; } .page-header h1 { font-size: 22px; } .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" style="display:block;">
+            <div class="brand-icon-fallback" style="display:none;">🖨️</div>
+            <div><div class="brand-text">Sultan Digital Sign</div><div class="brand-sub">Management System</div></div>
+        </a>
+        <div class="navbar-actions">
+            <a href="index.html" class="btn btn-ghost btn-sm">📊 Dashboard</a>
+            <a href="customers.html" class="btn btn-outline btn-sm">👥 Customers</a>
+            <a href="collections.html" class="btn btn-outline btn-sm">💵 Collection</a>
+            <a href="expenses.html" class="btn btn-outline btn-sm">💸 Expenses</a>
+            <a href="suppliers.html" class="btn btn-outline btn-sm">🏭 Suppliers</a>
+            <a href="reports.html" class="btn btn-outline btn-sm">📊 Reports</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header"><div><h1>Sale Entry</h1><p class="subtitle">Create invoice with items, discount & print</p></div></div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Invoices</div><div class="stat-value" id="statTotal">0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Sales</div><div class="stat-value" id="statAmount">৳ 0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Collected</div><div class="stat-value" style="color:#10b981;" id="statPaid">৳ 0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Due</div><div class="stat-value" style="color:#ef4444;" id="statDue">৳ 0</div></div>
+        </div>
+
+        <div class="sale-entry-card">
+            <h3 style="margin-bottom:16px;font-size:16px;">📝 Create New Invoice</h3>
+            <form id="saleForm" autocomplete="off">
+                <div class="form-grid">
+                    <div class="form-group"><label>Invoice No</label><input type="text" id="s_invoice" readonly style="background:#f1f5f9;font-weight:600;"></div>
+                    <div class="form-group"><label>Sale Date *</label><input type="date" id="s_date" required></div>
+                    <div class="form-group">
+                        <label>Customer</label>
+                        <div class="searchable-select" id="customerSelectWrapper">
+                            <input type="text" class="select-input" id="s_customer_search" placeholder="🔍 Search customer..." autocomplete="off" oninput="filterCustomerDropdown()" onfocus="filterCustomerDropdown()">
+                            <input type="hidden" id="s_customer">
+                            <div class="product-card-dropdown" id="customerDropdown"></div>
+                        </div>
+                        <span class="input-hint" id="customerDuePreview"></span>
+                    </div>
+                    <div class="form-group"><label>Due Date</label><input type="date" id="s_dueDate"><span class="input-hint">If credit sale</span></div>
+                    <div class="form-group full"><label>Notes</label><input type="text" id="s_notes" placeholder="Additional notes"></div>
+                </div>
+                <h4 style="margin:16px 0 8px;font-size:13px;">🛒 Sale Items</h4>
+                <!-- REMOVED overflow-x:auto wrapper to allow dropdown to break free -->
+                <table class="items-table"><thead><tr><th style="width:3%;">#</th><th style="width:28%;">Item *</th><th style="width:25%;">Details (Optional)</th><th style="width:8%;">Qty</th><th style="width:12%;">Unit Price</th><th style="width:15%;">Total</th><th style="width:3%;"></th></tr></thead><tbody id="itemsContainer"></tbody></table>
+
+                <div class="discount-section"><div class="discount-label">🏷️ Discount</div><input type="number" id="s_discountValue" value="0" step="0.01" min="0" onchange="recalculate()" placeholder="0"><select id="s_discountType" onchange="recalculate()"><option value="fixed">৳ Taka</option><option value="percent">% Percent</option></select></div>
+                <div class="summary-box">
+                    <div class="summary-item"><div class="s-label">Subtotal</div><div class="s-value" id="subtotalDisplay">৳ 0</div></div>
+                    <div class="summary-item"><div class="s-label">Grand Total</div><div class="s-value" id="grandTotalDisplay" style="color:var(--primary);">৳ 0</div></div>
+                    <div class="summary-item">
+                        <div class="s-label">Payment & Paid</div>
+                        <div class="payment-row">
+                            <select id="s_payment"><option value="Cash">Cash</option><option value="Bank">Bank</option><option value="Mobile Banking">Mobile Banking</option><option value="Due">Due</option></select>
+                            <input type="number" id="s_paid" value="0" step="0.01" onchange="recalculate()" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="summary-item"><div class="s-label">Due Amount</div><div class="s-value" id="dueDisplay" style="color:#ef4444;">৳ 0</div></div>
+                </div>
+                <input type="hidden" id="s_id">
+                <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;"><button type="button" class="btn btn-outline" onclick="resetForm()">🔄 Reset</button><button type="submit" class="btn btn-primary">💾 Save & Preview Invoice</button></div>
+            </form>
+        </div>
+
+        <div class="card"><div class="card-header"><h3>📋 Invoice List</h3><div class="search-box"><input type="text" id="searchInput" placeholder="Search invoice or customer..." onkeyup="updateTable()"></div></div>
+            <div class="card-body no-padding"><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead><tbody id="saleTable"><tr><td colspan="10"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody></table></div></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="invoiceModal"><div class="modal" style="max-width:900px;width:95%;"><div class="modal-header"><h3>🧾 Invoice Preview</h3><button class="btn-close" onclick="closeInvoiceModal()">✕</button></div><div class="modal-body" style="padding:0;overflow-x:auto;" id="invoiceContent"></div><div class="modal-footer"><button class="btn btn-outline btn-sm" onclick="printInvoice()">🖨️ Print</button><button class="btn btn-outline btn-sm" onclick="exportInvoice('jpg')">🖼️ JPG</button><button class="btn btn-outline btn-sm" onclick="exportInvoice('pdf')">📄 PDF</button><button class="btn btn-outline btn-sm" onclick="closeInvoiceModal()">Close</button></div></div></div>
+    <div class="modal-overlay" id="quickCustomerModal"><div class="modal"><div class="modal-header"><h3>➕ Add Customer</h3><button class="btn-close" onclick="closeQuickCustomerModal()">✕</button></div><form id="quickCustomerForm"><div class="modal-body"><div class="form-group"><label>Name *</label><input type="text" id="qc_name" required></div><div class="form-group"><label>Mobile</label><input type="text" id="qc_mobile"></div><div class="form-group"><label>Address</label><textarea id="qc_address" rows="2"></textarea></div></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeQuickCustomerModal()">Cancel</button><button type="submit" class="btn btn-primary">💾 Save</button></div></form></div></div>
+    <div class="modal-overlay" id="quickProductModal"><div class="modal"><div class="modal-header"><h3>📦 Add Product</h3><button class="btn-close" onclick="closeQuickProductModal()">✕</button></div><form id="quickProductForm"><div class="modal-body"><div class="form-group"><label>Product Name *</label><input type="text" id="qp_name" required placeholder="e.g., Business Card, Banner"></div><div class="form-grid" style="grid-template-columns:1fr 1fr;"><div class="form-group"><label>Default Price</label><input type="number" id="qp_price" step="0.01" value="0"></div><div class="form-group"><label>Unit</label><select id="qp_unit"><option value="Piece">Piece</option><option value="Pack">Pack</option><option value="Ream">Ream</option><option value="SqFt">Sq. Ft.</option><option value="Roll">Roll</option><option value="Set">Set</option></select></div></div><div class="form-group full"><label>Description</label><textarea id="qp_description" rows="2" placeholder="Brief description..."></textarea></div></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeQuickProductModal()">Cancel</button><button type="submit" class="btn btn-primary">💾 Save Product</button></div></form></div></div>
+
+    <script src="../frameworkdb.js"></script>
+    <script>
+        let sales = [], customers = [], products = [], collections = [], items = [], editingId = null, currentInvoice = null;
+
+        async function init() { await loadData(); resetForm(); }
+        async function loadData() { try { const [sd, cd, pd, cld] = await Promise.all([FrameworkDB.get('sales'), FrameworkDB.get('customers'), FrameworkDB.get('products'), FrameworkDB.get('collections')]); sales = ensureArray(sd); customers = ensureArray(cd); products = ensureArray(pd); collections = ensureArray(cld); updateAllUI(); } catch (e) { console.error(e); } }
+
+        function resetForm() { editingId = null; document.getElementById('s_id').value = ''; document.getElementById('s_invoice').value = 'INV-' + String(sales.length + 1).padStart(3, '0'); document.getElementById('s_date').value = todayDate(); document.getElementById('s_customer_search').value = ''; document.getElementById('s_customer').value = ''; document.getElementById('s_dueDate').value = ''; document.getElementById('s_payment').value = 'Cash'; document.getElementById('s_notes').value = ''; document.getElementById('s_discountValue').value = '0'; document.getElementById('s_discountType').value = 'fixed'; document.getElementById('s_paid').value = '0'; document.getElementById('customerDuePreview').textContent = ''; items = [{ description: '', details: '', qty: 1, price: 0, total: 0 }]; renderItems(); recalculate(); }
+
+        // ============================================
+        // FIXED: Dropdown position calculated with getBoundingClientRect
+        // ============================================
+        function positionDropdown(dd, inputEl) {
+            const rect = inputEl.getBoundingClientRect();
+            const top = rect.bottom + 4;
+            const left = rect.left;
+            const maxWidth = Math.min(400, window.innerWidth - left - 20);
+            dd.style.top = top + 'px';
+            dd.style.left = left + 'px';
+            dd.style.maxWidth = maxWidth + 'px';
+            dd.style.width = Math.max(300, rect.width) + 'px';
+        }
+
+        function filterCustomerDropdown() {
+            const input = document.getElementById('s_customer_search');
+            const dd = document.getElementById('customerDropdown');
+            const s = (input.value || '').trim().toLowerCase();
+            let f = customers; if (s) f = customers.filter(c => (c.name || '').toLowerCase().includes(s) || (c.mobile || '').includes(s));
+            const dl = f.slice(0, 3);
+            let h = dl.map(c => `<div class="customer-card-item" onclick="selectCustomer(${c.id},'${esc(c.name)}')"><div class="cust-avatar">${(c.name||'?').charAt(0).toUpperCase()}</div><div class="cust-info"><div class="cust-name">${highlightMatch(c.name, s)}</div><div class="cust-mobile">${c.mobile || 'No mobile'}</div></div></div>`).join('');
+            const em = customers.some(c => (c.name || '').toLowerCase() === s);
+            if (s && !em) h += `<div class="product-card-item add-new-item" onclick="openQuickCustomer()"><div class="prod-icon">➕</div><div class="prod-info"><div class="prod-name">Add "${esc(input.value)}"</div><div class="prod-meta">Create new customer</div></div></div>`;
+            dd.innerHTML = h || '<div class="no-product-found">No customers found</div>';
+            positionDropdown(dd, input);
+            dd.classList.add('show');
+        }
+        function selectCustomer(id, name) { document.getElementById('s_customer').value = id; document.getElementById('s_customer_search').value = name; document.getElementById('customerDropdown').classList.remove('show'); updateCustomerDue(); }
+        function openQuickCustomer() { document.getElementById('customerDropdown').classList.remove('show'); document.getElementById('qc_name').value = document.getElementById('s_customer_search').value; document.getElementById('qc_mobile').value = ''; document.getElementById('qc_address').value = ''; document.getElementById('quickCustomerModal').classList.add('show'); }
+        function closeQuickCustomerModal() { document.getElementById('quickCustomerModal').classList.remove('show'); }
+        document.getElementById('quickCustomerForm').addEventListener('submit', async function(e) { e.preventDefault(); const d = { name: document.getElementById('qc_name').value.trim(), mobile: document.getElementById('qc_mobile').value.trim(), address: document.getElementById('qc_address').value.trim(), opening_balance: 0, createdAt: new Date().toISOString() }; if (!d.name) { showToast('Name required', 'error'); return; } try { const r = await FrameworkDB.save('customers', d); customers.push({ id: r?.id || r, ...d }); selectCustomer(r?.id || r, d.name); closeQuickCustomerModal(); showToast('✅ Customer added!'); } catch (err) { showToast('❌ ' + err.message, 'error'); } });
+        function openQuickProduct(presetName = '') { document.getElementById('qp_name').value = presetName; document.getElementById('qp_price').value = '0'; document.getElementById('qp_unit').value = 'Piece'; document.getElementById('qp_description').value = ''; document.getElementById('quickProductModal').classList.add('show'); document.getElementById('qp_name').focus(); }
+        function closeQuickProductModal() { document.getElementById('quickProductModal').classList.remove('show'); }
+        document.getElementById('quickProductForm').addEventListener('submit', async function(e) { e.preventDefault(); const d = { name: document.getElementById('qp_name').value.trim(), salePrice: parseFloat(document.getElementById('qp_price').value) || 0, unit: document.getElementById('qp_unit').value, description: document.getElementById('qp_description').value.trim(), purchasePrice: 0, stock: 0, createdAt: new Date().toISOString() }; if (!d.name) { showToast('Name required', 'error'); return; } try { const r = await FrameworkDB.save('products', d); const np = { id: r?.id || r, ...d }; products.push(np); const idx = parseInt(document.getElementById('quickProductModal').dataset.itemIndex); if (!isNaN(idx) && idx >= 0) { selectProduct(idx, np.id, np.name, np.salePrice || 0); } closeQuickProductModal(); showToast('✅ Product added!'); } catch (err) { showToast('❌ ' + err.message, 'error'); } });
+        function updateCustomerDue() { const cid = parseInt(document.getElementById('s_customer').value); if (!cid) { document.getElementById('customerDuePreview').textContent = ''; return; } const fs = getCustomerFinancialSummary(cid, sales, collections, customers); document.getElementById('customerDuePreview').innerHTML = fs.currentDue > 0 ? `⚠️ Existing Due: ${dueAmountLink(getCollectionEntryUrl({ customerId: cid, amount: fs.currentDue }), fmtCurrency(fs.currentDue))}` : '✅ Clear'; }
+
+        function commitItemRow(i, focusNext = false) {
+            if (i !== items.length - 1) return;
+            const desc = (document.getElementById(`id_${i}`)?.value || '').trim();
+            const dtl = (document.getElementById(`dtl_${i}`)?.value || '').trim();
+            const qty = (document.getElementById(`qty_${i}`)?.value || '').trim();
+            const price = (document.getElementById(`prc_${i}`)?.value || '').trim();
+            if (!(desc || dtl || qty || price)) return;
+            const hasTrailingBlank = items.length > 0 && !String(items[items.length - 1]?.description || '').trim() && !String(items[items.length - 1]?.details || '').trim() && !String(items[items.length - 1]?.qty || '').trim() && !String(items[items.length - 1]?.price || '').trim();
+            if (hasTrailingBlank) return;
+            items.push({ description: '', details: '', qty: 1, price: 0, total: 0 });
+            renderItems();
+            recalculate();
+            if (focusNext) {
+                setTimeout(() => {
+                    const newInput = document.getElementById(`id_${i + 1}`);
+                    if (newInput) newInput.focus();
+                }, 50);
+            }
+        }
+        function removeItem(i) { if (items.length <= 1) { items = [{ description: '', details: '', qty: 1, price: 0, total: 0 }]; renderItems(); recalculate(); return; } items.splice(i, 1); renderItems(); recalculate(); }
+        function updateItem(i) { const d = document.getElementById(`id_${i}`)?.value || ''; const dt = document.getElementById(`dtl_${i}`)?.value || ''; const q = parseFloat(document.getElementById(`qty_${i}`)?.value) || 1; const p = parseFloat(document.getElementById(`prc_${i}`)?.value) || 0; items[i] = { description: d, details: dt, qty: q, price: p, total: q * p }; document.getElementById(`tot_${i}`).textContent = '৳ ' + (q * p).toFixed(2); recalculate(); }
+        function renderItems() { document.getElementById('itemsContainer').innerHTML = items.map((it, i) => `<tr>
+            <td style="text-align:center;font-weight:700;color:var(--text-muted);">${i+1}</td>
+            <td style="position:relative;">
+                <div class="searchable-select" id="itemSearchWrapper_${i}">
+                    <input type="text" class="select-input" id="id_${i}" value="${esc(it.description)}" placeholder="🔍 Search product..." autocomplete="off" oninput="filterProductDropdown(${i});updateItem(${i});" onfocus="filterProductDropdown(${i})" onkeydown="if(event.key==='Enter'){event.preventDefault();commitItemRow(${i}, true);}" onchange="commitItemRow(${i}, true);">
+                    <div class="product-card-dropdown" id="productDropdown_${i}"></div>
+                </div>
+            </td>
+            <td><textarea id="dtl_${i}" placeholder="Size, color, paper type... (optional)" oninput="updateItem(${i});">${esc(it.details||'')}</textarea></td>
+            <td><input type="number" id="qty_${i}" value="${it.qty}" min="1" step="0.01" oninput="updateItem(${i});" style="text-align:center;"></td>
+            <td><input type="number" id="prc_${i}" value="${it.price}" step="0.01" oninput="updateItem(${i});" style="text-align:right;"></td>
+            <td class="item-total" id="tot_${i}">৳ ${(it.total||0).toFixed(2)}</td>
+            <td><button type="button" class="btn btn-danger btn-xs" onclick="removeItem(${i})">✕</button></td>
+        </tr>`).join(''); }
+
+        function highlightMatch(text, query) { if (!query || !text) return esc(text); const escaped = esc(text); const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'); return escaped.replace(regex, '<span class="highlight">$1</span>'); }
+
+        function filterProductDropdown(i) {
+            const input = document.getElementById(`id_${i}`);
+            const dd = document.getElementById(`productDropdown_${i}`);
+            if (!input || !dd) return;
+            const st = (input.value || '').trim().toLowerCase();
+            let f = products; if (st) f = products.filter(p => (p.name || '').toLowerCase().includes(st));
+            const dl = f.slice(0, 4);
+            const icons = ['📄','🖨️','🖼️','📦','🏷️','📋','🎨','✂️','📐','🖌️','📌','🔖'];
+            let h = dl.map((p, idx) => `<div class="product-card-item" onclick="selectProduct(${i},${p.id},'${esc(p.name)}',${parseFloat(p.salePrice||p.price||0)})"><div class="prod-icon">${icons[idx % icons.length]}</div><div class="prod-info"><div class="prod-name">${highlightMatch(p.name, st)}</div><div class="prod-meta">${p.unit || 'Piece'}${p.description ? ' · ' + esc(p.description.substring(0,30)) : ''}</div></div><div class="prod-price-tag">৳ ${(parseFloat(p.salePrice||p.price)||0).toFixed(2)}</div></div>`).join('');
+            const em = products.some(p => (p.name || '').toLowerCase() === st);
+            if (st && !em) h += `<div class="product-card-item add-new-item" onclick="openQuickProductForItem(${i})"><div class="prod-icon">➕</div><div class="prod-info"><div class="prod-name">Add "${esc(input.value || 'New Product')}"</div><div class="prod-meta">Create new product with price & unit</div></div><div class="prod-price-tag">+ New</div></div>`;
+            dd.innerHTML = h || '<div class="no-product-found">Type to search or create new product</div>';
+            positionDropdown(dd, input);
+            dd.classList.add('show');
+        }
+        function selectProduct(i, pid, name, price) { document.getElementById(`id_${i}`).value = name; document.getElementById(`prc_${i}`).value = price; document.getElementById(`productDropdown_${i}`).classList.remove('show'); updateItem(i); commitItemRow(i, true); }
+        function openQuickProductForItem(i) { document.getElementById(`productDropdown_${i}`).classList.remove('show'); openQuickProduct(document.getElementById(`id_${i}`).value); document.getElementById('quickProductModal').dataset.itemIndex = i; }
+        function recalculate() { const validItems = items.filter(i => i.description.trim() !== ''); const sub = validItems.reduce((s, i) => s + (parseFloat(i.total) || 0), 0); const dv = parseFloat(document.getElementById('s_discountValue').value) || 0; const dt = document.getElementById('s_discountType').value; const disc = dt === 'percent' ? sub * (dv / 100) : dv; const gt = Math.max(0, sub - Math.min(disc, sub)); const paid = parseFloat(document.getElementById('s_paid').value) || 0; const due = Math.max(0, gt - paid); const cid = parseInt(document.getElementById('s_customer').value) || null; document.getElementById('subtotalDisplay').textContent = '৳ ' + sub.toFixed(2); document.getElementById('grandTotalDisplay').textContent = '৳ ' + gt.toFixed(2); document.getElementById('dueDisplay').innerHTML = cid ? dueAmountLink(getCollectionEntryUrl({ customerId: cid, amount: due }), '৳ ' + due.toFixed(2)) : '৳ ' + due.toFixed(2); }
+        function updateAllUI() { updateStats(); updateTable(); }
+        function updateStats() { document.getElementById('statTotal').textContent = sales.length; const ta = sales.reduce((s, sl) => s + (parseFloat(sl.total_amount || sl.grandTotal || 0)), 0); const tp = sales.reduce((s, sl) => s + (parseFloat(sl.paid_amount || sl.paid || 0)), 0); document.getElementById('statAmount').textContent = fmtCurrency(ta); document.getElementById('statPaid').textContent = fmtCurrency(tp); document.getElementById('statDue').innerHTML = `<a href="${getCollectionEntryUrl()}" class="inline-link inline-due">${fmtCurrency(ta - tp)}</a>`; }
+        function updateTable() { const tbody = document.getElementById('saleTable'); const s = (document.getElementById('searchInput')?.value || '').trim().toLowerCase(); let list = [...sales].sort((a, b) => (b.id || 0) - (a.id || 0)); if (s) list = list.filter(sl => (sl.invoice_no || sl.invoiceNo || '').toLowerCase().includes(s) || (getCN(sl.customer_id || sl.customerId) || '').toLowerCase().includes(s)); if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><p>No invoices yet</p></div></td></tr>'; return; } tbody.innerHTML = list.map(sl => { const due = getSaleDueAmount(sl); const paid = getSalePaidAmount(sl); const dd = sl.due_date || sl.dueDate || ''; const t = todayDate(); let st = 'Paid', bdg = 'badge-success'; if (due > 0 && dd && dd < t) { st = 'Overdue'; bdg = 'badge-danger'; } else if (due > 0 && dd === t) { st = 'Due Today'; bdg = 'badge-warning'; } else if (due > 0) { st = 'Pending'; bdg = 'badge-info'; } let ic = 0; try { ic = JSON.parse(sl.items || '[]').length; } catch (e) {} const hasCol = collections.some(c => (c.sale_id || c.saleId) == sl.id); const inv = sl.invoice_no || sl.invoiceNo || '#' + sl.id; return `<tr><td>#${sl.id}</td><td>${saleLink(sl.id, inv)}</td><td>${sl.sale_date||sl.date}</td><td class="cname">${customerLink(sl.customer_id||sl.customerId, getCN(sl.customer_id||sl.customerId) || 'N/A')}</td><td>${ic}</td><td class="amount">${fmtCurrency(sl.total_amount||sl.grandTotal)}</td><td class="amount green">${fmtCurrency(paid)}</td><td class="amount red">${due > 0 ? dueAmountLink(getCollectionEntryUrl({ customerId: sl.customer_id || sl.customerId, saleId: sl.id, amount: due }), fmtCurrency(due)) : '<span class="amount red">৳ 0</span>'}</td><td><span class="badge ${bdg}">${st}</span></td><td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-xs" onclick="previewInvoice(${sl.id})">👁️</button><button class="btn btn-ghost btn-xs" onclick="editSale(${sl.id})">✏️</button><button class="btn btn-ghost btn-xs" onclick="deleteSale(${sl.id})" style="color:var(--danger);">🗑️</button></div></td></tr>`; }).join(''); }
+        function getCN(id) { const c = customers.find(x => x.id == id); return c ? c.name : 'Walk-in Customer'; }
+        function hasCollection(sid) { return collections.some(c => (c.sale_id || c.saleId) == sid); }
+
+        document.getElementById('saleForm').addEventListener('submit', async function(e) { e.preventDefault(); const validItems = items.filter(i => i.description.trim() !== ''); if (validItems.length === 0) { showToast('Add at least one item', 'error'); return; } const sub = validItems.reduce((s, i) => s + (parseFloat(i.total) || 0), 0); const dv = parseFloat(document.getElementById('s_discountValue').value) || 0; const dt = document.getElementById('s_discountType').value; const disc = dt === 'percent' ? sub * (dv / 100) : dv; const gt = Math.max(0, sub - Math.min(disc, sub)); const paid = parseFloat(document.getElementById('s_paid').value) || 0; const due = Math.max(0, gt - paid); const cid = parseInt(document.getElementById('s_customer').value) || null; const data = { invoice_no: document.getElementById('s_invoice').value, customer_id: cid, sale_date: document.getElementById('s_date').value, due_date: document.getElementById('s_dueDate').value || null, payment_method: document.getElementById('s_payment').value, items: JSON.stringify(validItems), subtotal: sub, discount: disc, discount_type: dt, total_amount: gt, paid_amount: paid, due_amount: due, notes: document.getElementById('s_notes').value.trim(), createdAt: new Date().toISOString() }; try { let sid; if (editingId) { if (hasCollection(editingId)) { showToast('Cannot edit — payment exists.', 'error'); return; } await FrameworkDB.update('sales', editingId, data); sid = editingId; showToast('✅ Sale updated!'); } else { const r = await FrameworkDB.save('sales', data); sid = r?.id || r; showToast('✅ Sale saved!'); } resetForm(); document.getElementById('s_invoice').value = 'INV-' + String(sales.length + 1).padStart(3, '0'); document.getElementById('s_date').value = todayDate(); await loadData(); previewInvoice(sid); } catch (err) { showToast('❌ ' + err.message, 'error'); } });
+        async function editSale(id) { if (hasCollection(id)) { showToast('Cannot edit — payment exists.', 'error'); return; } const sl = sales.find(x => x.id == id); if (!sl) return; editingId = id; document.getElementById('s_id').value = id; document.getElementById('s_invoice').value = sl.invoice_no || sl.invoiceNo || ''; document.getElementById('s_date').value = sl.sale_date || sl.date || ''; document.getElementById('s_customer').value = sl.customer_id || sl.customerId || ''; document.getElementById('s_customer_search').value = getCN(sl.customer_id || sl.customerId); document.getElementById('s_dueDate').value = sl.due_date || sl.dueDate || ''; document.getElementById('s_payment').value = sl.payment_method || 'Cash'; document.getElementById('s_notes').value = sl.notes || ''; document.getElementById('s_discountValue').value = sl.discount || 0; document.getElementById('s_discountType').value = sl.discount_type || 'fixed'; document.getElementById('s_paid').value = sl.paid_amount || sl.paid || 0; try { items = JSON.parse(sl.items || '[]'); } catch (e) { items = [{ description: '', details: '', qty: 1, price: 0, total: 0 }]; } if (items.length === 0) items = [{ description: '', details: '', qty: 1, price: 0, total: 0 }]; items.forEach(i => { if (!i.details) i.details = ''; }); items.push({ description: '', details: '', qty: 1, price: 0, total: 0 }); renderItems(); recalculate(); updateCustomerDue(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        async function deleteSale(id) { if (hasCollection(id)) { showToast('Cannot delete — payment exists.', 'error'); return; } if (!confirm('Delete this invoice?')) return; try { await FrameworkDB.delete('sales', id); showToast('🗑️ Deleted!'); await loadData(); } catch (err) { showToast('❌ ' + err.message, 'error'); } }
+
+        function previewInvoice(id) { const sl = sales.find(x => x.id == id); if (!sl) return; let sitems; try { sitems = JSON.parse(sl.items || '[]'); } catch (e) { sitems = []; } currentInvoice = { ...sl, items: sitems }; document.getElementById('invoiceContent').innerHTML = buildInvoiceHTML(currentInvoice); document.getElementById('invoiceModal').classList.add('show'); }
+        function buildInvoiceHTML(d) { const it = d.items || []; const cust = customers.find(c => c.id == (d.customer_id || d.customerId)); const shopName = SHOP_SETTINGS.name, shopAddress = SHOP_SETTINGS.address, shopPhone = SHOP_SETTINGS.phone, shopEmail = SHOP_SETTINGS.email, shopLogo = SHOP_LOGO || ''; const isPaid = parseFloat(d.due_amount || d.due || 0) <= 0; return `<style>@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');.inv-sheet{width:210mm;min-height:297mm;margin:0 auto;background:#fff;font-family:'Roboto','Segoe UI',Arial,sans-serif;color:#334155;padding:15mm;box-sizing:border-box;position:relative;box-shadow:0 0 20px rgba(0,0,0,0.1)}.inv-sheet *{box-sizing:border-box}.inv-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:8mm;border-bottom:2px solid #1e293b;margin-bottom:8mm}.brand-area{display:flex;align-items:center;gap:5mm}.brand-area img{max-width:50mm;max-height:20mm;object-fit:contain}.brand-info h2{margin:0;font-size:22px;font-weight:900;color:#1e293b;text-transform:uppercase;letter-spacing:.5px}.brand-info p{margin:1px 0;font-size:11px;color:#64748b;line-height:1.4}.invoice-label-area{text-align:right}.invoice-label-area h1{margin:0;font-size:36px;font-weight:900;color:#1e293b;letter-spacing:2px;line-height:1}.invoice-label-area .inv-no{font-size:14px;font-weight:700;margin-top:4px;color:#3b82f6}.details-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:10mm;margin-bottom:10mm}.bill-to h4{margin:0 0 3mm;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;border-bottom:1px solid #e2e8f0;padding-bottom:1mm}.bill-to .cust-name{font-size:16px;font-weight:800;color:#1e293b;margin-bottom:1mm}.bill-to p{margin:1px 0;font-size:12px;line-height:1.5}.inv-meta-table{width:100%;border-collapse:collapse;font-size:12px}.inv-meta-table td{padding:1.5mm 0;border-bottom:1px dashed #e2e8f0}.inv-meta-table td:last-child{text-align:right;font-weight:700;color:#1e293b}.inv-meta-table .lbl{color:#64748b;font-weight:400}.inv-table{width:100%;border-collapse:collapse;margin-bottom:10mm;table-layout:fixed}.inv-table th{background:#1e293b;color:#fff;padding:4mm 3mm;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px}.inv-table td{padding:4mm 3mm;border-bottom:1px solid #e2e8f0;vertical-align:top;font-size:12px;line-height:1.4;word-wrap:break-word}.inv-table .col-idx{width:10mm;text-align:center;color:#64748b}.inv-table .col-desc{width:auto}.inv-table .col-qty{width:20mm;text-align:center}.inv-table .col-price{width:30mm;text-align:right}.inv-table .col-total{width:35mm;text-align:right;font-weight:700;color:#1e293b}.item-desc-main{font-weight:700;color:#1e293b;display:block;margin-bottom:1mm}.item-desc-sub{font-size:11px;color:#64748b;font-style:italic}.summary-area{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15mm}.notes-area{width:45%}.notes-area h4{font-size:11px;text-transform:uppercase;color:#64748b;margin-bottom:2mm}.notes-area p{font-size:11px;line-height:1.6;color:#64748b}.totals-area{width:45%}.totals-table{width:100%;border-collapse:collapse}.totals-table td{padding:2.5mm 0;font-size:13px}.totals-table td:last-child{text-align:right;font-weight:700;color:#1e293b}.totals-table .lbl{color:#64748b}.totals-table tr.grand-total td{padding:4mm 0;font-size:18px;font-weight:900;color:#3b82f6;border-top:2px solid #1e293b;border-bottom:2px solid #1e293b}.totals-table tr.paid-row td{color:#059669;font-size:14px}.totals-table tr.due-row td{color:#dc2626;font-size:14px}.signature-section{display:flex;justify-content:space-between;margin-top:20mm;padding-top:10mm}.sig-box{width:50mm;text-align:center;border-top:1px solid #1e293b;padding-top:2mm;font-size:12px;font-weight:700;color:#1e293b}.inv-footer{position:absolute;bottom:15mm;left:15mm;right:15mm;text-align:center;font-size:10px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:4mm}.paid-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:120px;font-weight:900;color:rgba(5,150,105,0.1);border:15px solid rgba(5,150,105,0.1);padding:10px 40px;border-radius:20px;text-transform:uppercase;pointer-events:none;display:${isPaid?'block':'none'}}@media print{@page{size:A4 portrait;margin:0}body{visibility:hidden;background:#fff}.inv-sheet{visibility:visible;position:absolute;top:0;left:0;width:210mm;height:297mm;box-shadow:none;margin:0;padding:15mm}.inv-table th{background-color:#1e293b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:white!important}.totals-table tr.grand-total td{-webkit-print-color-adjust:exact;print-color-adjust:exact}.paid-watermark{-webkit-print-color-adjust:exact;print-color-adjust:exact}}@media screen and (max-width:210mm){.inv-sheet{width:100%;height:auto;padding:10mm;box-shadow:none}.paid-watermark{font-size:15vw}}</style><div class="inv-sheet"><div class="paid-watermark">PAID</div><div class="inv-header"><div class="brand-area"><img src="${shopLogo}" alt="Logo" onerror="this.style.display='none'"><div class="brand-info"><h2>${esc(shopName)}</h2><p>${esc(shopAddress)}</p><p>Phone: ${esc(shopPhone)}</p><p>Email: ${esc(shopEmail)}</p></div></div><div class="invoice-label-area"><h1>INVOICE</h1><div class="inv-no">${saleLink(d.id, '# ' + esc(d.invoice_no||d.invoiceNo))}</div></div></div><div class="details-grid"><div class="bill-to"><h4>Bill To</h4><div class="cust-name">${cust ? customerLink(cust.id, cust.name||'Walk-in Customer') : esc('Walk-in Customer')}</div>${cust?.mobile?`<p><strong>Phone:</strong> ${esc(cust.mobile)}</p>`:''}${cust?.address?`<p><strong>Address:</strong> ${esc(cust.address)}</p>`:''}</div><div><h4>Invoice Details</h4><table class="inv-meta-table"><tr><td class="lbl">Invoice Date</td><td>${d.sale_date||d.date}</td></tr><tr><td class="lbl">Payment Method</td><td>${d.payment_method||'N/A'}</td></tr>${d.due_date||d.dueDate?`<tr><td class="lbl">Due Date</td><td style="color:#dc2626;">${d.due_date||d.dueDate}</td></tr>`:''}</table></div></div><table class="inv-table"><thead><tr><th class="col-idx">#</th><th class="col-desc">Description & Details</th><th class="col-qty">Qty</th><th class="col-price">Unit Price</th><th class="col-total">Total</th></tr></thead><tbody>${it.map((i,idx)=>`<tr><td class="col-idx">${idx+1}</td><td class="col-desc"><span class="item-desc-main">${esc(i.description)}</span>${i.details?`<span class="item-desc-sub">${esc(i.details)}</span>`:''}</td><td class="col-qty">${i.qty||1}</td><td class="col-price">৳ ${(parseFloat(i.price)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="col-total">৳ ${(parseFloat(i.total)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`).join('')}</tbody></table><div class="summary-area"><div class="notes-area">${d.notes?`<h4>Important Notes:</h4><p>${esc(d.notes)}</p>`:`<h4>Terms & Conditions:</h4><p>1. Goods once sold are not returnable.<br>2. Please check all items before leaving.<br>3. Thank you for choosing Sultan Digital Sign!</p>`}</div><div class="totals-area"><table class="totals-table"><tr><td class="lbl">Subtotal</td><td>৳ ${(parseFloat(d.subtotal)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>${parseFloat(d.discount)>0?`<tr><td class="lbl">Discount</td><td>- ৳ ${(parseFloat(d.discount)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`:''}<tr class="grand-total"><td class="lbl">Grand Total</td><td>৳ ${(parseFloat(d.total_amount||d.grandTotal)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr><tr class="paid-row"><td class="lbl">Paid Amount</td><td>৳ ${(parseFloat(d.paid_amount||d.paid)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr><tr class="due-row"><td class="lbl">Due Amount</td><td>৳ ${(parseFloat(d.due_amount||d.due)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr></table></div></div><div class="signature-section"><div class="sig-box">Customer Signature</div><div class="sig-box">Authorized Signature</div></div><div class="inv-footer">This is a computer generated invoice. No signature is required for electronic copy.<br><strong>Sultan Digital Sign</strong> | Professional Printing & Digital Solutions</div></div>`; }
+        function closeInvoiceModal() { document.getElementById('invoiceModal').classList.remove('show'); }
+        function printInvoice() { if (!currentInvoice) return; const w = window.open('', '_blank', 'width=900,height=700'); w.document.write(`<html><head><title>Print Invoice</title></head><body style="margin:0;padding:0;">` + buildInvoiceHTML(currentInvoice) + `</body></html>`); w.document.close(); setTimeout(() => { w.print(); }, 800); }
+        async function exportInvoice(format) { if (!currentInvoice) return; const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = buildInvoiceHTML(currentInvoice);
+            tempDiv.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;'; document.body.appendChild(tempDiv); try { const canvas = await html2canvas(tempDiv, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }); document.body.removeChild(tempDiv); if (format === 'jpg') { const link = document.createElement('a');
+                    link.download = `invoice_${currentInvoice.invoice_no || currentInvoice.invoiceNo || currentInvoice.id}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.95);
+                    link.click();
+                    showToast('✅ JPG exported!'); } else if (format === 'pdf') { const imgData = canvas.toDataURL('image/jpeg', 0.95); const pdfW = 210, pdfH = (canvas.height * pdfW) / canvas.width; if (window.jspdf && window.jspdf.jsPDF) { const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+                        pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, Math.min(pdfH, 297));
+                        pdf.save(`invoice_${currentInvoice.invoice_no || currentInvoice.invoiceNo || currentInvoice.id}.pdf`);
+                        showToast('✅ PDF exported!'); } else { const link = document.createElement('a');
+                        link.download = `invoice_${currentInvoice.invoice_no || currentInvoice.invoiceNo || currentInvoice.id}.jpg`;
+                        link.href = canvas.toDataURL('image/jpeg', 0.95);
+                        link.click();
+                        showToast('⚠️ PDF library not loaded. JPG exported.', 'warning'); } } } catch (err) { if (tempDiv.parentNode) document.body.removeChild(tempDiv);
+                showToast('⚠️ Export failed. Use Print.', 'error'); } }
+        (function() { if (!window.jspdf) { const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                document.head.appendChild(s); } })();
+        document.addEventListener('click', function(e) { if (!e.target.closest('.searchable-select')) document.querySelectorAll('.product-card-dropdown').forEach(d => d.classList.remove('show')); });
+        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); }));
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+                document.querySelectorAll('.product-card-dropdown.show').forEach(d => d.classList.remove('show')); } });
+        init();
+    </script>
+</body>
+</html>
