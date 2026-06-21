@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.sdfdsf.com"
+        applicationId = "com.sultalsing.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
