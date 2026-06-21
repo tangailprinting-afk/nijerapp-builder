@@ -400,6 +400,81 @@
         }
         .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
         .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+
+        @media (max-width: 1024px) {
+            body { padding: 28px; }
+            .main-wrapper { max-width: 100%; }
+            .left-panel { width: 320px; padding: 36px 28px; }
+            .right-panel { padding: 36px 32px; }
+            .status-header { gap: 16px; }
+            .status-icon-large { width: 64px; height: 64px; font-size: 30px; }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+                align-items: flex-start;
+            }
+            .landscape-container {
+                flex-direction: column;
+                min-height: auto;
+                border-radius: 20px;
+            }
+            .left-panel,
+            .right-panel {
+                width: 100%;
+                padding: 24px 18px;
+            }
+            .left-panel {
+                min-height: 0;
+                border-radius: 20px 20px 0 0;
+            }
+            .right-panel {
+                justify-content: flex-start;
+            }
+            .status-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .status-text h2 { font-size: 18px; }
+            .status-text p { font-size: 12px; }
+            .btn-group {
+                display: grid;
+                grid-template-columns: 1fr;
+                width: 100%;
+                gap: 10px;
+                margin-top: 18px;
+            }
+            .btn-group .btn {
+                width: 100%;
+            }
+            .info-card {
+                padding: 14px 16px;
+            }
+            .feature-list {
+                margin-top: 24px;
+            }
+            .contact-mini {
+                padding-top: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .left-panel,
+            .right-panel { padding: 18px 14px; }
+            .brand-section h1 { font-size: 20px; }
+            .tagline { letter-spacing: 1.4px; }
+            .feature-list .feat-item { font-size: 11px; }
+            .status-icon-large { width: 56px; height: 56px; font-size: 26px; }
+            .status-text h2 { font-size: 17px; }
+            .status-text p { font-size: 11px; }
+            .status-badge { font-size: 10px; padding: 5px 12px; }
+            .info-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+            .info-row .val { text-align: left; word-break: break-word; }
+            .brand-logo { width: 56px; height: 56px; }
+            .contact-mini .cm-row { font-size: 10px; }
+        }
     </style>
 </head>
 <body>
