@@ -1,0 +1,274 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Detail | Sultan Digital Sign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="common.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --primary:#6366f1; --primary-dark:#4f46e5; --bg:#f8fafc; --card-bg:#fff; --text:#0f172a; --text-secondary:#64748b; --border:#e2e8f0; --success:#10b981; --danger:#ef4444; --radius-sm:8px; --radius-lg:16px; --shadow:0 1px 3px rgba(0,0,0,.06); --shadow-lg:0 10px 25px rgba(0,0,0,.08); --transition:all .2s ease; }
+        *{box-sizing:border-box} body{margin:0;font-family:'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+        .navbar{background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:50;gap:16px;flex-wrap:wrap}
+        .navbar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}.navbar-brand img{width:38px;height:38px;border-radius:8px;object-fit:cover}.brand-text{font-size:16px;font-weight:800}.brand-sub{font-size:9px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px}
+        .navbar-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:inherit}.btn-primary{background:var(--primary);color:#fff}.btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}.btn:hover{transform:translateY(-1px)}.btn-xs{padding:5px 10px;font-size:11px}
+        .container{max-width:1300px;margin:0 auto;padding:24px}.page-header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}.page-header h1{margin:0;font-size:26px}.subtitle{font-size:13px;color:var(--text-secondary);margin-top:4px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+        .card{background:var(--card-bg);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}.card-header{padding:16px 20px;border-bottom:1px solid var(--border);background:#fafbfc;font-weight:700;font-size:14px}.card-body{padding:20px}.stat{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:18px 20px;border:1px solid transparent}.stat-label{font-size:11px;text-transform:uppercase;color:var(--text-secondary);font-weight:700}.stat-value{font-size:26px;font-weight:900;margin-top:4px}.stat-value.red{color:var(--danger)}.stat-value.green{color:var(--success)}
+        table{width:100%;border-collapse:collapse;font-size:12.5px} th,td{padding:11px 16px;border-bottom:1px solid #f1f5f9;text-align:left;white-space:nowrap} thead{background:#f8fafc} tbody tr:hover{background:#f8fafc}.amount{font-weight:700}.amount.red{color:var(--danger)}.amount.green{color:var(--success)}.badge{display:inline-flex;padding:4px 10px;border-radius:20px;font-size:10.5px;font-weight:700}.badge-success{background:#d1fae5;color:#065f46}.badge-warning{background:#fef3c7;color:#92400e}.badge-danger{background:#fee2e2;color:#991b1b}.badge-info{background:#dbeafe;color:#1e40af}.empty-state{text-align:center;padding:34px 20px;color:#94a3b8}
+        .detail-hero{background:linear-gradient(135deg,#111827,#6366f1);color:#fff;border-radius:20px;padding:24px;box-shadow:var(--shadow-lg);margin-bottom:20px}.detail-hero-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.detail-name{font-size:28px;font-weight:900;margin:0 0 6px}.detail-meta{font-size:13px;opacity:.9;line-height:1.6}.detail-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700}.link-card{display:inline-flex;align-items:center;gap:6px}
+        .action-row{display:flex;gap:8px;flex-wrap:wrap}
+        @media (max-width:768px){.navbar{height:auto;padding:12px 16px}.navbar-actions{width:100%}.navbar-actions .btn{flex:1;justify-content:center}.container{padding:16px}.page-header h1{font-size:22px}.detail-name{font-size:22px}}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand"><img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none'"><div><div class="brand-text">Sultan Digital Sign</div><div class="brand-sub">Management System</div></div></a>
+        <div class="navbar-actions">
+            <a href="index.html" class="btn btn-outline btn-xs">Dashboard</a>
+            <a href="customers.html" class="btn btn-outline btn-xs">Customers</a>
+            <a href="sales.html" class="btn btn-primary btn-xs">New Sale</a>
+            <a href="collections.html" class="btn btn-outline btn-xs">Collection</a>
+            <a href="reports.html" class="btn btn-outline btn-xs">Reports</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="page-header">
+            <div><h1>Customer Detail</h1><div class="subtitle">Click invoice numbers or due amounts to jump to the exact sale</div></div>
+            <div class="action-row">
+                <button class="btn btn-primary" onclick="printLedger()">🖨️ Print Ledger</button>
+                <button class="btn btn-outline" onclick="downloadLedger()">⬇️ Download Ledger</button>
+                <a href="customers.html" class="btn btn-outline">← Back to Customers</a>
+            </div>
+        </div>
+        <div class="detail-hero">
+            <div class="detail-hero-top">
+                <div>
+                    <div class="detail-badge">Customer profile</div>
+                    <h2 class="detail-name" id="customerName">Loading...</h2>
+                    <div class="detail-meta" id="customerMeta">Please wait...</div>
+                </div>
+                <div style="text-align:right">
+                    <div class="detail-badge">Current Due</div>
+                    <div style="font-size:34px;font-weight:900;margin-top:8px" id="customerDue">৳ 0</div>
+                </div>
+            </div>
+        </div>
+        <div class="grid">
+            <div class="stat"><div class="stat-label">Opening Balance</div><div class="stat-value" id="openingBalance">৳ 0</div></div>
+            <div class="stat"><div class="stat-label">Total Sales</div><div class="stat-value" id="totalSales">৳ 0</div></div>
+            <div class="stat"><div class="stat-label">Total Paid</div><div class="stat-value green" id="totalPaid">৳ 0</div></div>
+            <div class="stat"><div class="stat-label">Collections</div><div class="stat-value green" id="totalCollections">৳ 0</div></div>
+        </div>
+        <div class="card">
+            <div class="card-header">Sales History</div>
+            <div class="card-body" style="padding:0;overflow-x:auto">
+                <table>
+                    <thead><tr><th>Invoice</th><th>Date</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th></tr></thead>
+                    <tbody id="salesTable"><tr><td colspan="6"><div class="empty-state">Loading...</div></td></tr></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Collections</div>
+            <div class="card-body" style="padding:0;overflow-x:auto">
+                <table>
+                    <thead><tr><th>Receipt</th><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Notes</th></tr></thead>
+                    <tbody id="collectionTable"><tr><td colspan="6"><div class="empty-state">Loading...</div></td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="../frameworkdb.js"></script>
+    <script>
+        let customers = [], sales = [], collections = [], currentCustomer = null;
+        const params = new URLSearchParams(location.search);
+        const customerId = parseInt(params.get('customer_id') || params.get('id') || '0', 10) || null;
+
+        async function init() { await loadData(); }
+        async function loadData() {
+            try {
+                const [cd, sd, cld] = await Promise.all([FrameworkDB.get('customers'), FrameworkDB.get('sales'), FrameworkDB.get('collections')]);
+                customers = ensureArray(cd); sales = ensureArray(sd); collections = ensureArray(cld);
+                render();
+            } catch (e) { console.error(e); document.getElementById('customerName').textContent = 'Failed to load'; }
+        }
+
+        function render() {
+            currentCustomer = customers.find(c => c.id == customerId);
+            if (!currentCustomer) {
+                document.getElementById('customerName').textContent = 'Customer not found';
+                document.getElementById('customerMeta').textContent = 'The requested customer record could not be located.';
+                document.getElementById('salesTable').innerHTML = '<tr><td colspan="6"><div class="empty-state">No customer data</div></td></tr>';
+                document.getElementById('collectionTable').innerHTML = '<tr><td colspan="6"><div class="empty-state">No customer data</div></td></tr>';
+                return;
+            }
+            const fs = getCustomerFinancialSummary(currentCustomer.id, sales, collections, customers);
+            document.title = `${currentCustomer.name || 'Customer'} | Sultan Digital Sign`;
+            document.getElementById('customerName').innerHTML = customerLink(currentCustomer.id, currentCustomer.name || 'N/A');
+            document.getElementById('customerMeta').innerHTML = `${esc(currentCustomer.mobile || 'N/A')}<br>${esc(currentCustomer.address || 'No address')}`;
+            document.getElementById('customerDue').innerHTML = dueAmountLink(getCollectionEntryUrl({ customerId: currentCustomer.id, amount: fs.currentDue }), fmtCurrency(fs.currentDue));
+            document.getElementById('openingBalance').textContent = fmtCurrency(fs.openingBalance);
+            document.getElementById('totalSales').textContent = fmtCurrency(fs.salesTotal);
+            document.getElementById('totalPaid').textContent = fmtCurrency(fs.totalPaid);
+            document.getElementById('totalCollections').textContent = fmtCurrency(fs.generalCollections);
+
+            const customerSales = sales.filter(s => (s.customer_id || s.customerId) == currentCustomer.id).sort((a,b)=>(b.id||0)-(a.id||0));
+            document.getElementById('salesTable').innerHTML = customerSales.length ? customerSales.map(s => {
+                const paid = getSalePaidAmount(s);
+                const due = getSaleDueAmount(s);
+                const t = todayDate();
+                const dd = s.due_date || s.dueDate || '';
+                let st = 'Paid', bdg = 'badge-success';
+                if (due > 0 && dd && dd < t) { st = 'Overdue'; bdg = 'badge-danger'; }
+                else if (due > 0 && dd === t) { st = 'Due Today'; bdg = 'badge-warning'; }
+                else if (due > 0) { st = 'Pending'; bdg = 'badge-info'; }
+                return `<tr><td>${saleLink(s.id, s.invoice_no || s.invoiceNo || '#')}</td><td>${s.sale_date || s.date || '-'}</td><td class="amount">${fmtCurrency(getSaleTotalAmount(s))}</td><td class="amount green">${fmtCurrency(paid)}</td><td class="amount red">${due > 0 ? dueAmountLink(getCollectionEntryUrl({ customerId: currentCustomer.id, saleId: s.id, amount: due }), fmtCurrency(due)) : '৳ 0'}</td><td><span class="badge ${bdg}">${st}</span></td></tr>`;
+            }).join('') : '<tr><td colspan="6"><div class="empty-state">No sales found</div></td></tr>';
+
+            const customerCollections = collections.filter(c => (c.customer_id || c.customerId) == currentCustomer.id).sort((a,b)=>(b.id||0)-(a.id||0));
+            document.getElementById('collectionTable').innerHTML = customerCollections.length ? customerCollections.map(c => {
+                const saleRef = c.sale_id || c.saleId;
+                const sale = saleRef ? sales.find(s => s.id == saleRef) : null;
+                return `<tr><td style="font-family:monospace;">${esc(c.receipt_no || '-' )}</td><td>${c.collection_date || c.date || '-'}</td><td class="amount green">${fmtCurrency(parseFloat(c.amount || 0))}</td><td>${esc(c.payment_method || 'Cash')}</td><td>${sale ? saleLink(sale.id, sale.invoice_no || sale.invoiceNo || '#'+sale.id) : 'General'}</td><td>${esc(c.notes || '-')}</td></tr>`;
+            }).join('') : '<tr><td colspan="6"><div class="empty-state">No collections found</div></td></tr>';
+        }
+
+        function buildLedgerReportStyles() {
+            return `
+                @page { margin: 10mm; size: A4 portrait; }
+                body { font-family: 'Segoe UI', Arial, sans-serif; color: #111827; margin: 0; background: #fff; }
+                .wrap { padding: 14px; }
+                .shop-header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #111827; padding-bottom: 8px; }
+                .shop-header h2 { margin: 0 0 4px 0; font-size: 18px; }
+                .shop-header p { margin: 1px 0; font-size: 10px; color: #374151; }
+                .logo-img { max-width: 180px; max-height: 60px; width: auto; height: auto; object-fit: contain; }
+                .header { text-align: center; border-bottom: 2px solid #111827; padding-bottom: 10px; margin-bottom: 12px; }
+                .header h1 { margin: 0; font-size: 20px; }
+                .header p { margin: 4px 0 0; font-size: 11px; color: #4b5563; }
+                .hero { background: linear-gradient(135deg, #111827, #6366f1); color: white; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+                .hero .name { font-size: 22px; font-weight: 900; margin: 0 0 4px; }
+                .hero .meta { font-size: 11px; line-height: 1.5; opacity: 0.95; }
+                .hero .due { font-size: 28px; font-weight: 900; text-align: right; }
+                .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+                .summary .card { border: 1px solid #d1d5db; border-radius: 12px; padding: 10px 12px; background: #fff; text-align: center; }
+                .summary .label { font-size: 10px; text-transform: uppercase; color: #6b7280; font-weight: 700; }
+                .summary .value { font-size: 18px; font-weight: 900; margin-top: 4px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+                th, td { border: 1px solid #d1d5db; padding: 7px 8px; font-size: 10px; text-align: left; }
+                th { background: #f3f4f6; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; }
+                .section-title { font-size: 13px; font-weight: 800; margin: 14px 0 6px; }
+                .amount.green { color: #059669; font-weight: 800; }
+                .amount.red { color: #dc2626; font-weight: 800; }
+                .footer { margin-top: 14px; padding-top: 8px; border-top: 1px solid #d1d5db; text-align: center; font-size: 10px; color: #6b7280; }
+            `;
+        }
+
+        function buildLedgerReportContent() {
+            if (!currentCustomer) return '';
+            const fs = getCustomerFinancialSummary(currentCustomer.id, sales, collections, customers);
+            const customerSales = sales.filter(s => (s.customer_id || s.customerId) == currentCustomer.id).sort((a,b)=>(a.sale_date || a.date || '').localeCompare(b.sale_date || b.date || ''));
+            const customerCollections = collections.filter(c => (c.customer_id || c.customerId) == currentCustomer.id).sort((a,b)=>(a.collection_date || a.date || '').localeCompare(b.collection_date || b.date || ''));
+            const salesRows = customerSales.map(s => {
+                const paid = getSalePaidAmount(s);
+                const due = getSaleDueAmount(s);
+                return `<tr><td>${esc(s.sale_date || s.date || '-')}</td><td>${esc(s.invoice_no || s.invoiceNo || '#'+s.id)}</td><td class="amount">${fmtCurrency(getSaleTotalAmount(s))}</td><td class="amount green">${fmtCurrency(paid)}</td><td class="amount red">${fmtCurrency(due)}</td></tr>`;
+            }).join('');
+            const collectionRows = customerCollections.map(c => {
+                const saleRef = c.sale_id || c.saleId;
+                const sale = saleRef ? sales.find(s => s.id == saleRef) : null;
+                return `<tr><td>${esc(c.collection_date || c.date || '-')}</td><td>${esc(c.receipt_no || '-')}</td><td>${esc(sale ? (sale.invoice_no || sale.invoiceNo || '#'+sale.id) : 'General')}</td><td class="amount green">${fmtCurrency(parseFloat(c.amount || 0))}</td><td>${esc(c.payment_method || 'Cash')}</td><td>${esc(c.notes || '-')}</td></tr>`;
+            }).join('');
+            return `
+                <div class="wrap">
+                    ${getShopHeaderHTML()}
+                    <div class="hero">
+                        <div>
+                            <div class="name">${esc(currentCustomer.name || 'N/A')}</div>
+                            <div class="meta">${esc(currentCustomer.mobile || 'N/A')}<br>${esc(currentCustomer.address || 'No address')}</div>
+                        </div>
+                        <div>
+                            <div class="meta">Current Due</div>
+                            <div class="due">${fmtCurrency(fs.currentDue)}</div>
+                        </div>
+                    </div>
+                    <div class="summary">
+                        <div class="card"><div class="label">Opening</div><div class="value">${fmtCurrency(fs.openingBalance)}</div></div>
+                        <div class="card"><div class="label">Sales</div><div class="value">${fmtCurrency(fs.salesTotal)}</div></div>
+                        <div class="card"><div class="label">Paid</div><div class="value" style="color:#059669;">${fmtCurrency(fs.totalPaid)}</div></div>
+                        <div class="card"><div class="label">Collections</div><div class="value" style="color:#059669;">${fmtCurrency(fs.generalCollections)}</div></div>
+                    </div>
+                    <div class="section-title">Sales History</div>
+                    <table>
+                        <thead><tr><th>Date</th><th>Invoice</th><th>Total</th><th>Paid</th><th>Due</th></tr></thead>
+                        <tbody>${salesRows || '<tr><td colspan="5">No sales found</td></tr>'}</tbody>
+                    </table>
+                    <div class="section-title">Collections</div>
+                    <table>
+                        <thead><tr><th>Date</th><th>Receipt</th><th>Reference</th><th>Amount</th><th>Method</th><th>Notes</th></tr></thead>
+                        <tbody>${collectionRows || '<tr><td colspan="6">No collections found</td></tr>'}</tbody>
+                    </table>
+                    <div class="footer">Generated on ${new Date().toLocaleString()} | ${esc(SHOP_SETTINGS.name)}</div>
+                    ${getShopFooterHTML()}
+                </div>
+            `;
+        }
+
+        function buildLedgerReportHTML() {
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${esc(currentCustomer ? currentCustomer.name || 'Customer' : 'Customer')} Ledger</title>
+                    <style>${buildLedgerReportStyles()}</style>
+                </head>
+                <body>
+                    ${buildLedgerReportContent()}
+                </body>
+                </html>
+            `;
+        }
+
+        function printLedger() {
+            if (!currentCustomer) return;
+            printHTMLContent(buildLedgerReportHTML());
+        }
+
+        async function downloadLedger() {
+            if (!currentCustomer) return;
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;z-index:-1;background:#fff;';
+            tempDiv.innerHTML = `<style>${buildLedgerReportStyles()}</style>${buildLedgerReportContent()}`;
+            document.body.appendChild(tempDiv);
+            try {
+                const canvas = await html2canvas(tempDiv, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false });
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+                const pageW = pdf.internal.pageSize.getWidth();
+                const pageH = pdf.internal.pageSize.getHeight();
+                const imgH = (canvas.height * pageW) / canvas.width;
+                let remainingH = imgH;
+                let y = 0;
+                pdf.addImage(imgData, 'JPEG', 0, y, pageW, imgH);
+                remainingH -= pageH;
+                while (remainingH > 0) {
+                    y = remainingH - imgH;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, y, pageW, imgH);
+                    remainingH -= pageH;
+                }
+                pdf.save(`customer_ledger_${(currentCustomer.name || 'customer').replace(/[^a-z0-9]+/gi, '_').toLowerCase()}.pdf`);
+            } catch (err) {
+                console.error(err);
+                alert('PDF export failed. Please try again.');
+            } finally {
+                if (tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
