@@ -1,0 +1,208 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Detail | Sultan Digital Sign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="common.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --primary:#6366f1; --bg:#f8fafc; --card-bg:#fff; --text:#0f172a; --text-secondary:#64748b; --border:#e2e8f0; --success:#10b981; --danger:#ef4444; --radius-sm:8px; --radius-lg:16px; --shadow:0 1px 3px rgba(0,0,0,.06); --shadow-lg:0 10px 25px rgba(0,0,0,.08); }
+        *{box-sizing:border-box} body{margin:0;font-family:'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+        .navbar{background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:50;gap:16px;flex-wrap:wrap}
+        .navbar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}.navbar-brand img{width:38px;height:38px;border-radius:8px;object-fit:cover}.brand-text{font-size:16px;font-weight:800}.brand-sub{font-size:9px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px}
+        .navbar-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:inherit}.btn-primary{background:var(--primary);color:#fff}.btn-success{background:var(--success);color:#fff}.btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}.btn:hover{transform:translateY(-1px)}.btn-xs{padding:5px 10px;font-size:11px}
+        .container{max-width:1300px;margin:0 auto;padding:24px}.page-header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}.page-header h1{margin:0;font-size:26px}.subtitle{font-size:13px;color:var(--text-secondary);margin-top:4px}
+        .card{background:var(--card-bg);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}.card-header{padding:16px 20px;border-bottom:1px solid var(--border);background:#fafbfc;font-weight:700;font-size:14px}.card-body{padding:20px}
+        .hero{background:linear-gradient(135deg,#111827,#6366f1);color:#fff;border-radius:20px;padding:24px;box-shadow:var(--shadow-lg);margin-bottom:20px}.hero-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.hero-title{font-size:28px;font-weight:900;margin:0 0 6px}.hero-meta{font-size:13px;opacity:.9;line-height:1.6}.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}.stat{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:18px 20px}.stat-label{font-size:11px;text-transform:uppercase;color:var(--text-secondary);font-weight:700}.stat-value{font-size:26px;font-weight:900;margin-top:4px}.stat-value.green{color:var(--success)}.stat-value.red{color:var(--danger)}
+        table{width:100%;border-collapse:collapse;font-size:12.5px} th,td{padding:11px 16px;border-bottom:1px solid #f1f5f9;text-align:left;white-space:nowrap} thead{background:#f8fafc} tbody tr:hover{background:#f8fafc}.amount{font-weight:700}.amount.green{color:var(--success)}.amount.red{color:var(--danger)}.badge{display:inline-flex;padding:4px 10px;border-radius:20px;font-size:10.5px;font-weight:700}.badge-success{background:#d1fae5;color:#065f46}.badge-warning{background:#fef3c7;color:#92400e}.badge-danger{background:#fee2e2;color:#991b1b}.badge-info{background:#dbeafe;color:#1e40af}.empty-state{text-align:center;padding:34px 20px;color:#94a3b8}
+        .invoice-shell{background:#fff;border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px}
+        .invoice-shell-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:#fafbfc;flex-wrap:wrap}
+        .invoice-shell-head h3{margin:0;font-size:14px}
+        .invoice-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .invoice-preview{overflow-x:auto;background:#f8fafc}
+        .due-action{display:inline-flex;align-items:center;justify-content:center;margin-top:10px;text-decoration:none;font-size:12px;font-weight:800;padding:7px 12px;border-radius:999px;background:#fff;color:var(--danger);border:1.5px solid rgba(239,68,68,.25);box-shadow:0 4px 14px rgba(239,68,68,.08)}
+        .due-action:hover{background:#fff5f5}
+        @media (max-width:768px){.navbar{height:auto;padding:12px 16px}.navbar-actions{width:100%}.navbar-actions .btn{flex:1;justify-content:center}.container{padding:16px}.page-header h1{font-size:22px}.hero-title{font-size:22px}.summary{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand"><img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none'"><div><div class="brand-text">Sultan Digital Sign</div><div class="brand-sub">Management System</div></div></a>
+        <div class="navbar-actions">
+            <a href="index.html" class="btn btn-outline btn-xs">Dashboard</a>
+            <a href="sales.html" class="btn btn-primary btn-xs">Sales</a>
+            <a href="customers.html" class="btn btn-outline btn-xs">Customers</a>
+            <a href="collections.html" class="btn btn-outline btn-xs">Collections</a>
+            <a href="reports.html" class="btn btn-outline btn-xs">Reports</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="page-header">
+            <div><h1>Sale Detail</h1><div class="subtitle">Invoice, customer and due details in one place</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <a href="sales.html" class="btn btn-outline">← Back to Sales</a>
+                <a id="collectPaymentTop" href="#" class="btn btn-success">💵 Collect Payment</a>
+                <button class="btn btn-primary" onclick="printInvoice()">🖨️ Print</button>
+                <button class="btn btn-outline" onclick="exportInvoice('jpg')">🖼️ JPG</button>
+                <button class="btn btn-outline" onclick="exportInvoice('pdf')">📄 PDF</button>
+            </div>
+        </div>
+        <div class="hero">
+            <div class="hero-top">
+                <div>
+                    <div class="hero-badge">Invoice detail</div>
+                    <h2 class="hero-title" id="invoiceNo">Loading...</h2>
+                    <div class="hero-meta" id="invoiceMeta">Please wait...</div>
+                </div>
+                <div style="text-align:right">
+                    <div class="hero-badge">Due Amount</div>
+                    <div style="font-size:34px;font-weight:900;margin-top:8px" id="dueAmount">৳ 0</div>
+                    <div id="duePayHero"></div>
+                </div>
+            </div>
+        </div>
+        <div class="grid">
+            <div class="stat"><div class="stat-label">Total</div><div class="stat-value" id="totalAmount">৳ 0</div></div>
+            <div class="stat"><div class="stat-label">Paid</div><div class="stat-value green" id="paidAmount">৳ 0</div></div>
+            <div class="stat"><div class="stat-label">Due</div><div class="stat-value red" id="dueAmountSmall">৳ 0</div><div id="duePayStat"></div></div>
+            <div class="stat"><div class="stat-label">Payment Method</div><div class="stat-value" style="font-size:18px" id="paymentMethod">-</div></div>
+        </div>
+        <div class="invoice-shell">
+            <div class="invoice-shell-head">
+                <h3>Invoice Preview</h3>
+                <div class="invoice-actions">
+                    <button class="btn btn-outline btn-xs" onclick="printInvoice()">🖨️ Print</button>
+                    <button class="btn btn-outline btn-xs" onclick="exportInvoice('jpg')">🖼️ JPG</button>
+                    <button class="btn btn-outline btn-xs" onclick="exportInvoice('pdf')">📄 PDF</button>
+                </div>
+            </div>
+            <div class="invoice-preview" id="invoicePreview"></div>
+        </div>
+        <div class="card">
+            <div class="card-header">Linked Collections</div>
+            <div class="card-body" style="padding:0;overflow-x:auto">
+                <table>
+                    <thead><tr><th>Receipt</th><th>Date</th><th>Amount</th><th>Method</th><th>Notes</th></tr></thead>
+                    <tbody id="collectionsTable"><tr><td colspan="5"><div class="empty-state">Loading...</div></td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="../frameworkdb.js"></script>
+    <script>
+        let customers = [], sales = [], collections = [], currentSale = null;
+        const params = new URLSearchParams(location.search);
+        const saleId = parseInt(params.get('sale_id') || params.get('id') || '0', 10) || null;
+
+        async function init() { await loadData(); }
+        async function loadData() {
+            try {
+                const [cd, sd, cld] = await Promise.all([FrameworkDB.get('customers'), FrameworkDB.get('sales'), FrameworkDB.get('collections')]);
+                customers = ensureArray(cd); sales = ensureArray(sd); collections = ensureArray(cld);
+                render();
+            } catch (e) { console.error(e); document.getElementById('invoiceNo').textContent = 'Failed to load'; }
+        }
+
+        function render() {
+            currentSale = sales.find(s => s.id == saleId);
+            if (!currentSale) {
+                document.getElementById('invoiceNo').textContent = 'Sale not found';
+                document.getElementById('invoiceMeta').textContent = 'The requested sale record could not be located.';
+                document.getElementById('collectionsTable').innerHTML = '<tr><td colspan="5"><div class="empty-state">No sale data</div></td></tr>';
+                document.getElementById('invoicePreview').innerHTML = '<div class="empty-state">No sale data</div>';
+                return;
+            }
+            let items = [];
+            try { items = JSON.parse(currentSale.items || '[]'); } catch (e) { items = []; }
+            const cust = customers.find(c => c.id == (currentSale.customer_id || currentSale.customerId));
+            const total = getSaleTotalAmount(currentSale);
+            const paid = getSalePaidAmount(currentSale);
+            const due = getSaleDueAmount(currentSale);
+            document.title = `${currentSale.invoice_no || currentSale.invoiceNo || 'Sale'} | Sultan Digital Sign`;
+            document.getElementById('invoiceNo').innerHTML = saleLink(currentSale.id, currentSale.invoice_no || currentSale.invoiceNo || '#');
+            document.getElementById('invoiceMeta').innerHTML = `${esc(currentSale.sale_date || currentSale.date || '-')}${currentSale.due_date || currentSale.dueDate ? `<br>Due date: ${esc(currentSale.due_date || currentSale.dueDate)}` : ''}`;
+            const payUrl = cust ? getCollectionEntryUrl({ customerId: cust.id, saleId: currentSale.id, amount: due }) : '';
+            document.getElementById('dueAmount').innerHTML = cust ? dueAmountLink(payUrl, fmtCurrency(due)) : fmtCurrency(due);
+            document.getElementById('totalAmount').textContent = fmtCurrency(total);
+            document.getElementById('paidAmount').textContent = fmtCurrency(paid);
+            document.getElementById('dueAmountSmall').innerHTML = cust ? dueAmountLink(payUrl, fmtCurrency(due)) : fmtCurrency(due);
+            const payBtnHtml = cust ? `<a class="due-action" href="${esc(payUrl)}">💵 Pay Due</a>` : '';
+            document.getElementById('duePayHero').innerHTML = payBtnHtml;
+            document.getElementById('duePayStat').innerHTML = payBtnHtml;
+            const collectPaymentTop = document.getElementById('collectPaymentTop');
+            if (collectPaymentTop) {
+                if (cust && due > 0) {
+                    collectPaymentTop.href = payUrl;
+                    collectPaymentTop.style.display = 'inline-flex';
+                } else {
+                    collectPaymentTop.style.display = 'none';
+                }
+            }
+            document.getElementById('paymentMethod').textContent = currentSale.payment_method || 'N/A';
+            document.getElementById('collectionsTable').innerHTML = collections.filter(c => (c.sale_id || c.saleId) == currentSale.id).sort((a,b)=>(b.id||0)-(a.id||0)).map(c => `<tr><td style="font-family:monospace;">${esc(c.receipt_no || '-')}</td><td>${c.collection_date || c.date || '-'}</td><td class="amount green">${fmtCurrency(parseFloat(c.amount || 0))}</td><td>${esc(c.payment_method || 'Cash')}</td><td>${esc(c.notes || '-')}</td></tr>`).join('') || '<tr><td colspan="5"><div class="empty-state">No linked collections</div></td></tr>';
+            document.getElementById('invoicePreview').innerHTML = buildInvoiceHTML(currentSale, cust, items);
+        }
+
+        function buildInvoiceHTML(d, cust, it) {
+            const shopName = SHOP_SETTINGS.name, shopAddress = SHOP_SETTINGS.address, shopPhone = SHOP_SETTINGS.phone, shopEmail = SHOP_SETTINGS.email, shopLogo = SHOP_LOGO || '';
+            const isPaid = parseFloat(d.due_amount || d.due || 0) <= 0;
+            return `<style>@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');.inv-sheet{width:210mm;min-height:297mm;margin:0 auto;background:#fff;font-family:'Roboto','Segoe UI',Arial,sans-serif;color:#334155;padding:15mm;box-sizing:border-box;position:relative;box-shadow:0 0 20px rgba(0,0,0,0.1)}.inv-sheet *{box-sizing:border-box}.inv-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:8mm;border-bottom:2px solid #1e293b;margin-bottom:8mm}.brand-area{display:flex;align-items:center;gap:5mm}.brand-area img{max-width:50mm;max-height:20mm;object-fit:contain}.brand-info h2{margin:0;font-size:22px;font-weight:900;color:#1e293b;text-transform:uppercase;letter-spacing:.5px}.brand-info p{margin:1px 0;font-size:11px;color:#64748b;line-height:1.4}.invoice-label-area{text-align:right}.invoice-label-area h1{margin:0;font-size:36px;font-weight:900;color:#1e293b;letter-spacing:2px;line-height:1}.invoice-label-area .inv-no{font-size:14px;font-weight:700;margin-top:4px;color:#3b82f6}.details-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:10mm;margin-bottom:10mm}.bill-to h4{margin:0 0 3mm;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;border-bottom:1px solid #e2e8f0;padding-bottom:1mm}.bill-to .cust-name{font-size:16px;font-weight:800;color:#1e293b;margin-bottom:1mm}.bill-to p{margin:1px 0;font-size:12px;line-height:1.5}.inv-meta-table{width:100%;border-collapse:collapse;font-size:12px}.inv-meta-table td{padding:1.5mm 0;border-bottom:1px dashed #e2e8f0}.inv-meta-table td:last-child{text-align:right;font-weight:700;color:#1e293b}.inv-meta-table .lbl{color:#64748b;font-weight:400}.inv-table{width:100%;border-collapse:collapse;margin-bottom:10mm;table-layout:fixed}.inv-table th{background:#1e293b;color:#fff;padding:4mm 3mm;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px}.inv-table td{padding:4mm 3mm;border-bottom:1px solid #e2e8f0;vertical-align:top;font-size:12px;line-height:1.4;word-wrap:break-word}.inv-table .col-idx{width:10mm;text-align:center;color:#64748b}.inv-table .col-desc{width:auto}.inv-table .col-qty{width:20mm;text-align:center}.inv-table .col-price{width:30mm;text-align:right}.inv-table .col-total{width:35mm;text-align:right;font-weight:700;color:#1e293b}.item-desc-main{font-weight:700;color:#1e293b;display:block;margin-bottom:1mm}.item-desc-sub{font-size:11px;color:#64748b;font-style:italic}.summary-area{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15mm}.notes-area{width:45%}.notes-area h4{font-size:11px;text-transform:uppercase;color:#64748b;margin-bottom:2mm}.notes-area p{font-size:11px;line-height:1.6;color:#64748b}.totals-area{width:45%}.totals-table{width:100%;border-collapse:collapse}.totals-table td{padding:2.5mm 0;font-size:13px}.totals-table td:last-child{text-align:right;font-weight:700;color:#1e293b}.totals-table .lbl{color:#64748b}.totals-table tr.grand-total td{padding:4mm 0;font-size:18px;font-weight:900;color:#3b82f6;border-top:2px solid #1e293b;border-bottom:2px solid #1e293b}.totals-table tr.paid-row td{color:#059669;font-size:14px}.totals-table tr.due-row td{color:#dc2626;font-size:14px}.signature-section{display:flex;justify-content:space-between;margin-top:20mm;padding-top:10mm}.sig-box{width:50mm;text-align:center;border-top:1px solid #1e293b;padding-top:2mm;font-size:12px;font-weight:700;color:#1e293b}.inv-footer{position:absolute;bottom:15mm;left:15mm;right:15mm;text-align:center;font-size:10px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:4mm}.paid-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:120px;font-weight:900;color:rgba(5,150,105,0.1);border:15px solid rgba(5,150,105,0.1);padding:10px 40px;border-radius:20px;text-transform:uppercase;pointer-events:none;display:${isPaid?'block':'none'}}@media print{@page{size:A4 portrait;margin:0}body{visibility:hidden;background:#fff}.inv-sheet{visibility:visible;position:absolute;top:0;left:0;width:210mm;height:297mm;box-shadow:none;margin:0;padding:15mm}.inv-table th{background-color:#1e293b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:white!important}.totals-table tr.grand-total td{-webkit-print-color-adjust:exact;print-color-adjust:exact}.paid-watermark{-webkit-print-color-adjust:exact;print-color-adjust:exact}}@media screen and (max-width:210mm){.inv-sheet{width:100%;height:auto;padding:10mm;box-shadow:none}.paid-watermark{font-size:15vw}}</style><div class="inv-sheet"><div class="paid-watermark">PAID</div><div class="inv-header"><div class="brand-area"><img src="${shopLogo}" alt="Logo" onerror="this.style.display='none'"><div class="brand-info"><h2>${esc(shopName)}</h2><p>${esc(shopAddress)}</p><p>Phone: ${esc(shopPhone)}</p><p>Email: ${esc(shopEmail)}</p></div></div><div class="invoice-label-area"><h1>INVOICE</h1><div class="inv-no">${saleLink(d.id, '# ' + esc(d.invoice_no || d.invoiceNo || ''))}</div></div></div><div class="details-grid"><div class="bill-to"><h4>Bill To</h4><div class="cust-name">${cust ? customerLink(cust.id, cust.name || 'Walk-in Customer') : esc('Walk-in Customer')}</div>${cust?.mobile?`<p><strong>Phone:</strong> ${esc(cust.mobile)}</p>`:''}${cust?.address?`<p><strong>Address:</strong> ${esc(cust.address)}</p>`:''}</div><div><h4>Invoice Details</h4><table class="inv-meta-table"><tr><td class="lbl">Invoice Date</td><td>${esc(d.sale_date || d.date || '-')}</td></tr><tr><td class="lbl">Payment Method</td><td>${esc(d.payment_method || 'N/A')}</td></tr>${d.due_date||d.dueDate?`<tr><td class="lbl">Due Date</td><td style="color:#dc2626;">${esc(d.due_date || d.dueDate)}</td></tr>`:''}</table></div></div><table class="inv-table"><thead><tr><th class="col-idx">#</th><th class="col-desc">Description & Details</th><th class="col-qty">Qty</th><th class="col-price">Unit Price</th><th class="col-total">Total</th></tr></thead><tbody>${(it || []).map((i,idx)=>`<tr><td class="col-idx">${idx+1}</td><td class="col-desc"><span class="item-desc-main">${esc(i.description || '')}</span>${i.details?`<span class="item-desc-sub">${esc(i.details)}</span>`:''}</td><td class="col-qty">${i.qty||1}</td><td class="col-price">৳ ${(parseFloat(i.price)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="col-total">৳ ${(parseFloat(i.total)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`).join('')}</tbody></table><div class="summary-area"><div class="notes-area">${d.notes?`<h4>Important Notes:</h4><p>${esc(d.notes)}</p>`:`<h4>Terms & Conditions:</h4><p>1. Goods once sold are not returnable.<br>2. Please check all items before leaving.<br>3. Thank you for choosing Sultan Digital Sign!</p>`}</div><div class="totals-area"><table class="totals-table"><tr><td class="lbl">Subtotal</td><td>৳ ${(parseFloat(d.subtotal)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>${parseFloat(d.discount)>0?`<tr><td class="lbl">Discount</td><td>- ৳ ${(parseFloat(d.discount)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`:''}<tr class="grand-total"><td class="lbl">Grand Total</td><td>৳ ${(parseFloat(d.total_amount||d.grandTotal)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr><tr class="paid-row"><td class="lbl">Paid Amount</td><td>৳ ${(parseFloat(d.paid_amount||d.paid)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr><tr class="due-row"><td class="lbl">Due Amount</td><td>৳ ${(parseFloat(d.due_amount||d.due)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr></table></div></div><div class="signature-section"><div class="sig-box">Customer Signature</div><div class="sig-box">Authorized Signature</div></div><div class="inv-footer">This is a computer generated invoice. No signature is required for electronic copy.<br><strong>Sultan Digital Sign</strong> | Professional Printing & Digital Solutions</div></div>`;
+        }
+
+        function printInvoice() {
+            if (!currentSale) return;
+            const cust = customers.find(c => c.id == (currentSale.customer_id || currentSale.customerId));
+            let items = [];
+            try { items = JSON.parse(currentSale.items || '[]'); } catch (e) {}
+            const w = window.open('', '_blank', 'width=900,height=700');
+            w.document.write(`<html><head><title>Print Invoice</title></head><body style="margin:0;padding:0;">${buildInvoiceHTML(currentSale, cust, items)}</body></html>`);
+            w.document.close();
+            setTimeout(() => { w.print(); }, 800);
+        }
+
+        async function exportInvoice(format) {
+            if (!currentSale) return;
+            const cust = customers.find(c => c.id == (currentSale.customer_id || currentSale.customerId));
+            let items = [];
+            try { items = JSON.parse(currentSale.items || '[]'); } catch (e) {}
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = buildInvoiceHTML(currentSale, cust, items);
+            tempDiv.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;';
+            document.body.appendChild(tempDiv);
+            try {
+                const canvas = await html2canvas(tempDiv, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false });
+                if (format === 'jpg') {
+                    const link = document.createElement('a');
+                    link.download = `invoice_${currentSale.invoice_no || currentSale.invoiceNo || currentSale.id}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.95);
+                    link.click();
+                } else if (format === 'pdf') {
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+                    const pageW = pdf.internal.pageSize.getWidth();
+                    const pageH = pdf.internal.pageSize.getHeight();
+                    const imgH = (canvas.height * pageW) / canvas.width;
+                    let remainingH = imgH;
+                    let y = 0;
+                    pdf.addImage(imgData, 'JPEG', 0, y, pageW, imgH);
+                    remainingH -= pageH;
+                    while (remainingH > 0) {
+                        y = remainingH - imgH;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'JPEG', 0, y, pageW, imgH);
+                        remainingH -= pageH;
+                    }
+                    pdf.save(`invoice_${currentSale.invoice_no || currentSale.invoiceNo || currentSale.id}.pdf`);
+                }
+            } finally {
+                if (tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
