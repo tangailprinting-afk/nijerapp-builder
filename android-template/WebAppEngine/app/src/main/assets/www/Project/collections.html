@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection Entry | Sultan Digital Sign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="common.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #eef2ff;
+            --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-secondary: #64748b; --text-muted: #94a3b8;
+            --border: #e2e8f0; --success: #10b981; --success-light: #ecfdf5; --warning: #f59e0b; --warning-light: #fffbeb;
+            --danger: #ef4444; --danger-light: #fef2f2; --info: #3b82f6; --info-light: #eff6ff;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 6px rgba(0,0,0,0.05); --shadow-lg: 0 10px 25px rgba(0,0,0,0.06); --shadow-xl: 0 20px 40px rgba(0,0,0,0.08);
+            --radius-xs: 6px; --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --transition: all 0.2s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        .navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 50; gap: 16px; flex-wrap: wrap; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .navbar-brand img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+        .navbar-brand .brand-icon-fallback { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .navbar-brand .brand-text { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
+        .navbar-brand .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+        .navbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; } .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: white; color: var(--text); border: 1.5px solid var(--border); } .btn-outline:hover { background: #f8fafc; }
+        .btn-ghost { background: transparent; color: var(--text-secondary); } .btn-ghost:hover { background: #f1f5f9; }
+        .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: var(--radius-xs); } .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .main-container { max-width: 1300px; margin: 0 auto; padding: 24px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; } .subtitle { font-size: 13px; color: var(--text-secondary); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow); }
+        .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .stat-value { font-size: 26px; font-weight: 900; }
+
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fafbfc; }
+        .card-header h3 { font-size: 14px; font-weight: 700; } .card-body { padding: 20px; } .card-body.no-padding { padding: 0; overflow-x: auto; }
+
+        .search-box { display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 25px; padding: 0 16px; }
+        .search-box input { border: none; background: transparent; padding: 9px 0; outline: none; font-size: 13px; width: 200px; font-family: inherit; }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; } table thead { background: #f8fafc; }
+        table th { padding: 11px 16px; text-align: left; font-weight: 700; color: var(--text-secondary); font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); }
+        table td { padding: 11px 16px; border-bottom: 1px solid #f1f5f9; } table tbody tr:hover { background: #f8fafc; }
+        .cname { font-weight: 600; } .amount { font-weight: 700; } .amount.green { color: #10b981; } .amount.red { color: #ef4444; }
+        .badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        .badge-success { background: #d1fae5; color: #065f46; } .badge-info { background: #dbeafe; color: #1e40af; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); } .empty-state p { font-size: 13px; }
+
+        .collection-entry-card { background: linear-gradient(135deg, #fafbfc 0%, #f0fdf4 100%); border: 2px dashed #10b981; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        .form-group { margin-bottom: 12px; } .form-group.full { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; outline: none; background: #fafbfc; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(99,102,241,0.06); }
+        .form-group textarea { resize: vertical; min-height: 60px; } .input-hint { font-size: 10px; color: var(--text-muted); }
+
+        .searchable-select { position: relative; z-index: 1; }
+        .searchable-select input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; outline: none; background: #fafbfc; }
+        .searchable-select input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.06); }
+        .searchable-select:focus-within { z-index: 50; }
+        .searchable-select .dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); max-height: 200px; overflow-y: auto; z-index: 999; box-shadow: var(--shadow-md); }
+        .searchable-select .dropdown.show { display: block; }
+        .searchable-select .dropdown-item { padding: 9px 14px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+        .searchable-select .dropdown-item:hover { background: var(--primary-light); }
+
+        .customer-info-card { background: white; padding: 14px 16px; border-radius: var(--radius-sm); margin-top: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .customer-info-card .info-item { text-align: center; }
+        .customer-info-card .info-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .customer-info-card .info-value { font-size: 18px; font-weight: 800; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.5); z-index: 200; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: var(--radius-lg); width: 90%; max-width: 650px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); animation: slideUp 0.25s ease; }
+        .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 1; }
+        .modal-header h3 { font-size: 16px; font-weight: 700; } .btn-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); } .btn-close:hover { background: #f1f5f9; }
+        .modal-body { padding: 20px 22px; } .modal-footer { padding: 14px 22px; border-top: 1px solid(var(--border)); display: flex; gap: 8px; justify-content: flex-end; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .navbar { height: auto; padding: 12px 16px; } .navbar-actions { width: 100%; } .navbar-actions .btn { flex: 1; justify-content: center; }
+            .form-grid { grid-template-columns: 1fr; } .main-container { padding: 16px; } .page-header h1 { font-size: 22px; } .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" style="display:block;">
+            <div class="brand-icon-fallback" style="display:none;">🖨️</div>
+            <div><div class="brand-text">Sultan Digital Sign</div><div class="brand-sub">Management System</div></div>
+        </a>
+        <div class="navbar-actions">
+            <a href="index.html" class="btn btn-ghost btn-sm">📊 Dashboard</a>
+            <a href="customers.html" class="btn btn-outline btn-sm">👥 Customers</a>
+            <a href="sales.html" class="btn btn-outline btn-sm">➕ New Sale</a>
+            <a href="expenses.html" class="btn btn-outline btn-sm">💸 Expenses</a>
+            <a href="suppliers.html" class="btn btn-outline btn-sm">🏭 Suppliers</a>
+            <a href="reports.html" class="btn btn-outline btn-sm">📊 Reports</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header"><div><h1>Collection Entry</h1><p class="subtitle">Record customer payments & print receipt</p></div></div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Collections</div><div class="stat-value" id="statTotal">0</div></div>
+            <div class="stat-card"><div class="stat-label">Today's Collection</div><div class="stat-value" style="color:#10b981;" id="statToday">৳ 0</div></div>
+            <div class="stat-card"><div class="stat-label">This Month</div><div class="stat-value" style="color:#6366f1;" id="statMonth">৳ 0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Due Remaining</div><div class="stat-value" style="color:#ef4444;" id="statRemaining">৳ 0</div></div>
+        </div>
+
+        <div class="collection-entry-card">
+            <h3 style="margin-bottom:16px;font-size:16px;">💵 Record Collection</h3>
+            <form id="collectionForm" autocomplete="off">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Customer *</label>
+                        <div class="searchable-select"><input type="text" id="c_customer_search" placeholder="Search customer..." autocomplete="off" oninput="filterCustomerDropdown()" onfocus="filterCustomerDropdown()"><input type="hidden" id="c_customer"><div class="dropdown" id="customerDropdown"></div></div>
+                    </div>
+                    <div class="form-group"><label>Collection Date *</label><input type="date" id="c_date" required></div>
+                    <div class="form-group"><label>Payment Method</label><select id="c_paymentMethod"><option value="Cash">Cash</option><option value="Bank">Bank</option><option value="Mobile Banking">Mobile Banking</option><option value="Cheque">Cheque</option></select></div>
+                    <div class="form-group"><label>Amount *</label><input type="number" id="c_amount" required step="0.01" placeholder="0.00" min="0.01"></div>
+                    <div class="form-group"><label>Reference Invoice (Optional)</label><select id="c_saleId"><option value="">General Collection</option></select></div>
+                    <div class="form-group"><label>Notes</label><input type="text" id="c_notes" placeholder="Collection notes"></div>
+                </div>
+                <div class="customer-info-card" id="customerInfoCard" style="display:none;">
+                    <div class="info-item"><div class="info-label">Customer</div><div class="info-value" id="infoName">-</div></div>
+                    <div class="info-item"><div class="info-label">Mobile</div><div class="info-value" id="infoMobile" style="font-size:14px;">-</div></div>
+                    <div class="info-item"><div class="info-label">Total Due</div><div class="info-value" id="infoDue" style="color:#ef4444;">৳ 0</div></div>
+                    <div class="info-item"><div class="info-label">Total Paid</div><div class="info-value" id="infoPaid" style="color:#10b981;">৳ 0</div></div>
+                </div>
+                <input type="hidden" id="c_id">
+                <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;"><button type="button" class="btn btn-outline" onclick="resetCollectionForm()">🔄 Reset</button><button type="submit" class="btn btn-success">💾 Save & Print Receipt</button></div>
+            </form>
+        </div>
+
+        <div class="card"><div class="card-header"><h3>📋 Collection History</h3><div class="search-box"><input type="text" id="searchInput" placeholder="Search customer..." onkeyup="updateCollectionTable()"></div></div>
+            <div class="card-body no-padding"><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Receipt No</th><th>Date</th><th>Customer</th><th>Amount</th><th>Method</th><th>Reference</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="collectionTable"><tr><td colspan="9"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody></table></div></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="receiptModal"><div class="modal" style="max-width:600px;"><div class="modal-header"><h3>🧾 Collection Receipt</h3><button class="btn-close" onclick="closeReceiptModal()">✕</button></div><div class="modal-body" id="receiptContent"></div><div class="modal-footer"><button class="btn btn-outline btn-sm" onclick="printReceipt()">🖨️ Print</button><button class="btn btn-outline btn-sm" onclick="exportReceipt('jpg')">🖼️ JPG</button><button class="btn btn-outline btn-sm" onclick="closeReceiptModal()">Close</button></div></div></div>
+
+    <script src="../frameworkdb.js"></script>
+    <script>
+        let collections = [], customers = [], sales = [], editingId = null, currentReceipt = null;
+        const collectionEntryParams = new URLSearchParams(location.search);
+        const prefillCollection = {
+            customerId: parseInt(collectionEntryParams.get('customer_id') || collectionEntryParams.get('customerId') || '0', 10) || null,
+            saleId: parseInt(collectionEntryParams.get('sale_id') || collectionEntryParams.get('saleId') || '0', 10) || null,
+            amount: parseFloat(collectionEntryParams.get('amount') || '0') || null,
+            notes: collectionEntryParams.get('notes') || '',
+        };
+
+        async function init() { await loadAllData(); resetCollectionForm(); applyPrefillFromUrl(); }
+        async function loadAllData() { try { const [cd, cud, sd] = await Promise.all([FrameworkDB.get('collections'), FrameworkDB.get('customers'), FrameworkDB.get('sales')]); collections = ensureArray(cd); customers = ensureArray(cud); sales = ensureArray(sd); updateAllUI(); } catch (e) { console.error(e); showToast('Failed to load data', 'error'); } }
+
+        function getCustomerDue(cid) { return getCustomerFinancialSummary(cid, sales, collections, customers).currentDue; }
+        function getCustomerTotalPaid(cid) { return getCustomerFinancialSummary(cid, sales, collections, customers).totalPaid; }
+        function generateReceiptNo() { return 'RCP-' + String(collections.length + 1).padStart(3, '0'); }
+
+        function resetCollectionForm() { editingId = null; document.getElementById('c_id').value = ''; document.getElementById('c_customer_search').value = ''; document.getElementById('c_customer').value = ''; document.getElementById('c_date').value = todayDate(); document.getElementById('c_paymentMethod').value = 'Cash'; document.getElementById('c_amount').value = ''; document.getElementById('c_saleId').innerHTML = '<option value="">General Collection</option>'; document.getElementById('c_notes').value = ''; document.getElementById('customerInfoCard').style.display = 'none'; }
+
+        function applyPrefillFromUrl() {
+            if (!prefillCollection.customerId) return;
+            const c = customers.find(x => x.id == prefillCollection.customerId);
+            if (!c) return;
+            document.getElementById('c_customer').value = c.id;
+            document.getElementById('c_customer_search').value = c.name || '';
+            updateCustomerInfo(c.id);
+            populateSaleDropdown(c.id);
+            if (prefillCollection.saleId) {
+                document.getElementById('c_saleId').value = String(prefillCollection.saleId);
+            }
+            if (prefillCollection.amount && prefillCollection.amount > 0) {
+                document.getElementById('c_amount').value = prefillCollection.amount.toFixed(2);
+            }
+            if (prefillCollection.notes) {
+                document.getElementById('c_notes').value = prefillCollection.notes;
+            }
+            const sale = prefillCollection.saleId ? sales.find(s => s.id == prefillCollection.saleId) : null;
+            if (!prefillCollection.amount && sale) {
+                document.getElementById('c_amount').value = getSaleDueAmount(sale).toFixed(2);
+            }
+        }
+
+        function filterCustomerDropdown() { const s = (document.getElementById('c_customer_search').value || '').trim().toLowerCase(); const dd = document.getElementById('customerDropdown'); let f = customers; if (s) f = customers.filter(c => (c.name || '').toLowerCase().includes(s) || (c.mobile || '').includes(s)); dd.innerHTML = f.map(c => `<div class="dropdown-item" onclick="selectCollectionCustomer(${c.id},'${esc(c.name)}')">${esc(c.name)} ${c.mobile?'- '+esc(c.mobile):''} ${getCustomerDue(c.id)>0?'(Due: '+fmtCurrency(getCustomerDue(c.id))+')':'(Clear)'}</div>`).join('') || '<div class="dropdown-item" style="color:var(--text-muted);">No customers found</div>'; dd.classList.add('show'); }
+        function selectCollectionCustomer(id, name) { document.getElementById('c_customer').value = id; document.getElementById('c_customer_search').value = name; document.getElementById('customerDropdown').classList.remove('show'); updateCustomerInfo(id); populateSaleDropdown(id); }
+        function updateCustomerInfo(cid) { const c = customers.find(x => x.id == cid); if (!c) { document.getElementById('customerInfoCard').style.display = 'none'; return; } const fs = getCustomerFinancialSummary(cid, sales, collections, customers); document.getElementById('customerInfoCard').style.display = 'flex'; document.getElementById('infoName').innerHTML = customerLink(c.id, c.name || 'N/A'); document.getElementById('infoMobile').textContent = c.mobile || '-'; document.getElementById('infoDue').innerHTML = fs.currentDue > 0 ? dueAmountLink(getCollectionEntryUrl({ customerId: c.id, amount: fs.currentDue }), fmtCurrency(fs.currentDue)) : '<span style="color:#10b981;font-weight:800;">✅ Clear</span>'; document.getElementById('infoPaid').textContent = fmtCurrency(fs.totalPaid); if (fs.currentDue > 0) document.getElementById('c_amount').value = fs.currentDue; }
+        function populateSaleDropdown(cid) { const dueSales = sales.filter(s => (s.customer_id || s.customerId) == cid && getSaleDueAmount(s) > 0); document.getElementById('c_saleId').innerHTML = '<option value="">General Collection</option>' + dueSales.map(s => `<option value="${s.id}">${esc(s.invoice_no||s.invoiceNo||'#'+s.id)} — Due: ${fmtCurrency(getSaleDueAmount(s))}</option>`).join(''); }
+
+        function updateAllUI() { updateStats(); updateCollectionTable(); }
+        function updateStats() { document.getElementById('statTotal').textContent = collections.length; const t = todayDate(), ms = monthStartDate(); document.getElementById('statToday').textContent = fmtCurrency(collections.filter(c => (c.collection_date||c.date)===t).reduce((s,c)=>s+(parseFloat(c.amount||0)),0)); document.getElementById('statMonth').textContent = fmtCurrency(collections.filter(c => (c.collection_date||c.date)>=ms).reduce((s,c)=>s+(parseFloat(c.amount||0)),0)); let tr = 0; customers.forEach(c => { tr += getCustomerDue(c.id); }); document.getElementById('statRemaining').innerHTML = `<a href="${getCollectionEntryUrl()}" class="inline-link inline-due">${fmtCurrency(tr)}</a>`; }
+
+        function updateCollectionTable() { const tbody = document.getElementById('collectionTable'); const s = (document.getElementById('searchInput')?.value || '').trim().toLowerCase(); let list = [...collections].sort((a, b) => (b.id || 0) - (a.id || 0)); if (s) list = list.filter(c => (getCustName(c.customer_id || c.customerId) || '').toLowerCase().includes(s)); if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">💵</div><p>No collections yet</p></div></td></tr>'; return; } tbody.innerHTML = list.map(c => { const saleRef = c.sale_id || c.saleId; const sale = saleRef ? sales.find(s => s.id == saleRef) : null; const invoiceHtml = sale ? saleLink(sale.id, sale.invoice_no || sale.invoiceNo || '#'+sale.id) : 'General'; return `<tr><td>#${c.id}</td><td style="font-family:monospace;">${esc(c.receipt_no||'-')}</td><td>${c.collection_date||c.date||'-'}</td><td class="cname">${customerLink(c.customer_id||c.customerId, getCustName(c.customer_id||c.customerId))}</td><td class="amount green">${fmtCurrency(parseFloat(c.amount||0))}</td><td><span class="badge badge-info">${esc(c.payment_method||'Cash')}</span></td><td>${invoiceHtml}</td><td>${esc(c.notes||'-')}</td><td><button class="btn btn-outline btn-xs" onclick="previewReceipt(${c.id})">🧾</button><button class="btn btn-danger btn-xs" onclick="deleteCollection(${c.id})">🗑️</button></td></tr>`; }).join(''); }
+        function getCustName(cid) { const c = customers.find(x => x.id == cid); return c?.name || 'N/A'; }
+
+        document.getElementById('collectionForm').addEventListener('submit', async function(e) { e.preventDefault(); const cid = parseInt(document.getElementById('c_customer').value); const amount = parseFloat(document.getElementById('c_amount').value); if (!cid) { showToast('Select customer', 'error'); return; } if (!amount || amount <= 0) { showToast('Enter valid amount', 'error'); return; } const originalCollection = editingId ? collections.find(c => c.id == editingId) : null; const originalSaleId = originalCollection ? parseInt(originalCollection.sale_id || originalCollection.saleId || 0) || null : null; const originalAmount = parseFloat(originalCollection?.amount || 0) || 0; const newSaleId = document.getElementById('c_saleId').value ? parseInt(document.getElementById('c_saleId').value) : null; const rno = editingId && originalCollection ? (originalCollection.receipt_no || generateReceiptNo()) : generateReceiptNo(); const data = { customer_id: cid, amount, receipt_no: rno, collection_date: document.getElementById('c_date').value, payment_method: document.getElementById('c_paymentMethod').value, sale_id: newSaleId, notes: document.getElementById('c_notes').value.trim(), createdAt: new Date().toISOString() }; try { let sid; if (editingId) { await FrameworkDB.update('collections', editingId, data); sid = editingId; showToast('✅ Updated!'); } else { const r = await FrameworkDB.save('collections', data); sid = r?.id || r; showToast('✅ Recorded!'); } const saleIdsToUpdate = [...new Set([originalSaleId, newSaleId].filter(Boolean))]; for (const saleId of saleIdsToUpdate) { const sale = sales.find(s => s.id == saleId); if (!sale) continue; let paid = getSalePaidAmount(sale); if (saleId === originalSaleId) paid -= originalAmount; if (saleId === newSaleId) paid += amount; paid = Math.max(0, paid); const total = getSaleTotalAmount(sale); const due = Math.max(0, total - paid); await FrameworkDB.update('sales', saleId, { ...sale, paid_amount: paid, due_amount: due, status: due === 0 ? 'Completed' : 'Partial', updatedAt: new Date().toISOString() }); } resetCollectionForm(); document.getElementById('c_date').value = todayDate(); await loadAllData(); previewReceipt(sid); } catch (err) { showToast('❌ ' + err.message, 'error'); } });
+
+        async function deleteCollection(id) { if (!confirm('Delete this collection?')) return; try { const col = collections.find(c => c.id == id); if (col && (col.sale_id||col.saleId)) { const saleId = col.sale_id||col.saleId; const sale = sales.find(s => s.id == saleId); if (sale) { const paid = Math.max(0, getSalePaidAmount(sale) - (parseFloat(col.amount || 0) || 0)); const total = getSaleTotalAmount(sale); const due = Math.max(0, total - paid); await FrameworkDB.update('sales', saleId, { ...sale, paid_amount: paid, due_amount: due, status: due===0?'Completed':'Partial', updatedAt: new Date().toISOString() }); } } await FrameworkDB.delete('collections', id); showToast('🗑️ Deleted!'); await loadAllData(); } catch (err) { showToast('❌ ' + err.message, 'error'); } }
+
+        function previewReceipt(id) { const col = collections.find(c => c.id == id); if (!col) return; currentReceipt = col; document.getElementById('receiptContent').innerHTML = buildReceiptHTML(col); document.getElementById('receiptModal').classList.add('show'); }
+
+        function buildReceiptHTML(col) {
+            const cust = customers.find(c => c.id == (col.customer_id || col.customerId));
+            const saleRef = col.sale_id || col.saleId;
+            const sale = saleRef ? sales.find(s => s.id == saleRef) : null;
+            const due = cust ? getCustomerDue(cust.id) : 0;
+            const shopName = SHOP_SETTINGS.name, shopAddress = SHOP_SETTINGS.address, shopPhone = SHOP_SETTINGS.phone, shopEmail = SHOP_SETTINGS.email;
+            return `
+            <div style="font-family:'Segoe UI',sans-serif;color:#000;background:#fff;padding:10px;">
+                <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:12px;">
+                    ${SHOP_LOGO?`<img src="${SHOP_LOGO}" alt="Logo" style="max-width:120px;max-height:40px;margin-bottom:6px;">`:''}
+                    <h2 style="margin:0;font-size:18px;font-weight:800;">${esc(shopName)}</h2>
+                    <p style="margin:2px 0;font-size:10px;">${esc(shopAddress)}</p>
+                    <p style="margin:2px 0;font-size:10px;">📞 ${esc(shopPhone)} | ✉️ ${esc(shopEmail)}</p>
+                    <h3 style="margin:8px 0 0;font-size:16px;font-weight:900;color:#059669;">COLLECTION RECEIPT</h3>
+                    <p style="margin:2px 0;font-size:12px;font-weight:600;">Receipt No: ${esc(col.receipt_no || 'RCP-'+String(col.id).padStart(3,'0'))}</p>
+                </div>
+                <table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:12px;">
+                    <tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:600;background:#f5f5f5;width:35%;">Date</td><td style="padding:6px 8px;border:1px solid #ccc;">${col.collection_date || col.date || '-'}</td></tr>
+                    <tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:600;background:#f5f5f5;">Customer</td><td style="padding:6px 8px;border:1px solid #ccc;">${cust ? customerLink(cust.id, cust.name || 'N/A') : 'N/A'}</td></tr>
+                    ${cust?.mobile ? `<tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:600;background:#f5f5f5;">Mobile</td><td style="padding:6px 8px;border:1px solid #ccc;">${esc(cust.mobile)}</td></tr>` : ''}
+                    ${cust?.address ? `<tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:600;background:#f5f5f5;">Address</td><td style="padding:6px 8px;border:1px solid #ccc;">${esc(cust.address)}</td></tr>` : ''}
+                    <tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:600;background:#f5f5f5;">Payment Method</td><td style="padding:6px 8px;border:1px solid #ccc;">${esc(col.payment_method || 'Cash')}</td></tr>
+                    ${sale ? `<tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:600;background:#f5f5f5;">Invoice Ref</td><td style="padding:6px 8px;border:1px solid #ccc;">${saleLink(sale.id, sale.invoice_no || sale.invoiceNo || '#'+sale.id)}</td></tr>` : ''}
+                    <tr><td style="padding:8px;border:1px solid #ccc;font-weight:700;background:#f5f5f5;font-size:14px;">Amount Received</td><td style="padding:8px;border:1px solid #ccc;font-size:18px;font-weight:800;color:#059669;">${fmtCurrency(parseFloat(col.amount||0))}</td></tr>
+                    <tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:600;background:#f5f5f5;">Remaining Due</td><td style="padding:6px 8px;border:1px solid #ccc;font-weight:700;color:#c00;">${fmtCurrency(due)}</td></tr>
+                </table>
+                ${col.notes ? `<p style="margin:6px 0;font-size:11px;"><strong>Notes:</strong> ${esc(col.notes)}</p>` : ''}
+                <div style="text-align:center;margin-top:16px;padding-top:10px;border-top:1px solid #ccc;font-size:10px;color:#555;">
+                    <p>Signature: ____________________</p>
+                    <p>Thank you! | ${esc(shopName)} | 📞 ${esc(shopPhone)}</p>
+                </div>
+            </div>`;
+        }
+
+        function closeReceiptModal() { document.getElementById('receiptModal').classList.remove('show'); }
+        function printReceipt() { if (!currentReceipt) return; printHTMLContent(buildReceiptHTML(currentReceipt)); }
+        async function exportReceipt(format) { if (!currentReceipt) return; const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = buildReceiptHTML(currentReceipt);
+            tempDiv.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;'; document.body.appendChild(tempDiv); try { const canvas = await html2canvas(tempDiv, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }); document.body.removeChild(tempDiv); if (format === 'jpg') { const link = document.createElement('a');
+                    link.download = `receipt_${currentReceipt.receipt_no||currentReceipt.id}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.95);
+                    link.click();
+                    showToast('✅ JPG exported!'); } } catch (err) { if (tempDiv.parentNode) document.body.removeChild(tempDiv);
+                showToast('⚠️ Export failed.', 'error'); } }
+
+        document.addEventListener('click', function(e) { if (!e.target.closest('.searchable-select')) document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show')); });
+        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); }));
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show')); });
+        init();
+    </script>
+</body>
+</html>
