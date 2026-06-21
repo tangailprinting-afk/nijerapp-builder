@@ -1,1 +1,596 @@
-com.sdfdsf.com
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sultan Digital Sign | License Verification</title>
+    <link rel="icon" href="icon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
+            --shadow-xl: 0 25px 80px rgba(0,0,0,0.12);
+            --radius-xs: 6px;
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 80px;
+            -webkit-font-smoothing: antialiased;
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(139,92,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.04) 0%, transparent 50%);
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            animation: cardEntry 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes cardEntry {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================ */
+        /* LANDSCAPE LAYOUT */
+        /* ============================================ */
+        .landscape-container {
+            display: flex;
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            min-height: 520px;
+        }
+
+        /* LEFT PANEL - Brand */
+        .left-panel {
+            width: 380px;
+            flex-shrink: 0;
+            background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(99,102,241,0.08);
+            pointer-events: none;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -60px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(139,92,246,0.06);
+            pointer-events: none;
+        }
+
+        .brand-section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+            overflow: hidden;
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .brand-logo .logo-fallback {
+            font-size: 28px;
+        }
+
+        .brand-section h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .brand-section .tagline {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+        }
+
+        .feature-list {
+            margin-top: 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feature-list .feat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .feature-list .feat-item .feat-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .contact-mini {
+            margin-top: auto;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-mini .cm-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .contact-mini .cm-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .contact-mini .cm-row span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-mini .cm-row .cm-icon {
+            width: 16px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* RIGHT PANEL - Status */
+        .right-panel {
+            flex: 1;
+            padding: 48px 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .status-icon-large {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .status-icon-large.checking { background: #eff6ff; animation: iconPulse 1.5s ease-in-out infinite; }
+        .status-icon-large.active { background: #ecfdf5; box-shadow: 0 0 0 8px rgba(16,185,129,0.06); }
+        .status-icon-large.trial { background: #fffbeb; box-shadow: 0 0 0 8px rgba(245,158,11,0.06); }
+        .status-icon-large.expired { background: #fef2f2; box-shadow: 0 0 0 8px rgba(239,68,68,0.06); }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .status-text h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+
+        .status-text p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            margin-top: 8px;
+        }
+        .status-badge.active { background: #d1fae5; color: #065f46; }
+        .status-badge.trial { background: #fef3c7; color: #92400e; }
+        .status-badge.expired { background: #fee2e2; color: #991b1b; }
+        .status-badge.checking { background: #dbeafe; color: #1e40af; }
+        .status-badge .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        .status-badge.active .dot { background: #10b981; }
+        .status-badge.trial .dot { background: #f59e0b; animation: blink 1s infinite; }
+        .status-badge.expired .dot { background: #ef4444; }
+        .status-badge.checking .dot { background: #3b82f6; animation: blink 0.6s infinite; }
+
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: inherit;
+            text-decoration: none;
+            letter-spacing: -0.2px;
+        }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 8px 28px rgba(99,102,241,0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn-outline:hover { border-color: #94a3b8; background: #f8fafc; }
+
+        .btn-sm { padding: 8px 16px; font-size: 11px; }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        /* SPINNER */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* INFO TABLE */
+        .info-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-top: 20px;
+        }
+        .info-card .info-header {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+        .info-row:not(:last-child) { border-bottom: 1px solid #f1f5f9; }
+        .info-row .lbl { color: var(--text-muted); font-weight: 500; }
+        .info-row .val { font-weight: 600; color: var(--text); text-align: right; }
+        .info-row .val.mono { font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; font-size: 11px; letter-spacing: 0.5px; color: var(--primary); }
+        .info-row .val.green { color: #10b981; }
+        .info-row .val.orange { color: #f59e0b; }
+        .info-row .val.red { color: #ef4444; }
+
+        /* ALERT */
+        .alert-box {
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="landscape-container">
+
+            <!-- LEFT PANEL -->
+            <div class="left-panel">
+                <div class="brand-section">
+                    <div class="brand-logo">
+                        <img src="icon.ico" alt="Logo" onerror="this.style.display='none';this.parentElement.querySelector('.logo-fallback').style.display='flex';">
+                        <span class="logo-fallback" style="display:none;">🖨️</span>
+                    </div>
+                    <h1>Sultan Digital Sign</h1>
+                    <p class="tagline">Print Shop Management</p>
+                    <div class="feature-list">
+                        <div class="feat-item"><span class="feat-icon">📊</span> Real-time Dashboard</div>
+                        <div class="feat-item"><span class="feat-icon">💰</span> Professional Invoicing</div>
+                        <div class="feat-item"><span class="feat-icon">💵</span> Payment Collection</div>
+                        <div class="feat-item"><span class="feat-icon">💸</span> Expense Tracking</div>
+                        <div class="feat-item"><span class="feat-icon">📒</span> Cash Book & Reports</div>
+                        <div class="feat-item"><span class="feat-icon">🖨️</span> Print & Export</div>
+                    </div>
+                </div>
+                <div class="contact-mini">
+                    <div class="cm-label">Support & Contact</div>
+                    <div class="cm-row">
+                        <span><span class="cm-icon">🏢</span> Canvas Digital Lab</span>
+                        <span><span class="cm-icon">📱</span> 01740-493702</span>
+                        <span><span class="cm-icon">📍</span> Mymensingh Road, Tangail</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right-panel" id="rightPanel">
+                <div class="status-header">
+                    <div class="status-icon-large checking" id="statusIcon">🔍</div>
+                    <div class="status-text">
+                        <h2 id="statusTitle">Verifying License...</h2>
+                        <p id="statusMessage">Please wait while we verify your license from the server.</p>
+                        <div id="statusBadgeContainer">
+                            <span class="status-badge checking"><span class="dot"></span> Verifying</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loading-spinner" id="loadingSpinner"></div>
+                <div class="btn-group" id="actionButtons"></div>
+                <div id="infoCardContainer"></div>
+                <div id="alertArea"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="frameworkdb.js"></script>
+    <script>
+        const HARDCODED_KEY = "PSMS-A1B2-C3D4-E5F6";
+        const LICENSE_URL = 'https://raw.githubusercontent.com/tangailprinting-afk/apk-license-server2/refs/heads/main/licenses.json';
+        const CACHE_KEY = 'psms_license_data';
+        const CACHE_TIME_KEY = 'psms_license_cache_time';
+        const CACHE_DURATION = 24 * 60 * 60 * 1000;
+
+        const $ = (id) => document.getElementById(id);
+
+        function setUI(state) {
+            const s = {
+                loading: {
+                    iconClass: 'status-icon-large checking', iconText: '🔍',
+                    title: 'Verifying License...', message: 'Please wait while we verify your license from the server.',
+                    badge: '<span class="status-badge checking"><span class="dot"></span> Verifying</span>',
+                    spinner: true, buttons: '', info: false, alert: ''
+                },
+                active: (name, offline) => ({
+                    iconClass: 'status-icon-large active', iconText: '✅',
+                    title: `Welcome, ${name || 'User'}!`,
+                    message: 'Your license is active. All features are unlocked and ready to use.',
+                    badge: `<span class="status-badge active"><span class="dot"></span> Active${offline ? ' (Offline)' : ''}</span>`,
+                    spinner: false,
+                    buttons: `<a href="Project/index.html" class="btn btn-primary">Launch Application</a><button class="btn btn-outline btn-sm" onclick="validateLicense()">Refresh</button>`,
+                    info: true, alert: ''
+                }),
+                trial: (expiry, offline) => ({
+                    iconClass: 'status-icon-large trial', iconText: '⏳',
+                    title: 'Trial License Active',
+                    message: `Your free trial is active until ${expiry || 'N/A'}.`,
+                    badge: `<span class="status-badge trial"><span class="dot"></span> Trial${offline ? ' (Offline)' : ''}</span>`,
+                    spinner: false,
+                    buttons: `<a href="Project/index.html" class="btn btn-primary">Launch Application</a><button class="btn btn-outline btn-sm" onclick="validateLicense()">Refresh</button>`,
+                    info: true, alert: ''
+                }),
+                expired: (msg) => ({
+                    iconClass: 'status-icon-large expired', iconText: '🔒',
+                    title: 'License Expired', message: msg || 'Your license has expired.',
+                    badge: '<span class="status-badge expired"><span class="dot"></span> Expired</span>',
+                    spinner: false, buttons: `<button class="btn btn-outline btn-sm" onclick="validateLicense()">Check Again</button>`,
+                    info: true,
+                    alert: '<div class="alert-box alert-danger">⚠️ Your license has expired. Contact Canvas Digital Lab to renew.  Call: 01740-493702</div>'
+                }),
+                blocked: (msg) => ({
+                    iconClass: 'status-icon-large expired', iconText: '🚫',
+                    title: 'License Blocked', message: msg || 'Your license has been blocked.',
+                    badge: '<span class="status-badge expired"><span class="dot"></span> Blocked</span>',
+                    spinner: false, buttons: `<button class="btn btn-outline btn-sm" onclick="validateLicense()">Check Again</button>`,
+                    info: true,
+                    alert: '<div class="alert-box alert-danger">🚫 Your license has been blocked. Contact Canvas Digital Lab immediately.</div>'
+                }),
+                offline: () => ({
+                    iconClass: 'status-icon-large trial', iconText: '📡',
+                    title: 'Offline Mode', message: 'Cannot reach license server.',
+                    badge: '<span class="status-badge trial"><span class="dot"></span> Offline Trial</span>',
+                    spinner: false,
+                    buttons: `<button class="btn btn-primary" onclick="useOfflineTrial()">Continue Offline</button><button class="btn btn-outline btn-sm" onclick="validateLicense()">Retry</button>`,
+                    info: false, alert: ''
+                }),
+                notfound: () => ({
+                    iconClass: 'status-icon-large expired', iconText: '❌',
+                    title: 'License Not Found', message: 'License key not found on server.',
+                    badge: '<span class="status-badge expired"><span class="dot"></span> Not Found</span>',
+                    spinner: false, buttons: `<button class="btn btn-outline btn-sm" onclick="validateLicense()">Retry</button>`,
+                    info: false, alert: ''
+                })
+            };
+            return s;
+        }
+
+        function applyUI(config, license) {
+            $('statusIcon').className = config.iconClass;
+            $('statusIcon').textContent = config.iconText;
+            $('statusTitle').textContent = config.title;
+            $('statusMessage').textContent = config.message;
+            $('statusBadgeContainer').innerHTML = config.badge;
+            $('loadingSpinner').style.display = config.spinner ? 'block' : 'none';
+            $('actionButtons').innerHTML = config.buttons;
+            $('alertArea').innerHTML = config.alert || '';
+
+            if (config.info && license) {
+                const st = license.status || 'trial';
+                const sc = st === 'active' ? 'green' : st === 'trial' ? 'orange' : 'red';
+                const stx = st === 'active' ? 'Active' : st === 'trial' ? 'Trial' : st === 'expired' ? 'Expired' : 'Blocked';
+                $('infoCardContainer').innerHTML = `
+                    <div class="info-card">
+                        <div class="info-header">License Information</div>
+                        <div class="info-row"><span class="lbl">License Key</span><span class="val mono">${HARDCODED_KEY}</span></div>
+                        <div class="info-row"><span class="lbl">Customer</span><span class="val">${license.customer_name || 'N/A'}</span></div>
+                        <div class="info-row"><span class="lbl">Organization</span><span class="val">${license.shop_name || 'N/A'}</span></div>
+                        <div class="info-row"><span class="lbl">Plan</span><span class="val">${license.plan || 'Trial'}</span></div>
+                        <div class="info-row"><span class="lbl">Expiry</span><span class="val">${license.expiry_date || 'N/A'}</span></div>
+                        <div class="info-row"><span class="lbl">Status</span><span class="val ${sc}">${stx}</span></div>
+                    </div>`;
+            } else { $('infoCardContainer').innerHTML = ''; }
+        }
+
+        async function validateLicense() {
+            applyUI(setUI().loading);
+            let allLicenses = null, isOffline = false;
+            try {
+                const r = await fetch(LICENSE_URL, { cache: 'no-cache' });
+                if (r.ok) { allLicenses = await r.json();
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(allLicenses));
+                    localStorage.setItem(CACHE_TIME_KEY, Date.now().toString()); } else throw new Error('Server error');
+            } catch (e) {
+                const c = localStorage.getItem(CACHE_KEY), t = localStorage.getItem(CACHE_TIME_KEY);
+                if (c && t && (Date.now() - parseInt(t) < CACHE_DURATION)) { allLicenses = JSON.parse(c);
+                    isOffline = true; }
+            }
+            if (!allLicenses || !allLicenses.licenses) { applyUI(setUI().offline()); return; }
+            const license = allLicenses.licenses.find(l => l.key === HARDCODED_KEY);
+            if (!license) { applyUI(setUI().notfound()); return; }
+            const status = license.status || 'trial', ui = setUI();
+            if (status === 'active') applyUI(ui.active(license.customer_name, isOffline), license);
+            else if (status === 'trial') applyUI(ui.trial(license.expiry_date, isOffline), license);
+            else if (status === 'expired') applyUI(ui.expired(license.message), license);
+            else applyUI(ui.blocked(license.message), license);
+        }
+
+        function useOfflineTrial() {
+            $('statusIcon').className = 'status-icon-large trial';
+            $('statusIcon').textContent = '⏳';
+            $('statusTitle').textContent = 'Offline Trial Active';
+            $('statusMessage').textContent = 'You are using the software in offline trial mode.';
+            $('statusBadgeContainer').innerHTML = '<span class="status-badge trial"><span class="dot"></span> Offline Trial</span>';
+            $('loadingSpinner').style.display = 'none';
+            $('actionButtons').innerHTML = `<a href="Project/index.html" class="btn btn-primary">Launch Application</a><button class="btn btn-outline btn-sm" onclick="validateLicense()">Try Online Check</button>`;
+            $('alertArea').innerHTML = '<div class="alert-box alert-info">ℹ️ Offline mode. Connect to internet and refresh.</div>';
+            $('infoCardContainer').innerHTML = `<div class="info-card"><div class="info-header">License Information</div><div class="info-row"><span class="lbl">License Key</span><span class="val mono">${HARDCODED_KEY}</span></div><div class="info-row"><span class="lbl">Status</span><span class="val orange">Trial (Offline)</span></div></div>`;
+        }
+
+        validateLicense();
+    </script>
+</body>
+</html>
