@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.sultalsing.app"
+        applicationId = "digital.sultan.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
