@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Management | Rizq Restaurant</title>
+    <script src="common.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #eef2ff;
+            --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-secondary: #64748b; --text-muted: #94a3b8;
+            --border: #e2e8f0; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --purple: #8b5cf6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 6px rgba(0,0,0,0.05); --shadow-lg: 0 10px 25px rgba(0,0,0,0.06); --shadow-xl: 0 20px 40px rgba(0,0,0,0.08);
+            --radius-xs: 6px; --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --transition: all 0.2s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        .navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 50; gap: 16px; flex-wrap: wrap; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .navbar-brand img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+        .navbar-brand .brand-icon-fallback { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .navbar-brand .brand-text { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
+        .navbar-brand .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+        .navbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; } .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: white; color: var(--text); border: 1.5px solid var(--border); } .btn-outline:hover { background: #f8fafc; }
+        .btn-ghost { background: transparent; color: var(--text-secondary); } .btn-ghost:hover { background: #f1f5f9; }
+        .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: var(--radius-xs); } .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .main-container { max-width: 1300px; margin: 0 auto; padding: 24px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; } .subtitle { font-size: 13px; color: var(--text-secondary); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow); }
+        .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .stat-value { font-size: 26px; font-weight: 900; }
+
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fafbfc; }
+        .card-header h3 { font-size: 14px; font-weight: 700; } .card-body { padding: 20px; } .card-body.no-padding { padding: 0; overflow-x: auto; }
+
+        .search-box { display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 25px; padding: 0 16px; }
+        .search-box input { border: none; background: transparent; padding: 9px 0; outline: none; font-size: 13px; width: 200px; font-family: inherit; }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; } table thead { background: #f8fafc; }
+        table th { padding: 11px 16px; text-align: left; font-weight: 700; color: var(--text-secondary); font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); }
+        table td { padding: 11px 16px; border-bottom: 1px solid #f1f5f9; } table tbody tr:hover { background: #f8fafc; }
+        .cname { font-weight: 600; } .amount { font-weight: 700; } .amount.red { color: #ef4444; } .amount.green { color: #10b981; }
+        .badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        .badge-info { background: #dbeafe; color: #1e40af; } .badge-success { background: #d1fae5; color: #065f46; } .badge-warning { background: #fef3c7; color: #92400e; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); } .empty-state p { font-size: 13px; }
+
+        .entry-card { background: linear-gradient(135deg, #fafbfc 0%, #f5f3ff 100%); border: 2px dashed #8b5cf6; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        .form-group { margin-bottom: 12px; } .form-group.full { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; outline: none; background: #fafbfc; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(99,102,241,0.06); }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.5); z-index: 200; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: var(--radius-lg); width: 90%; max-width: 520px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); animation: slideUp 0.25s ease; }
+        .modal-lg { max-width: 900px; }
+        .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 1; }
+        .modal-header h3 { font-size: 16px; font-weight: 700; } .btn-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); } .btn-close:hover { background: #f1f5f9; }
+        .modal-body { padding: 20px 22px; } .modal-footer { padding: 14px 22px; border-top: 1px solid(var(--border)); display: flex; gap: 8px; justify-content: flex-end; }
+
+        .ledger-header { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; padding: 24px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .ledger-header h2 { font-size: 20px; } .ledger-header .balance { text-align: right; } .ledger-header .balance-amount { font-size: 32px; font-weight: 900; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .navbar { height: auto; padding: 12px 16px; } .navbar-actions { width: 100%; } .navbar-actions .btn { flex: 1; justify-content: center; }
+            .form-grid { grid-template-columns: 1fr; } .main-container { padding: 16px; } .page-header h1 { font-size: 22px; } .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" style="display:block;">
+            <div class="brand-icon-fallback" style="display:none;">🖨️</div>
+            <div><div class="brand-text">Rizq Restaurant</div><div class="brand-sub">Management System</div></div>
+        </a>
+        <div class="navbar-actions">
+            <a href="index.html" class="btn btn-ghost btn-sm">📊 Dashboard</a>
+            <a href="customers.html" class="btn btn-outline btn-sm">👥 Customers</a>
+            <a href="sales.html" class="btn btn-outline btn-sm">➕ New Sale</a>
+            <a href="collections.html" class="btn btn-outline btn-sm">💵 Collection</a>
+            <a href="expenses.html" class="btn btn-outline btn-sm">💸 Expenses</a>
+            <a href="reports.html" class="btn btn-outline btn-sm">📊 Reports</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header"><div><h1>Supplier Management</h1><p class="subtitle">Manage suppliers, purchases & payments</p></div><button class="btn btn-primary" onclick="openAddModal()">➕ Add Supplier</button></div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Suppliers</div><div class="stat-value" id="statTotal">0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Payable</div><div class="stat-value" style="color:#ef4444;" id="statPayable">৳ 0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Paid</div><div class="stat-value" style="color:#10b981;" id="statPaid">৳ 0</div></div>
+            <div class="stat-card"><div class="stat-label">Pending Payments</div><div class="stat-value" style="color:#f59e0b;" id="statPending">0</div></div>
+        </div>
+
+        <div class="entry-card" style="border-color:#10b981;background:linear-gradient(135deg, #fafbfc 0%, #ecfdf5 100%);">
+            <h3 style="margin-bottom:16px;font-size:16px;">💵 Supplier Payment</h3>
+            <form id="paymentForm" autocomplete="off">
+                <div class="form-grid">
+                    <div class="form-group"><label>Supplier *</label><select id="p_supplier" required onchange="updateSupplierPayable()"><option value="">Select Supplier</option></select></div>
+                    <div class="form-group"><label>Amount *</label><input type="number" id="p_amount" required step="0.01" min="0.01" oninput="updateSupplierPayable()"></div>
+                    <div class="form-group"><label>Payment Date *</label><input type="date" id="p_date" required></div>
+                    <div class="form-group"><label>Payment Method</label><select id="p_method" onchange="updateSupplierPayable()"><option value="Cash">Cash</option><option value="Bank">Bank</option><option value="Mobile Banking">Mobile Banking</option><option value="Due">Due</option></select></div>
+                    <div class="form-group full"><label>Notes</label><input type="text" id="p_notes"></div>
+                </div>
+                <div style="margin-top:8px;font-size:12px;color:var(--text-secondary);" id="payablePreview"></div>
+                <input type="hidden" id="p_id">
+                <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;"><button type="button" class="btn btn-outline" onclick="resetPaymentForm()">🔄 Reset</button><button type="submit" class="btn btn-success">💵 Record Payment / Due</button></div>
+            </form>
+        </div>
+
+        <div class="card"><div class="card-header"><h3>🏭 Supplier List</h3><div class="search-box"><input type="text" id="searchInput" placeholder="Search..." onkeyup="updateTable()"></div></div>
+            <div class="card-body no-padding"><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Name</th><th>Company</th><th>Mobile</th><th>Opening</th><th>Total Purchases</th><th>Total Paid</th><th>Current Payable</th><th>Actions</th></tr></thead><tbody id="supplierTable"><tr><td colspan="9"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody></table></div></div>
+        </div>
+
+        <div class="card"><div class="card-header"><h3>📋 Payment History</h3></div><div class="card-body no-padding"><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Date</th><th>Supplier</th><th>Amount</th><th>Method</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="paymentTable"><tr><td colspan="7"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody></table></div></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="supplierModal"><div class="modal"><div class="modal-header"><h3 id="modalTitle">➕ Add Supplier</h3><button class="btn-close" onclick="closeSupplierModal()">✕</button></div><form id="modalSupplierForm"><div class="modal-body"><div class="form-group"><label>Name *</label><input type="text" id="ms_name" required></div><div class="form-group"><label>Company</label><input type="text" id="ms_company"></div><div class="form-group"><label>Mobile</label><input type="text" id="ms_mobile"></div><div class="form-group"><label>Opening Balance</label><input type="number" id="ms_opening" value="0" step="0.01"></div><div class="form-group"><label>Address</label><textarea id="ms_address" rows="2"></textarea></div><div class="form-group"><label>Notes</label><textarea id="ms_notes" rows="2"></textarea></div><input type="hidden" id="ms_id"></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeSupplierModal()">Cancel</button><button type="submit" class="btn btn-primary">💾 Save</button></div></form></div></div>
+    <div class="modal-overlay" id="ledgerModal"><div class="modal modal-lg"><div class="modal-header"><h3>📒 Supplier Ledger</h3><button class="btn-close" onclick="closeLedgerModal()">✕</button></div><div class="ledger-header"><div><h2 id="ledgerName">-</h2><p id="ledgerDetails" style="opacity:0.85;font-size:13px;"></p></div><div class="balance"><div class="balance-amount" id="ledgerBalance">৳ 0</div><p style="font-size:11px;opacity:0.8;">Current Payable</p></div></div><div class="modal-body" style="max-height:400px;overflow-y:auto;"><div class="table-wrapper"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody id="ledgerTable"></tbody></table></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeLedgerModal()">Close</button></div></div></div>
+
+    <script src="frameworkdb.js"></script>
+    <script>
+        let suppliers = [], purchases = [], supplierPayments = [], editingId = null;
+
+        async function init() { await loadAllData(); resetForm(); resetPaymentForm(); populatePaymentSupplierDropdown(); }
+        async function loadAllData() { try { const [sd, pd, spd] = await Promise.all([FrameworkDB.get('suppliers'), FrameworkDB.get('purchases'), FrameworkDB.get('supplier_payments')]); suppliers = ensureArray(sd); purchases = ensureArray(pd); supplierPayments = ensureArray(spd); updateAllUI(); populatePaymentSupplierDropdown(); } catch (e) { console.error(e); } }
+
+        function getSupplierPayable(sid) { const tp = purchases.filter(p => (p.supplier_id || p.supplierId) == sid).reduce((s, p) => s + (parseFloat(p.total_amount || p.grandTotal || 0)), 0); const tpaid = supplierPayments.filter(sp => (sp.supplier_id || sp.supplierId) == sid).reduce((s, sp) => s + (parseFloat(sp.amount || 0)), 0); const opening = parseFloat(suppliers.find(s => s.id == sid)?.opening_balance || 0); return Math.max(0, opening + tp - tpaid); }
+        function getSupplierTotalPaid(sid) { return supplierPayments.filter(sp => (sp.supplier_id || sp.supplierId) == sid).reduce((s, sp) => s + (parseFloat(sp.amount || 0)), 0); }
+        function getSupplierTotalPurchases(sid) { return purchases.filter(p => (p.supplier_id || p.supplierId) == sid).reduce((s, p) => s + (parseFloat(p.total_amount || p.grandTotal || 0)), 0); }
+
+        function resetForm() {
+            editingId = null;
+            ['ms_id','ms_name','ms_company','ms_mobile','ms_address','ms_notes'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const opening = document.getElementById('ms_opening');
+            if (opening) opening.value = '0';
+        }
+        function resetPaymentForm() { document.getElementById('p_id').value = ''; document.getElementById('p_supplier').value = ''; document.getElementById('p_amount').value = ''; document.getElementById('p_date').value = todayDate(); document.getElementById('p_method').value = 'Cash'; document.getElementById('p_notes').value = ''; document.getElementById('payablePreview').textContent = ''; }
+        function populatePaymentSupplierDropdown() { document.getElementById('p_supplier').innerHTML = '<option value="">Select Supplier</option>' + suppliers.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join(''); }
+        function updateSupplierPayable() {
+            const sid = parseInt(document.getElementById('p_supplier').value);
+            const method = document.getElementById('p_method').value;
+            const amount = parseFloat(document.getElementById('p_amount').value || 0) || 0;
+            if (!sid) { document.getElementById('payablePreview').textContent = ''; return; }
+            const payable = getSupplierPayable(sid);
+            if (method === 'Due') {
+                document.getElementById('payablePreview').textContent = `Current Payable: ${fmtCurrency(payable)} | After Due: ${fmtCurrency(payable + amount)}`;
+                return;
+            }
+            document.getElementById('payablePreview').textContent = `Current Payable: ${fmtCurrency(payable)}`;
+            if (payable > 0 && !document.getElementById('p_amount').value) document.getElementById('p_amount').value = payable;
+        }
+
+        function updateAllUI() { updateStats(); updateTable(); updatePaymentTable(); }
+        function updateStats() { document.getElementById('statTotal').textContent = suppliers.length; let tp = 0, tpd = 0, pc = 0; suppliers.forEach(s => { const p = getSupplierPayable(s.id); tp += p; tpd += getSupplierTotalPaid(s.id); if (p > 0) pc++; }); document.getElementById('statPayable').textContent = fmtCurrency(tp); document.getElementById('statPaid').textContent = fmtCurrency(tpd); document.getElementById('statPending').textContent = pc; }
+
+        function updateTable() {
+            const tbody = document.getElementById('supplierTable');
+            const s = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+            let list = [...suppliers].sort((a, b) => {
+                const payableB = getSupplierPayable(b.id) || 0;
+                const payableA = getSupplierPayable(a.id) || 0;
+                if (payableB !== payableA) return payableB - payableA;
+                return (a.name || '').localeCompare(b.name || '');
+            });
+            if (s) list = list.filter(sl => (sl.name || '').toLowerCase().includes(s) || (sl.company || '').toLowerCase().includes(s) || (sl.mobile || '').includes(s));
+            if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><p>No suppliers yet</p></div></td></tr>'; return; }
+            tbody.innerHTML = list.map(sl => { const payable = getSupplierPayable(sl.id); return `<tr><td>#${sl.id}</td><td class="cname">${esc(sl.name||'N/A')}</td><td>${esc(sl.company||'-')}</td><td>${esc(sl.mobile||'-')}</td><td>${fmtCurrency(parseFloat(sl.opening_balance||0))}</td><td>${fmtCurrency(getSupplierTotalPurchases(sl.id))}</td><td class="amount green">${fmtCurrency(getSupplierTotalPaid(sl.id))}</td><td class="amount red">${payable>0?fmtCurrency(payable):'✅ Clear'}</td><td><button class="btn btn-outline btn-xs" onclick="openLedger(${sl.id})">📒</button><button class="btn btn-outline btn-xs" onclick="openEditModal(${sl.id})">✏️</button><button class="btn btn-danger btn-xs" onclick="deleteSupplier(${sl.id})">🗑️</button></td></tr>`; }).join(''); }
+
+        function updatePaymentTable() { const tbody = document.getElementById('paymentTable'); const list = [...supplierPayments].sort((a, b) => (b.id || 0) - (a.id || 0)); if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No payments yet</p></div></td></tr>'; return; } tbody.innerHTML = list.map(p => `<tr><td>#${p.id}</td><td>${p.payment_date||p.date||'-'}</td><td class="cname">${esc(getSuppName(p.supplier_id||p.supplierId))}</td><td class="amount green">${fmtCurrency(parseFloat(p.amount||0))}</td><td><span class="badge badge-info">${esc(p.payment_method||'Cash')}</span></td><td>${esc(p.notes||'-')}</td><td><button class="btn btn-danger btn-xs" onclick="deletePayment(${p.id})">🗑️</button></td></tr>`).join(''); }
+        function getSuppName(sid) { const s = suppliers.find(x => x.id == sid); return s?.name || 'N/A'; }
+
+        function openAddModal() { editingId = null; document.getElementById('modalTitle').textContent = '➕ Add Supplier'; ['ms_id','ms_name','ms_company','ms_mobile','ms_address','ms_notes'].forEach(id => document.getElementById(id).value = ''); document.getElementById('ms_opening').value = '0'; document.getElementById('supplierModal').classList.add('show'); }
+        function openEditModal(id) { const s = suppliers.find(x => x.id == id); if (!s) return; editingId = id; document.getElementById('modalTitle').textContent = '✏️ Edit Supplier'; document.getElementById('ms_id').value = id; document.getElementById('ms_name').value = s.name || ''; document.getElementById('ms_company').value = s.company || ''; document.getElementById('ms_mobile').value = s.mobile || ''; document.getElementById('ms_opening').value = s.opening_balance || 0; document.getElementById('ms_address').value = s.address || ''; document.getElementById('ms_notes').value = s.notes || ''; document.getElementById('supplierModal').classList.add('show'); }
+        function closeSupplierModal() { document.getElementById('supplierModal').classList.remove('show'); editingId = null; }
+        document.getElementById('modalSupplierForm').addEventListener('submit', async function(e) { e.preventDefault(); const d = { name: document.getElementById('ms_name').value.trim(), company: document.getElementById('ms_company').value.trim(), mobile: document.getElementById('ms_mobile').value.trim(), opening_balance: parseFloat(document.getElementById('ms_opening').value) || 0, address: document.getElementById('ms_address').value.trim(), notes: document.getElementById('ms_notes').value.trim(), updatedAt: new Date().toISOString() }; if (!d.name) { showToast('Name required', 'error'); return; } try { if (editingId) { await FrameworkDB.update('suppliers', editingId, d); showToast('✅ Updated!'); } else { await FrameworkDB.save('suppliers', d); showToast('✅ Added!'); } closeSupplierModal(); await loadAllData(); } catch (err) { showToast('❌ ' + err.message, 'error'); } });
+        async function deleteSupplier(id) { if (!confirm('Delete this supplier?')) return; try { await FrameworkDB.delete('suppliers', id); showToast('🗑️ Deleted!'); await loadAllData(); } catch (err) { showToast('❌ ' + err.message, 'error'); } }
+
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const sid = parseInt(document.getElementById('p_supplier').value);
+            const amt = parseFloat(document.getElementById('p_amount').value);
+            const method = document.getElementById('p_method').value;
+            const notes = document.getElementById('p_notes').value.trim();
+            const paymentDate = document.getElementById('p_date').value;
+            if (!sid) { showToast('Select supplier', 'error'); return; }
+            if (!amt || amt <= 0) { showToast('Enter valid amount', 'error'); return; }
+            try {
+                if (method === 'Due') {
+                    const d = {
+                        supplier_id: sid,
+                        supplierId: sid,
+                        purchase_date: paymentDate,
+                        date: paymentDate,
+                        total_amount: amt,
+                        grandTotal: amt,
+                        payment_method: 'Due',
+                        notes: notes || 'Recorded as due from supplier payment form',
+                        createdAt: new Date().toISOString(),
+                    };
+                    await FrameworkDB.save('purchases', d);
+                    showToast('✅ Due recorded!');
+                } else {
+                    const d = {
+                        supplier_id: sid,
+                        amount: amt,
+                        payment_date: paymentDate,
+                        payment_method: method,
+                        notes,
+                        createdAt: new Date().toISOString()
+                    };
+                    await FrameworkDB.save('supplier_payments', d);
+                    showToast('✅ Payment recorded!');
+                }
+                resetPaymentForm();
+                document.getElementById('p_date').value = todayDate();
+                await loadAllData();
+            } catch (err) { showToast('❌ ' + err.message, 'error'); }
+        });
+        async function deletePayment(id) { if (!confirm('Delete this payment?')) return; try { await FrameworkDB.delete('supplier_payments', id); showToast('🗑️ Deleted!'); await loadAllData(); } catch (err) { showToast('❌ ' + err.message, 'error'); } }
+
+        function openLedger(sid) { const s = suppliers.find(x => x.id == sid); if (!s) return; document.getElementById('ledgerName').textContent = s.name || 'N/A'; document.getElementById('ledgerDetails').textContent = `${s.company || ''} | ${s.mobile || ''}`; const opening = parseFloat(s.opening_balance || 0); let entries = []; if (opening > 0) entries.push({ date: '-', type: 'opening', description: 'Opening Balance', debit: 0, credit: opening }); purchases.filter(p => (p.supplier_id || p.supplierId) == sid).forEach(p => entries.push({ date: p.purchase_date || p.date || '-', type: 'purchase', description: `Purchase #${p.id}`, debit: 0, credit: parseFloat(p.total_amount || p.grandTotal || 0) })); supplierPayments.filter(sp => (sp.supplier_id || sp.supplierId) == sid).forEach(sp => entries.push({ date: sp.payment_date || sp.date || '-', type: 'payment', description: `Payment - ${sp.payment_method || 'Cash'}`, debit: parseFloat(sp.amount || 0), credit: 0 })); entries.sort((a, b) => a.date.localeCompare(b.date)); let balance = 0; document.getElementById('ledgerTable').innerHTML = entries.map(e => { balance = balance - e.debit + e.credit; const bdg = e.type === 'opening' ? 'badge-info' : e.type === 'purchase' ? 'badge-warning' : 'badge-success'; return `<tr><td>${e.date}</td><td><span class="badge ${bdg}">${e.type}</span></td><td>${esc(e.description)}</td><td class="amount green">${e.debit>0?fmtCurrency(e.debit):'-'}</td><td class="amount red">${e.credit>0?fmtCurrency(e.credit):'-'}</td><td><strong>${fmtCurrency(balance)}</strong></td></tr>`; }).join(''); document.getElementById('ledgerBalance').textContent = fmtCurrency(Math.max(0, balance)); document.getElementById('ledgerModal').classList.add('show'); }
+        function closeLedgerModal() { document.getElementById('ledgerModal').classList.remove('show'); }
+
+        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); }));
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show')); });
+        init();
+    </script>
+</body>
+</html>
+
