@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management | Rizq Restaurant</title>
+    <script src="common.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #eef2ff;
+            --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-secondary: #64748b; --text-muted: #94a3b8;
+            --border: #e2e8f0; --success: #10b981; --success-light: #ecfdf5; --warning: #f59e0b; --warning-light: #fffbeb;
+            --danger: #ef4444; --danger-light: #fef2f2; --info: #3b82f6; --info-light: #eff6ff; --purple: #8b5cf6; --purple-light: #f5f3ff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.06); --shadow-xl: 0 20px 40px rgba(0,0,0,0.08);
+            --radius-xs: 6px; --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --transition: all 0.2s;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        .navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 50; gap: 16px; flex-wrap: wrap; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .navbar-brand img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+        .navbar-brand .brand-icon-fallback { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .navbar-brand .brand-text { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
+        .navbar-brand .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+        .navbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(99,102,241,0.3); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; } .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: white; color: var(--text); border: 1.5px solid var(--border); } .btn-outline:hover { background: #f8fafc; }
+        .btn-ghost { background: transparent; color: var(--text-secondary); } .btn-ghost:hover { background: #f1f5f9; }
+        .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: var(--radius-xs); } .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .main-container { max-width: 1300px; margin: 0 auto; padding: 24px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow); border: 1px solid transparent; }
+        .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .stat-value { font-size: 26px; font-weight: 900; }
+
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fafbfc; }
+        .card-header h3 { font-size: 14px; font-weight: 700; }
+        .card-body { padding: 20px; } .card-body.no-padding { padding: 0; overflow-x: auto; }
+
+        .search-box { display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 25px; padding: 0 16px; }
+        .search-box input { border: none; background: transparent; padding: 9px 0; outline: none; font-size: 13px; width: 220px; font-family: inherit; }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        table thead { background: #f8fafc; } table th { padding: 11px 16px; text-align: left; font-weight: 700; color: var(--text-secondary); font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); }
+        table td { padding: 11px 16px; border-bottom: 1px solid #f1f5f9; } table tbody tr:hover { background: #f8fafc; }
+        .customer-name { font-weight: 600; } .amount { font-weight: 700; } .amount.due { color: #ef4444; } .amount.paid { color: #10b981; }
+        .badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        .badge-success { background: #d1fae5; color: #065f46; } .badge-warning { background: #fef3c7; color: #92400e; } .badge-danger { background: #fee2e2; color: #991b1b; } .badge-info { background: #dbeafe; color: #1e40af; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); } .empty-state .empty-icon { font-size: 40px; } .empty-state p { font-size: 13px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.5); z-index: 200; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: var(--radius-lg); width: 90%; max-width: 520px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); animation: slideUp 0.25s ease; display: flex; flex-direction: column; }
+        .modal-lg { max-width: 1000px; }
+        .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 1; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+        .modal-header h3 { font-size: 16px; font-weight: 700; }
+        .btn-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); } .btn-close:hover { background: #f1f5f9; }
+        .modal-body { padding: 20px 22px; flex: 1 1 auto; overflow-y: auto; }
+        .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; background: white; position: sticky; bottom: 0; z-index: 2; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 14px; } .form-group.full { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; outline: none; background: #fafbfc; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(99,102,241,0.06); }
+        .form-group textarea { min-height: 70px; resize: vertical; }
+
+        .ledger-header { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 24px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .ledger-header h2 { font-size: 20px; } .ledger-header .balance { text-align: right; } .ledger-header .balance-amount { font-size: 32px; font-weight: 900; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .navbar { height: auto; padding: 12px 16px; } .navbar-actions { width: 100%; } .navbar-actions .btn { flex: 1; justify-content: center; }
+            .form-grid { grid-template-columns: 1fr; } .main-container { padding: 16px; } .page-header h1 { font-size: 22px; } .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .ledger-header { flex-direction: column; text-align: center; } .ledger-header .balance { text-align: center; }
+            .modal { width: calc(100% - 16px); max-height: calc(100vh - 16px); margin: 8px; border-radius: 18px; }
+            .modal-body { padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+            .modal-footer { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
+            #customerModal .modal { height: calc(100vh - 16px); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" style="display:block;">
+            <div class="brand-icon-fallback" style="display:none;">🖨️</div>
+            <div><div class="brand-text">Rizq Restaurant</div><div class="brand-sub">Management System</div></div>
+        </a>
+        <div class="navbar-actions">
+            <a href="index.html" class="btn btn-ghost btn-sm">📊 Dashboard</a>
+            <a href="sales.html" class="btn btn-outline btn-sm">➕ New Sale</a>
+            <a href="collections.html" class="btn btn-outline btn-sm">💵 Collection</a>
+            <a href="expenses.html" class="btn btn-outline btn-sm">💸 Expenses</a>
+            <a href="suppliers.html" class="btn btn-outline btn-sm">🏭 Suppliers</a>
+            <a href="reports.html" class="btn btn-outline btn-sm">📊 Reports</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header"><div><h1>Customer Management</h1><p class="subtitle">Manage customers, view ledger & statements</p></div><button class="btn btn-primary" onclick="openAddModal()">➕ Add Customer</button></div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Customers</div><div class="stat-value" id="statTotal">0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Due</div><div class="stat-value" style="color:#ef4444;" id="statDue">৳ 0</div></div>
+            <div class="stat-card"><div class="stat-label">Due Customers</div><div class="stat-value" style="color:#f59e0b;" id="statDueCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Collected</div><div class="stat-value" style="color:#10b981;" id="statCollected">৳ 0</div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>👥 Customer List</h3><div class="search-box"><span style="color:var(--text-muted);">🔍</span><input type="text" id="searchInput" placeholder="Search by mobile first..." onkeyup="updateTable()"></div></div>
+            <div class="card-body no-padding"><div class="table-wrapper"><table>
+                <thead><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Address</th><th>Opening Balance</th><th>Current Due</th><th>Actions</th></tr></thead>
+                <tbody id="customerTable"><tr><td colspan="7"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody>
+            </table></div></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal"><div class="modal-header"><h3 id="modalTitle">➕ Add Customer</h3><button class="btn-close" onclick="closeCustomerModal()">✕</button></div>
+            <form id="customerForm" autocomplete="off"><div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group"><label>Full Name *</label><input type="text" id="c_name" required></div>
+                    <div class="form-group"><label>Mobile Number *</label><input type="text" id="c_mobile" required></div>
+                    <div class="form-group"><label>Opening Balance (Old Due)</label><input type="number" id="c_opening" value="0" step="0.01"></div>
+                    <div class="form-group"><label>Address</label><textarea id="c_address" rows="2"></textarea></div>
+                    <div class="form-group full"><label>Notes</label><textarea id="c_notes" rows="2"></textarea></div>
+                </div><input type="hidden" id="c_id">
+            </div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeCustomerModal()">Cancel</button><button type="submit" class="btn btn-primary">💾 Save Customer</button></div></form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="ledgerModal">
+        <div class="modal modal-lg"><div class="modal-header"><h3>📒 Customer Ledger</h3><button class="btn-close" onclick="closeLedgerModal()">✕</button></div>
+            <div class="ledger-header" id="ledgerHeader"><div><h2 id="ledgerCustName">-</h2><p id="ledgerCustDetails" style="opacity:0.85;font-size:13px;"></p></div><div class="balance"><div class="balance-amount" id="ledgerBalance">৳ 0</div><div class="balance-label">Current Due</div></div></div>
+            <div class="modal-body" style="max-height:400px;overflow-y:auto;">
+                <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn btn-outline btn-xs active" onclick="filterLedger('all', this)">All</button>
+                    <button class="btn btn-outline btn-xs" onclick="filterLedger('sale', this)">Sales</button>
+                    <button class="btn btn-outline btn-xs" onclick="filterLedger('collection', this)">Collections</button>
+                    <button class="btn btn-outline btn-xs" onclick="printStatement()" style="margin-left:auto;">🖨️ Print Statement</button>
+                </div>
+                <div class="table-wrapper"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody id="ledgerTable"></tbody></table></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeLedgerModal()">Close</button></div>
+        </div>
+    </div>
+
+    <script src="frameworkdb.js"></script>
+    <script>
+        let customers = [], sales = [], collections = [], editingId = null, ledgerCustomer = null, ledgerFilter = 'all';
+
+        async function init() { await loadAllData(); }
+
+        async function loadAllData() {
+            try {
+                const [cd, sd, cld] = await Promise.all([FrameworkDB.get('customers'), FrameworkDB.get('sales'), FrameworkDB.get('collections')]);
+                customers = ensureArray(cd); sales = ensureArray(sd); collections = ensureArray(cld);
+                updateAllUI();
+            } catch (e) { console.error(e); showToast('Failed to load data', 'error'); }
+        }
+
+        function getCustomerStats(cid) { return getCustomerFinancialSummary(cid, sales, collections, customers); }
+
+        function updateAllUI() { updateStats(); updateTable(); }
+        function updateStats() {
+            document.getElementById('statTotal').textContent = customers.length;
+            let td = 0, dc = 0, tc = 0;
+            customers.forEach(c => { const s = getCustomerStats(c.id); if (s.currentDue > 0) dc++;
+                td += s.currentDue;
+                tc += s.totalPaid; });
+            document.getElementById('statDue').innerHTML = `<a href="${getCollectionEntryUrl()}" class="inline-link inline-due">${fmtCurrency(td)}</a>`;
+            document.getElementById('statDueCount').textContent = dc;
+            document.getElementById('statCollected').textContent = fmtCurrency(tc);
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('customerTable');
+            const s = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+            let list = [...customers].sort((a, b) => {
+                const dueB = getCustomerStats(b.id).currentDue || 0;
+                const dueA = getCustomerStats(a.id).currentDue || 0;
+                if (dueB !== dueA) return dueB - dueA;
+                return (a.name || '').localeCompare(b.name || '');
+            });
+            if (s) list = list.filter(c => (c.name || '').toLowerCase().includes(s) || (c.mobile || '').includes(s));
+            if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👥</div><p>${s?'No match':'No customers yet'}</p>${!s?'<button class="btn btn-primary btn-sm" onclick="openAddModal()">➕ Add Customer</button>':''}</div></td></tr>`; return; }
+            tbody.innerHTML = list.map(c => { const st = getCustomerStats(c.id); const dueLinkHtml = st.currentDue > 0 ? dueAmountLink(getCollectionEntryUrl({ customerId: c.id, amount: st.currentDue }), fmtCurrency(st.currentDue)) : '<span class="amount due">✅ Clear</span>'; return `<tr><td>#${c.id}</td><td>${customerLink(c.id, c.name||'N/A')}</td><td>${esc(c.mobile||'-')}</td><td>${esc(c.address||'-')}</td><td>${fmtCurrency(parseFloat(c.opening_balance||0))}</td><td>${dueLinkHtml}</td><td><button class="btn btn-outline btn-xs" onclick="openLedger(${c.id})">📒</button> <button class="btn btn-outline btn-xs" onclick="openEditModal(${c.id})">✏️</button> <button class="btn btn-danger btn-xs" onclick="deleteCustomer(${c.id})">🗑️</button></td></tr>`; }).join('');
+        }
+
+        function openAddModal() { editingId = null;
+            document.getElementById('modalTitle').textContent = '➕ Add Customer'; ['c_id','c_name','c_mobile','c_address','c_notes'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('c_opening').value = '0';
+            document.getElementById('customerModal').classList.add('show');
+            document.getElementById('c_name').focus(); }
+
+        function openEditModal(id) { const c = customers.find(x => x.id == id); if (!c) return;
+            editingId = id;
+            document.getElementById('modalTitle').textContent = '✏️ Edit Customer';
+            document.getElementById('c_id').value = c.id;
+            document.getElementById('c_name').value = c.name || '';
+            document.getElementById('c_mobile').value = c.mobile || '';
+            document.getElementById('c_opening').value = c.opening_balance || 0;
+            document.getElementById('c_address').value = c.address || '';
+            document.getElementById('c_notes').value = c.notes || '';
+            document.getElementById('customerModal').classList.add('show'); }
+
+        function closeCustomerModal() { document.getElementById('customerModal').classList.remove('show');
+            editingId = null; }
+
+        document.getElementById('customerForm').addEventListener('submit', async function(e) { e.preventDefault(); const data = { name: document.getElementById('c_name').value.trim(), mobile: document.getElementById('c_mobile').value.trim(), opening_balance: parseFloat(document.getElementById('c_opening').value) || 0, address: document.getElementById('c_address').value.trim(), notes: document.getElementById('c_notes').value.trim(), updatedAt: new Date().toISOString() }; if (!data.name) { showToast('Name required', 'error'); return; } if (!data.mobile) { showToast('Mobile number required', 'error'); return; } try { if (editingId) { await FrameworkDB.update('customers', editingId, data);
+                    showToast('✅ Updated!'); } else { await FrameworkDB.save('customers', data);
+                    showToast('✅ Added!'); } closeCustomerModal(); await loadAllData(); } catch (err) { showToast('❌ ' + err.message, 'error'); } });
+
+        async function deleteCustomer(id) { if (!confirm('Delete this customer?')) return; try { await FrameworkDB.delete('customers', id);
+                showToast('🗑️ Deleted!'); await loadAllData(); } catch (err) { showToast('❌ ' + err.message, 'error'); } }
+
+        function openLedger(cid) { const c = customers.find(x => x.id == cid); if (!c) return;
+            ledgerCustomer = c;
+            ledgerFilter = 'all';
+            document.getElementById('ledgerCustName').innerHTML = customerLink(c.id, c.name || 'N/A');
+            document.getElementById('ledgerCustDetails').textContent = `${c.mobile||'N/A'} | ${c.address||'N/A'}`;
+            document.querySelectorAll('#ledgerModal .btn-outline.btn-xs').forEach(b => b.classList.remove('active'));
+            document.querySelector('#ledgerModal .btn-outline.btn-xs').classList.add('active');
+            updateLedgerTable();
+            document.getElementById('ledgerModal').classList.add('show'); }
+
+        function updateLedgerTable() { if (!ledgerCustomer) return; const cid = ledgerCustomer.id; const opening = parseFloat(ledgerCustomer.opening_balance || 0); let entries = []; if (opening > 0) entries.push({ date: '-', type: 'opening', description: 'Opening Balance', debit: opening, credit: 0 });
+            sales.filter(s => (s.customer_id || s.customerId) == cid).forEach(s => { const total = getSaleTotalAmount(s); const paid = getSalePaidAmount(s); entries.push({ date: s.sale_date || s.date || '-', type: 'sale', description: `Invoice: ${s.invoice_no||s.invoiceNo||'#'+s.id}`, debit: total, credit: 0 }); if (paid > 0) entries.push({ date: s.sale_date || s.date || '-', type: 'sale_payment', description: `Paid on invoice - ${s.invoice_no||s.invoiceNo||'#'+s.id}`, debit: 0, credit: paid }); });
+            collections.filter(c => (c.customer_id || c.customerId) == cid && !(c.sale_id || c.saleId)).forEach(c => { entries.push({ date: c.collection_date || c.date || '-', type: 'collection', description: `Payment - ${c.payment_method||'Cash'}`, debit: 0, credit: parseFloat(c.amount||0) }); });
+            if (ledgerFilter !== 'all') entries = entries.filter(e => e.type === ledgerFilter || (ledgerFilter === 'sale' && e.type === 'sale_payment'));
+            entries.sort((a, b) => a.date.localeCompare(b.date)); let balance = 0; const tbody = document.getElementById('ledgerTable'); if (entries.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No entries</p></div></td></tr>'; return; }
+            tbody.innerHTML = entries.map(e => { balance = balance + e.debit - e.credit; const bdg = { opening: 'badge-info', sale: 'badge-warning', sale_payment: 'badge-success', collection: 'badge-success' }; const desc = String(e.description || ''); const invoiceMatch = desc.match(/(INV-[0-9A-Za-z-]+)/i) || desc.match(/(RZ[QI]?-[0-9A-Za-z-]+)/i); let descriptionHtml = esc(desc); if (invoiceMatch) { const invoiceNo = invoiceMatch[1]; const sale = sales.find(s => (s.invoice_no || s.invoiceNo || '').toLowerCase() === invoiceNo.toLowerCase()); if (sale) descriptionHtml = esc(desc).replace(esc(invoiceNo), saleLink(sale.id, invoiceNo)); } return `<tr><td>${e.date}</td><td><span class="badge ${bdg[e.type]||'badge-info'}">${e.type}</span></td><td>${descriptionHtml}</td><td class="amount due">${e.debit>0?fmtCurrency(e.debit):'-'}</td><td class="amount paid">${e.credit>0?fmtCurrency(e.credit):'-'}</td><td><strong>${fmtCurrency(balance)}</strong></td></tr>`; }).join('');
+            document.getElementById('ledgerBalance').textContent = fmtCurrency(Math.max(0, balance));
+            document.getElementById('ledgerBalance').style.color = balance > 0 ? '#fbbf24' : '#fff'; }
+
+        function filterLedger(filter, btn) { ledgerFilter = filter;
+            document.querySelectorAll('#ledgerModal .btn-outline.btn-xs').forEach(b => b.classList.remove('active')); if (btn) btn.classList.add('active');
+            updateLedgerTable(); }
+
+        function closeLedgerModal() { document.getElementById('ledgerModal').classList.remove('show');
+            ledgerCustomer = null; }
+
+        function printStatement() { if (!ledgerCustomer) return; const cid = ledgerCustomer.id; const opening = parseFloat(ledgerCustomer.opening_balance || 0); let html = `${getShopHeaderHTML()}<h2 style="text-align:center;">Customer Statement</h2><p style="text-align:center;">${esc(ledgerCustomer.name)} | ${esc(ledgerCustomer.mobile||'')}</p><table><thead><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th></tr></thead><tbody>`; if (opening > 0) html += `<tr><td>-</td><td>Opening Balance</td><td>${fmtCurrency(opening)}</td><td>-</td></tr>`;
+            sales.filter(s => (s.customer_id || s.customerId) == cid).forEach(s => { const total = getSaleTotalAmount(s); const paid = getSalePaidAmount(s); const inv = s.invoice_no || s.invoiceNo || '#'+s.id; html += `<tr><td>${s.sale_date||s.date}</td><td>Invoice: ${saleLink(s.id, inv)}</td><td>${fmtCurrency(total)}</td><td>-</td></tr>`; if (paid > 0) html += `<tr><td>${s.sale_date||s.date}</td><td>Paid on invoice - ${saleLink(s.id, inv)}</td><td>-</td><td>${fmtCurrency(paid)}</td></tr>`; });
+            collections.filter(c => (c.customer_id || c.customerId) == cid && !(c.sale_id || c.saleId)).forEach(c => { html += `<tr><td>${c.collection_date||c.date}</td><td>Payment - ${c.payment_method||'Cash'}</td><td>-</td><td>${fmtCurrency(parseFloat(c.amount||0))}</td></tr>`; });
+            html += `</tbody></table>${getShopFooterHTML()}`;
+            printHTMLContent(html); }
+
+        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); }));
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show')); });
+        init();
+    </script>
+</body>
+</html>
+
