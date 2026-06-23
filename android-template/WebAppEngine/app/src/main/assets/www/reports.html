@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | Rizq Restaurant</title>
+    <script src="vendor/html2canvas.min.js"></script>
+    <script src="vendor/jspdf.umd.min.js"></script>
+    <script src="common.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #eef2ff;
+            --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-secondary: #64748b; --text-muted: #94a3b8;
+            --border: #e2e8f0; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 6px rgba(0,0,0,0.05); --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
+            --radius-xs: 6px; --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --transition: all 0.2s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        .navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 50; gap: 16px; flex-wrap: wrap; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .navbar-brand img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+        .navbar-brand .brand-icon-fallback { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .navbar-brand .brand-text { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
+        .navbar-brand .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+        .navbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-outline { background: white; color: var(--text); border: 1.5px solid var(--border); } .btn-outline:hover { background: #f8fafc; }
+        .btn-ghost { background: transparent; color: var(--text-secondary); } .btn-ghost:hover { background: #f1f5f9; }
+        .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: var(--radius-xs); } .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; } .subtitle { font-size: 13px; color: var(--text-secondary); }
+
+        .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 20px; overflow-x: auto; flex-wrap: nowrap; }
+        .tab-btn { padding: 10px 16px; background: none; border: none; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-secondary); transition: var(--transition); border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; white-space: nowrap; }
+        .tab-btn:hover { color: var(--text); } .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; } .tab-content.active { display: block; }
+
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fafbfc; }
+        .card-header h3 { font-size: 14px; font-weight: 700; } .card-body { padding: 20px; } .card-body.no-padding { padding: 0; overflow-x: auto; }
+
+        .quick-dates { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+        .quick-date-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 11px; font-weight: 600; font-family: inherit; transition: var(--transition); white-space: nowrap; }
+        .quick-date-btn:hover { background: #f1f5f9; } .quick-date-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .filter-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+        .filter-row input, .filter-row select { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 25px; font-size: 12px; font-family: inherit; outline: none; background: white; }
+        .filter-row input:focus, .filter-row select:focus { border-color: var(--primary); }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; } table thead { background: #f8fafc; }
+        table th { padding: 11px 16px; text-align: left; font-weight: 700; color: var(--text-secondary); font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); }
+        table td { padding: 11px 16px; border-bottom: 1px solid #f1f5f9; } table tbody tr:hover { background: #f8fafc; }
+        .amount { font-weight: 700; } .amount.green { color: #10b981; } .amount.red { color: #ef4444; } .amount.orange { color: #f97316; }
+        .cname { font-weight: 600; }
+        .badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        .badge-success { background: #d1fae5; color: #065f46; } .badge-warning { background: #fef3c7; color: #92400e; } .badge-danger { background: #fee2e2; color: #991b1b; } .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-in { background: #d1fae5; color: #065f46; } .badge-out { background: #fee2e2; color: #991b1b; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); } .empty-state p { font-size: 13px; }
+
+        .profit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .profit-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 20px 24px; box-shadow: var(--shadow); text-align: center; }
+        .profit-card .p-label { font-size: 11px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.5px; }
+        .profit-card .p-value { font-size: 28px; font-weight: 900; margin: 6px 0; }
+        .profit-card.total { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
+        .profit-card.total .p-label { color: rgba(255,255,255,0.8); } .profit-card.total .p-value { color: white; }
+
+        .cash-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .cash-summary-item { background: white; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); text-align: center; }
+        .cash-summary-item .cs-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .cash-summary-item .cs-value { font-size: 18px; font-weight: 800; margin-top: 2px; }
+        .cashflow-note { margin-top: 14px; padding: 12px 14px; border: 1px dashed var(--border); border-radius: var(--radius-sm); background: #fafbfc; color: var(--text-secondary); font-size: 12px; }
+        .cf-sheet { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 20px; box-shadow: 0 10px 25px rgba(15,23,42,0.06); }
+        .cf-header { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .cf-header .brand { display: flex; gap: 12px; align-items: center; }
+        .cf-header .brand img { width: 58px; height: 58px; object-fit: cover; border-radius: 12px; }
+        .cf-header .brand h1 { margin: 0; font-size: 22px; line-height: 1.1; }
+        .cf-header .brand p { margin: 3px 0 0; font-size: 10px; color: #475569; }
+        .cf-header .title { text-align: right; }
+        .cf-header .title .kicker { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .cf-header .title h2 { margin: 4px 0 0; font-size: 24px; letter-spacing: .5px; }
+        .cf-header .period { margin-top: 6px; font-size: 11px; color: #334155; }
+        .hero-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+        .hero-card { position: relative; overflow: hidden; border: 1px solid #dbe3ea; border-top-width: 5px; border-radius: 16px; padding: 14px 16px; background: linear-gradient(180deg, #fff 0%, #f8fafc 100%); }
+        .hero-card.opening { border-top-color: #6366f1; }
+        .hero-card.in { border-top-color: #10b981; }
+        .hero-card.out { border-top-color: #ef4444; }
+        .hero-card.closing { border-top-color: #8b5cf6; }
+        .hero-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; color: #64748b; font-weight: 700; }
+        .hero-card .value { margin-top: 6px; font-size: 28px; font-weight: 900; line-height: 1; }
+        .hero-card .hint { margin-top: 4px; font-size: 10px; color: #94a3b8; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+        .stat { border: 1px solid #dbe3ea; border-radius: 14px; padding: 12px 14px; background: #fafbfc; }
+        .stat .label { font-size: 9px; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; color: #64748b; }
+        .stat .value { margin-top: 3px; font-size: 15px; font-weight: 800; color: #0f172a; }
+        .summary-box { margin-top: 12px; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 10px 12px; background: #fafafa; font-size: 11px; color: #475569; }
+        .summary-box strong { color: #0f172a; }
+        .footer { margin-top: 14px; padding-top: 8px; border-top: 1px solid #cbd5e1; text-align: center; font-size: 9px; color: #64748b; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 768px) {
+            .navbar { height: auto; padding: 12px 16px; } .navbar-actions { width: 100%; } .navbar-actions .btn { flex: 1; justify-content: center; }
+            .main-container { padding: 16px; } .page-header h1 { font-size: 22px; } .filter-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" style="display:block;">
+            <div class="brand-icon-fallback" style="display:none;">🖨️</div>
+            <div><div class="brand-text">Rizq Restaurant</div><div class="brand-sub">Management System</div></div>
+        </a>
+        <div class="navbar-actions">
+            <a href="index.html" class="btn btn-ghost btn-sm">📊 Dashboard</a>
+            <a href="customers.html" class="btn btn-outline btn-sm">👥 Customers</a>
+            <a href="sales.html" class="btn btn-outline btn-sm">➕ Sale</a>
+            <a href="collections.html" class="btn btn-outline btn-sm">💵 Collection</a>
+            <a href="expenses.html" class="btn btn-outline btn-sm">💸 Expenses</a>
+            <a href="suppliers.html" class="btn btn-outline btn-sm">🏭 Suppliers</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header"><div><h1>Reports</h1><p class="subtitle">All business reports with quick date filters & print support</p></div></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('sales')">💰 Sales</button>
+            <button class="tab-btn" onclick="switchTab('due')">📋 Due</button>
+            <button class="tab-btn" onclick="switchTab('expense')">💸 Expense</button>
+            <button class="tab-btn" onclick="switchTab('supplier')">🏭 Supplier</button>
+            <button class="tab-btn" onclick="switchTab('cashbook')">📒 Cash Book</button>
+            <button class="tab-btn" onclick="switchTab('cashflow')">📊 Cash Flow</button>
+            <button class="tab-btn" onclick="switchTab('profit')">📈 Profit</button>
+        </div>
+
+        <!-- SALES REPORT -->
+        <div class="tab-content active" id="tabSales"><div class="card"><div class="card-header"><h3>💰 Sales Report</h3></div><div class="card-body"><div class="quick-dates" id="salesQuickDates"></div><div class="filter-row"><label>From:</label><input type="date" id="salesFrom"><label>To:</label><input type="date" id="salesTo"><select id="salesCustomer"><option value="all">All Customers</option></select><button class="btn btn-primary btn-sm" onclick="loadSalesReport()">🔍 Generate</button><button class="btn btn-outline btn-sm" onclick="printReport('sales')">🖨️ Print</button></div><div class="table-wrapper"><table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th></tr></thead><tbody id="salesReportTable"><tr><td colspan="8"><div class="empty-state"><p>Select date & click Generate</p></div></td></tr></tbody></table></div><div style="text-align:right;margin-top:10px;font-weight:700;" id="salesTotal"></div></div></div></div>
+
+        <!-- DUE REPORT -->
+        <div class="tab-content" id="tabDue"><div class="card"><div class="card-header"><h3>📋 Due Report</h3></div><div class="card-body"><div class="quick-dates" id="dueQuickDates"></div><div class="filter-row"><label>From:</label><input type="date" id="dueFrom"><label>To:</label><input type="date" id="dueTo"><select id="dueFilter"><option value="all">All Due</option><option value="overdue">Overdue Only</option><option value="today">Due Today</option><option value="week">Due This Week</option></select><button class="btn btn-primary btn-sm" onclick="loadDueReport()">🔍 Generate</button><button class="btn btn-outline btn-sm" onclick="printReport('due')">🖨️ Print</button></div><div class="table-wrapper"><table><thead><tr><th>Customer</th><th>Mobile</th><th>Total Due</th><th>Due Date</th><th>Overdue Days</th><th>Status</th></tr></thead><tbody id="dueReportTable"><tr><td colspan="6"><div class="empty-state"><p>Click Generate</p></div></td></tr></tbody></table></div></div></div></div>
+
+        <!-- EXPENSE REPORT -->
+        <div class="tab-content" id="tabExpense"><div class="card"><div class="card-header"><h3>💸 Expense Report</h3></div><div class="card-body"><div class="quick-dates" id="expenseQuickDates"></div><div class="filter-row"><label>From:</label><input type="date" id="expenseFrom"><label>To:</label><input type="date" id="expenseTo"><select id="expenseCategory"><option value="all">All Categories</option></select><button class="btn btn-primary btn-sm" onclick="loadExpenseReport()">🔍 Generate</button><button class="btn btn-outline btn-sm" onclick="printReport('expense')">🖨️ Print</button></div><div class="table-wrapper"><table><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Paid By</th><th>Notes</th></tr></thead><tbody id="expenseReportTable"><tr><td colspan="5"><div class="empty-state"><p>Select date & click Generate</p></div></td></tr></tbody></table></div><div style="text-align:right;margin-top:10px;font-weight:700;" id="expenseTotal"></div></div></div></div>
+
+        <!-- SUPPLIER REPORT -->
+        <div class="tab-content" id="tabSupplier"><div class="card"><div class="card-header"><h3>🏭 Supplier Due Report</h3></div><div class="card-body"><div class="quick-dates" id="supplierQuickDates"></div><div class="filter-row"><label>From:</label><input type="date" id="supplierFrom"><label>To:</label><input type="date" id="supplierTo"><button class="btn btn-primary btn-sm" onclick="loadSupplierReport()">🔍 Generate</button><button class="btn btn-outline btn-sm" onclick="printReport('supplier')">🖨️ Print</button></div><div class="table-wrapper"><table><thead><tr><th>Supplier</th><th>Company</th><th>Mobile</th><th>Total Purchases</th><th>Total Paid</th><th>Payable</th></tr></thead><tbody id="supplierReportTable"><tr><td colspan="6"><div class="empty-state"><p>Click Generate</p></div></td></tr></tbody></table></div></div></div></div>
+
+        <!-- CASH BOOK -->
+        <div class="tab-content" id="tabCashbook"><div class="card"><div class="card-header"><h3>📒 Cash Book</h3></div><div class="card-body">
+            <div class="quick-dates" id="cashbookQuickDates"></div>
+            <div class="filter-row"><label>From:</label><input type="date" id="cashFrom"><label>To:</label><input type="date" id="cashTo"><button class="btn btn-primary btn-sm" onclick="loadCashBook()">🔍 Generate</button><button class="btn btn-outline btn-sm" onclick="printReport('cashbook')">🖨️ Print</button></div>
+            <div class="cash-summary" id="cashSummary"></div>
+            <div class="table-wrapper"><table><thead><tr><th>Date</th><th>Description</th><th>Type</th><th>In</th><th>Out</th><th>Balance</th></tr></thead><tbody id="cashbookTable"><tr><td colspan="6"><div class="empty-state"><p>Select date & click Generate</p></div></td></tr></tbody></table></div>
+        </div></div></div>
+
+        <!-- CASH FLOW STATEMENT -->
+        <div class="tab-content" id="tabCashflow"><div class="card"><div class="card-header"><h3>📊 Cash Flow Statement</h3></div><div class="card-body">
+            <div class="quick-dates" id="cashflowQuickDates"></div>
+            <div class="filter-row"><label>From:</label><input type="date" id="cfFrom"><label>To:</label><input type="date" id="cfTo"><button class="btn btn-primary btn-sm" onclick="loadCashFlow()">🔍 Generate</button><button class="btn btn-outline btn-sm" onclick="printCashFlow()">🖨️ Print</button><button class="btn btn-outline btn-sm" onclick="exportCashFlow('pdf')">📄 PDF</button><button class="btn btn-outline btn-sm" onclick="exportCashFlow('jpg')">🖼️ JPG</button></div>
+            <div class="cash-summary" id="cfSummary"></div>
+            <div class="cashflow-note">Detailed transactions are available in Cash Book. This tab is for summary printing only.</div>
+        </div></div></div>
+
+        <!-- PROFIT REPORT -->
+        <div class="tab-content" id="tabProfit"><div class="card"><div class="card-header"><h3>📈 Profit Report</h3></div><div class="card-body"><div class="quick-dates" id="profitQuickDates"></div><div class="filter-row"><label>From:</label><input type="date" id="profitFrom"><label>To:</label><input type="date" id="profitTo"><button class="btn btn-primary btn-sm" onclick="loadProfitReport()">🔍 Generate</button><button class="btn btn-outline btn-sm" onclick="printReport('profit')">🖨️ Print</button></div><div class="profit-grid"><div class="profit-card"><div class="p-label">Revenue</div><div class="p-value green-text" id="profRevenue">৳ 0</div></div><div class="profit-card"><div class="p-label">Expenses</div><div class="p-value" style="color:#f97316;" id="profExpense">৳ 0</div></div><div class="profit-card"><div class="p-label">Supplier Payments</div><div class="p-value" style="color:#ef4444;" id="profSuppPay">৳ 0</div></div><div class="profit-card total"><div class="p-label">Net Profit</div><div class="p-value" id="profNet">৳ 0</div></div></div></div></div></div>
+    </div>
+
+    <script src="frameworkdb.js"></script>
+    <script src="reports.js"></script>
+</body>
+</html>
