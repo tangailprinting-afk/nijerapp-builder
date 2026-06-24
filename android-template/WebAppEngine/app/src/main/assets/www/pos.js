@@ -533,11 +533,17 @@
                 showToast('No saved receipt yet', 'warning');
                 return;
             }
-            await printHTMLContent(buildThermalReceiptHTML(lastSavedSale), {
-                title: 'POS Receipt',
-                mode: 'thermal',
-                paperWidthMm: 58
-            });
+            try {
+                await printHTMLContent(buildThermalReceiptHTML(lastSavedSale), {
+                    title: 'POS Receipt',
+                    mode: 'thermal',
+                    paperWidthMm: 58,
+                    requireNative: true
+                });
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || 'Native printer bridge is not available', 'error');
+            }
         }
 
         async function savePOS() {
@@ -597,7 +603,8 @@
                     await printHTMLContent(buildThermalReceiptHTML(lastSavedSale), {
                         title: 'POS Receipt',
                         mode: 'thermal',
-                        paperWidthMm: 58
+                        paperWidthMm: 58,
+                        requireNative: true
                     });
                 } catch (printErr) {
                     console.warn('Receipt print skipped:', printErr);
