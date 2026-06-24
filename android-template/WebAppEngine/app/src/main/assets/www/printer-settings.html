@@ -81,6 +81,8 @@
                                     <option value="NativePrintAPI">NativePrintAPI</option>
                                     <option value="sunmiPrinter">sunmiPrinter</option>
                                     <option value="SUNMIPrinter">SUNMIPrinter</option>
+                                    <option value="NijerAppPrinter">NijerAppPrinter</option>
+                                    <option value="AndroidPrinter">AndroidPrinter</option>
                                     <option value="NativeBridge">NativeBridge</option>
                                     <option value="Android">Android</option>
                                     <option value="android">android</option>
@@ -173,7 +175,7 @@
                         <div class="muted">When turned on, thermal print will stop falling back to browser preview.</div>
                     </div>
                     <div class="methods">
-                        <div class="method"><strong>Supported Bridge Objects:</strong> NativePrintBridge, AndroidPrintBridge, NativePrintAPI, sunmiPrinter, SUNMIPrinter, NativeBridge, Android, android, printer</div>
+                        <div class="method"><strong>Supported Bridge Objects:</strong> NativePrintBridge, AndroidPrintBridge, NativePrintAPI, sunmiPrinter, SUNMIPrinter, NijerAppPrinter, AndroidPrinter, NativeBridge, Android, android, printer</div>
                         <div class="method"><strong>Supported Methods:</strong> printThermalReceipt, printReceiptHtml, printThermalHtml, printHtml, printHTML, printReceipt, printThermal, printTicket, printText, print</div>
                     </div>
                 </div>
@@ -182,17 +184,37 @@
     </div>
 
     <script>
+        const printerShared = {
+            getPrinterSettings: window.getPrinterSettings || (() => ({
+                enabled: true,
+                requireNative: true,
+                paperWidthMm: 58,
+                autoCut: true,
+                bridgeName: 'auto',
+                methodName: 'auto',
+            })),
+            savePrinterSettings: window.savePrinterSettings || ((data) => data),
+            printHTMLContent: window.printHTMLContent || (async () => { throw new Error('printHTMLContent helper is not loaded'); }),
+            getNativePrintBridge: window.getNativePrintBridge || (() => null),
+            showToast: window.showToast || ((msg) => { alert(msg); }),
+            settings: window.SHOP_SETTINGS || { name: 'Rizq Restaurant' },
+        };
+
         function loadForm() {
-            const settings = getPrinterSettings();
+            const settings = printerShared.getPrinterSettings();
             document.getElementById('bridgeName').value = settings.bridgeName || 'auto';
             document.getElementById('methodName').value = settings.methodName || 'auto';
             document.getElementById('paperWidthMm').value = String(settings.paperWidthMm || 58);
             document.getElementById('autoCut').value = settings.autoCut === false ? 'false' : 'true';
             document.getElementById('requireNative').checked = settings.requireNative !== false;
             document.getElementById('enabled').checked = settings.enabled !== false;
-            const bridge = getNativePrintBridge();
-            document.getElementById('bridgeStatus').textContent = bridge ? 'Bridge detected' : 'No bridge detected';
-            document.getElementById('bridgeDetail').textContent = bridge ? 'Native printing can be used from the wrapper.' : 'Open this app inside your Android wrapper to enable thermal printing.';
+            const bridge = printerShared.getNativePrintBridge();
+            const bridgeName = settings.bridgeName && settings.bridgeName !== 'auto' ? settings.bridgeName : 'auto detect';
+            const methodName = settings.methodName && settings.methodName !== 'auto' ? settings.methodName : 'auto detect';
+            document.getElementById('bridgeStatus').textContent = bridge ? `Bridge detected (${bridgeName})` : 'No bridge detected';
+            document.getElementById('bridgeDetail').textContent = bridge
+                ? `Native printing can be used from the wrapper. Method: ${methodName}.`
+                : 'Open this app inside your Android wrapper to enable thermal printing.';
         }
 
         function readForm() {
@@ -224,10 +246,10 @@
                 </head>
                 <body>
                     <div class="bill">
-                        <div class="title">${SHOP_SETTINGS.name}</div>
+                        <div class="title">${printerShared.settings.name}</div>
                         <div class="line"></div>
                         <div class="row"><span>Printer test</span><span>${new Date().toLocaleString()}</span></div>
-                        <div class="row"><span>Bridge</span><span>${getNativePrintBridge() ? 'OK' : 'Missing'}</span></div>
+                        <div class="row"><span>Bridge</span><span>${printerShared.getNativePrintBridge() ? 'OK' : 'Missing'}</span></div>
                         <div class="row"><span>Paper</span><span>${document.getElementById('paperWidthMm').value}mm</span></div>
                         <div class="line"></div>
                         <div style="text-align:center;font-size:8px;">SUNMI V2S test receipt</div>
@@ -239,30 +261,30 @@
 
         document.getElementById('printerForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            savePrinterSettings(readForm());
-            showToast('Printer settings saved');
+            printerShared.savePrinterSettings(readForm());
+            printerShared.showToast('Printer settings saved');
             loadForm();
         });
 
         document.getElementById('testPrintBtn').addEventListener('click', async function() {
             try {
-                savePrinterSettings(readForm());
-                await printHTMLContent(testPrintHtml(), {
+                printerShared.savePrinterSettings(readForm());
+                await printerShared.printHTMLContent(testPrintHtml(), {
                     title: 'Printer Test',
                     mode: 'thermal',
                     paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
                     autoCut: document.getElementById('autoCut').value === 'true',
                     requireNative: true,
                 });
-                showToast('Test print sent');
+                printerShared.showToast('Test print sent');
             } catch (err) {
                 console.error(err);
-                showToast('Test print failed: ' + err.message, 'error');
+                printerShared.showToast('Test print failed: ' + err.message, 'error');
             }
         });
 
         document.getElementById('resetBtn').addEventListener('click', function() {
-            savePrinterSettings({
+            printerShared.savePrinterSettings({
                 enabled: true,
                 requireNative: true,
                 paperWidthMm: 58,
@@ -271,10 +293,11 @@
                 methodName: 'auto',
             });
             loadForm();
-            showToast('Printer settings reset');
+            printerShared.showToast('Printer settings reset');
         });
 
         loadForm();
+        setInterval(loadForm, 5000);
     </script>
 </body>
 </html>
