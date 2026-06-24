@@ -257,6 +257,8 @@ function getNativePrintBridge() {
         window.NativePrintAPI ||
         window.sunmiPrinter ||
         window.SUNMIPrinter ||
+        window.NijerAppPrinter ||
+        window.AndroidPrinter ||
         window.NativeBridge ||
         window.Android ||
         window.android ||
