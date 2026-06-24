@@ -228,6 +228,11 @@ function getNativePrintBridge() {
         window.NativePrintAPI ||
         window.sunmiPrinter ||
         window.SUNMIPrinter ||
+        window.NativeBridge ||
+        window.Android ||
+        window.android ||
+        window.printBridge ||
+        window.printer ||
         null;
 }
 
@@ -270,6 +275,9 @@ async function printHTMLContent(html, options = {}) {
             'printHtml',
             'printHTML',
             'printReceipt',
+            'printThermal',
+            'printTicket',
+            'printText',
             'print',
         ];
         for (const methodName of methodNames) {
