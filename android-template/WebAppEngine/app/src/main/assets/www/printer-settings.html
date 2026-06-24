@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printer Settings | Rizq Restaurant</title>
+    <script src="common.js"></script>
+    <style>
+        :root{
+            --bg:#f8fbff; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
+            --primary:#6366f1; --primary2:#7c3aed; --good:#10b981; --warn:#f59e0b;
+        }
+        *{box-sizing:border-box}
+        body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(180deg,#eff5ff 0%,#f8fbff 100%);color:var(--text)}
+        .wrap{max-width:980px;margin:0 auto;padding:24px}
+        .hero{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin:6px 0 18px}
+        .hero h1{margin:0;font-size:30px;letter-spacing:-.5px}
+        .hero p{margin:6px 0 0;color:var(--muted);line-height:1.5}
+        .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:0 16px 40px rgba(15,23,42,.08);overflow:hidden}
+        .card-h{padding:16px 18px;border-bottom:1px solid var(--border);background:#fafcff;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:10px}
+        .card-b{padding:18px}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .form-group{display:flex;flex-direction:column;gap:6px}
+        .form-group.full{grid-column:1/-1}
+        label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+        input,select,textarea{width:100%;border:1.5px solid var(--border);background:#fafbfc;padding:12px 14px;border-radius:14px;font:inherit;font-size:15px;outline:none}
+        input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.08);background:#fff}
+        .switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:#fafbfc}
+        .switch-row strong{font-size:14px}
+        .switch-row span{font-size:12px;color:var(--muted)}
+        .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:12px 16px;font-weight:800;font:inherit;cursor:pointer;text-decoration:none}
+        .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+        .btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text)}
+        .btn-soft{background:#eef2ff;color:#4338ca}
+        .status{display:grid;gap:12px}
+        .status-box{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid var(--border)}
+        .status-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+        .status-value{margin-top:4px;font-weight:900;font-size:18px}
+        .muted{color:var(--muted)}
+        .hint{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.55}
+        .methods{display:grid;gap:8px;margin-top:10px}
+        .method{padding:10px 12px;border:1px dashed var(--border);border-radius:14px;font-size:13px;background:#fff}
+        .badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-weight:800;font-size:11px}
+        @media (max-width: 900px){.grid,.form-grid{grid-template-columns:1fr}.hero{flex-direction:column}}
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="hero">
+            <div>
+                <div class="badge">Printer Connect</div>
+                <h1>Printer Settings</h1>
+                <p>Native thermal printing works through the Android wrapper. This page stores the printer preference and lets you test the bridge from the app.</p>
+            </div>
+            <a class="btn btn-outline" href="pos.html">← Back to POS</a>
+        </div>
+
+        <div class="grid">
+            <section class="card">
+                <div class="card-h">Connection & Print Preferences</div>
+                <div class="card-b">
+                    <form id="printerForm">
+                        <div class="form-grid">
+                            <div class="form-group full">
+                                <label>Printer Status</label>
+                                <div class="status-box">
+                                    <div class="status-label">Detected Bridge</div>
+                                    <div class="status-value" id="bridgeStatus">Checking...</div>
+                                    <div class="muted" id="bridgeDetail"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Bridge Name</label>
+                                <select id="bridgeName">
+                                    <option value="auto">Auto detect</option>
+                                    <option value="NativePrintBridge">NativePrintBridge</option>
+                                    <option value="AndroidPrintBridge">AndroidPrintBridge</option>
+                                    <option value="NativePrintAPI">NativePrintAPI</option>
+                                    <option value="sunmiPrinter">sunmiPrinter</option>
+                                    <option value="SUNMIPrinter">SUNMIPrinter</option>
+                                    <option value="NativeBridge">NativeBridge</option>
+                                    <option value="Android">Android</option>
+                                    <option value="android">android</option>
+                                    <option value="printer">printer</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Method Name</label>
+                                <select id="methodName">
+                                    <option value="auto">Auto detect</option>
+                                    <option value="printThermalReceipt">printThermalReceipt</option>
+                                    <option value="printReceiptHtml">printReceiptHtml</option>
+                                    <option value="printThermalHtml">printThermalHtml</option>
+                                    <option value="printHtml">printHtml</option>
+                                    <option value="printHTML">printHTML</option>
+                                    <option value="printReceipt">printReceipt</option>
+                                    <option value="printThermal">printThermal</option>
+                                    <option value="printTicket">printTicket</option>
+                                    <option value="printText">printText</option>
+                                    <option value="print">print</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Paper Width</label>
+                                <select id="paperWidthMm">
+                                    <option value="58">58 mm</option>
+                                    <option value="80">80 mm</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Auto Cut</label>
+                                <select id="autoCut">
+                                    <option value="true">Enabled</option>
+                                    <option value="false">Disabled</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full">
+                                <div class="switch-row">
+                                    <div>
+                                        <strong>Require Native Printing</strong>
+                                        <div><span>When enabled, thermal print will not fall back to browser PDF/print.</span></div>
+                                    </div>
+                                    <input type="checkbox" id="requireNative" style="width:22px;height:22px;">
+                                </div>
+                            </div>
+
+                            <div class="form-group full">
+                                <div class="switch-row">
+                                    <div>
+                                        <strong>Printer Enabled</strong>
+                                        <div><span>Store printer settings and activate thermal bridge preference.</span></div>
+                                    </div>
+                                    <input type="checkbox" id="enabled" style="width:22px;height:22px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button type="submit" class="btn btn-primary">Save Printer Settings</button>
+                            <button type="button" class="btn btn-soft" id="testPrintBtn">Test Print</button>
+                            <button type="button" class="btn btn-outline" id="resetBtn">Reset</button>
+                        </div>
+                    </form>
+                    <div class="hint">
+                        Note: actual printer pairing happens in your Android wrapper. This page only stores which bridge/method to use and sends a test receipt when the wrapper bridge is present.
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-h">How It Works</div>
+                <div class="card-b status">
+                    <div class="status-box">
+                        <div class="status-label">1. Wrapper Bridge</div>
+                        <div class="status-value" style="font-size:16px;">Expose a native print object</div>
+                        <div class="muted">Use one of the supported objects in your Android wrapper.</div>
+                    </div>
+                    <div class="status-box">
+                        <div class="status-label">2. Thermal Print</div>
+                        <div class="status-value" style="font-size:16px;">Send receipt HTML to printer</div>
+                        <div class="muted">SUNMI V2S should receive the receipt via the native bridge method.</div>
+                    </div>
+                    <div class="status-box">
+                        <div class="status-label">3. No Browser PDF</div>
+                        <div class="status-value" style="font-size:16px;">Require native enabled</div>
+                        <div class="muted">When turned on, thermal print will stop falling back to browser preview.</div>
+                    </div>
+                    <div class="methods">
+                        <div class="method"><strong>Supported Bridge Objects:</strong> NativePrintBridge, AndroidPrintBridge, NativePrintAPI, sunmiPrinter, SUNMIPrinter, NativeBridge, Android, android, printer</div>
+                        <div class="method"><strong>Supported Methods:</strong> printThermalReceipt, printReceiptHtml, printThermalHtml, printHtml, printHTML, printReceipt, printThermal, printTicket, printText, print</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function loadForm() {
+            const settings = getPrinterSettings();
+            document.getElementById('bridgeName').value = settings.bridgeName || 'auto';
+            document.getElementById('methodName').value = settings.methodName || 'auto';
+            document.getElementById('paperWidthMm').value = String(settings.paperWidthMm || 58);
+            document.getElementById('autoCut').value = settings.autoCut === false ? 'false' : 'true';
+            document.getElementById('requireNative').checked = settings.requireNative !== false;
+            document.getElementById('enabled').checked = settings.enabled !== false;
+            const bridge = getNativePrintBridge();
+            document.getElementById('bridgeStatus').textContent = bridge ? 'Bridge detected' : 'No bridge detected';
+            document.getElementById('bridgeDetail').textContent = bridge ? 'Native printing can be used from the wrapper.' : 'Open this app inside your Android wrapper to enable thermal printing.';
+        }
+
+        function readForm() {
+            return {
+                bridgeName: document.getElementById('bridgeName').value,
+                methodName: document.getElementById('methodName').value,
+                paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
+                autoCut: document.getElementById('autoCut').value === 'true',
+                requireNative: document.getElementById('requireNative').checked,
+                enabled: document.getElementById('enabled').checked,
+            };
+        }
+
+        function testPrintHtml() {
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        @page { margin: 0; size: 58mm auto; }
+                        html, body { width: 58mm; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+                        .bill { padding: 4mm 3mm; }
+                        .title { text-align:center; font-weight:900; font-size:14px; }
+                        .line { border-top:1px dashed #000; margin:2mm 0; }
+                        .row { display:flex; justify-content:space-between; font-size:9px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="bill">
+                        <div class="title">${SHOP_SETTINGS.name}</div>
+                        <div class="line"></div>
+                        <div class="row"><span>Printer test</span><span>${new Date().toLocaleString()}</span></div>
+                        <div class="row"><span>Bridge</span><span>${getNativePrintBridge() ? 'OK' : 'Missing'}</span></div>
+                        <div class="row"><span>Paper</span><span>${document.getElementById('paperWidthMm').value}mm</span></div>
+                        <div class="line"></div>
+                        <div style="text-align:center;font-size:8px;">SUNMI V2S test receipt</div>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        document.getElementById('printerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            savePrinterSettings(readForm());
+            showToast('Printer settings saved');
+            loadForm();
+        });
+
+        document.getElementById('testPrintBtn').addEventListener('click', async function() {
+            try {
+                savePrinterSettings(readForm());
+                await printHTMLContent(testPrintHtml(), {
+                    title: 'Printer Test',
+                    mode: 'thermal',
+                    paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
+                    autoCut: document.getElementById('autoCut').value === 'true',
+                    requireNative: true,
+                });
+                showToast('Test print sent');
+            } catch (err) {
+                console.error(err);
+                showToast('Test print failed: ' + err.message, 'error');
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            savePrinterSettings({
+                enabled: true,
+                requireNative: true,
+                paperWidthMm: 58,
+                autoCut: true,
+                bridgeName: 'auto',
+                methodName: 'auto',
+            });
+            loadForm();
+            showToast('Printer settings reset');
+        });
+
+        loadForm();
+    </script>
+</body>
+</html>
