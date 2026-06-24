@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "app.rizq.app"
+        applicationId = "app.rizeeq.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
