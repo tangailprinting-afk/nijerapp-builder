@@ -222,6 +222,35 @@ function isFullHtmlDocument(html) {
     return source.startsWith('<!doctype html') || source.startsWith('<html');
 }
 
+const PRINTER_SETTINGS_KEY = 'sds_printer_settings';
+
+function getPrinterSettings() {
+    return readStore(PRINTER_SETTINGS_KEY, {
+        enabled: true,
+        requireNative: true,
+        paperWidthMm: 58,
+        autoCut: true,
+        bridgeName: 'auto',
+        methodName: 'auto',
+    });
+}
+
+function savePrinterSettings(nextSettings = {}) {
+    const current = getPrinterSettings();
+    const merged = {
+        ...current,
+        ...nextSettings,
+        paperWidthMm: parseInt(nextSettings.paperWidthMm ?? current.paperWidthMm ?? 58, 10) || 58,
+        autoCut: nextSettings.autoCut ?? current.autoCut ?? true,
+        enabled: nextSettings.enabled ?? current.enabled ?? true,
+        requireNative: nextSettings.requireNative ?? current.requireNative ?? true,
+        bridgeName: String(nextSettings.bridgeName ?? current.bridgeName ?? 'auto'),
+        methodName: String(nextSettings.methodName ?? current.methodName ?? 'auto'),
+    };
+    writeStore(PRINTER_SETTINGS_KEY, merged);
+    return merged;
+}
+
 function getNativePrintBridge() {
     return window.NativePrintBridge ||
         window.AndroidPrintBridge ||
@@ -255,6 +284,8 @@ async function invokeNativePrintMethod(bridge, methodName, payload, html) {
 }
 
 async function printHTMLContent(html, options = {}) {
+    const printerSettings = getPrinterSettings();
+    const requireNative = options.requireNative ?? (options.mode === 'thermal' ? printerSettings.requireNative !== false : false);
     const bridge = getNativePrintBridge();
     const payload = {
         html,
@@ -263,29 +294,36 @@ async function printHTMLContent(html, options = {}) {
         rawHtml: html,
         mode: options.mode || 'document',
         title: options.title || 'Print',
-        paperWidthMm: options.paperWidthMm || options.paperWidth || 58,
-        autoCut: options.autoCut !== false,
+        paperWidthMm: options.paperWidthMm || options.paperWidth || printerSettings.paperWidthMm || 58,
+        autoCut: options.autoCut ?? printerSettings.autoCut ?? true,
         copies: options.copies || 1,
     };
     if (bridge) {
-        const methodNames = [
-            'printThermalReceipt',
-            'printReceiptHtml',
-            'printThermalHtml',
-            'printHtml',
-            'printHTML',
-            'printReceipt',
-            'printThermal',
-            'printTicket',
-            'printText',
-            'print',
-        ];
-        for (const methodName of methodNames) {
+        const preferredMethods = printerSettings.methodName && printerSettings.methodName !== 'auto'
+            ? [printerSettings.methodName]
+            : [
+                'printThermalReceipt',
+                'printReceiptHtml',
+                'printThermalHtml',
+                'printHtml',
+                'printHTML',
+                'printReceipt',
+                'printThermal',
+                'printTicket',
+                'printText',
+                'print',
+            ];
+        for (const methodName of preferredMethods) {
             if (await invokeNativePrintMethod(bridge, methodName, payload, html)) {
                 return true;
             }
         }
         console.warn('Native print bridge detected, but no supported print method was found.');
+        if (requireNative) {
+            throw new Error('Native printer bridge is available, but no supported print method was found.');
+        }
+    } else if (requireNative) {
+        throw new Error('Native printer bridge is not available.');
     }
 
     const printWindow = window.open('', '_blank', 'width=800,height=600');
@@ -367,6 +405,7 @@ const SHARED_NAV_ITEMS = [
     { key: 'products', href: 'products.html', label: '📦 Menu', cls: 'btn btn-outline btn-sm' },
     { key: 'staff', href: 'staff.html', label: '🧑‍💼 Staff', cls: 'btn btn-outline btn-sm' },
     { key: 'suppliers', href: 'suppliers.html', label: '🏭 Suppliers', cls: 'btn btn-outline btn-sm' },
+    { key: 'printer', href: 'printer-settings.html', label: '🖨️ Printer', cls: 'btn btn-outline btn-sm' },
     { key: 'reports', href: 'reports.html', label: '📊 Reports', cls: 'btn btn-outline btn-sm' },
 ];
 
@@ -384,6 +423,7 @@ const MOBILE_MORE_ITEMS = [
     { href: 'expenses.html', label: 'Expenses', icon: 'expense' },
     { href: 'staff.html', label: 'Staff', icon: 'staff' },
     { href: 'suppliers.html', label: 'Suppliers', icon: 'store' },
+    { href: 'printer-settings.html', label: 'Printer', icon: 'print' },
     { href: 'reports.html', label: 'Reports', icon: 'chart' },
 ];
 
@@ -400,6 +440,7 @@ function getSharedNavKey() {
     if (page.startsWith('staff')) return 'staff';
     if (page.startsWith('supplier')) return 'suppliers';
     if (page.startsWith('report')) return 'reports';
+    if (page.startsWith('printer-setting')) return 'printer';
     return '';
 }
 
