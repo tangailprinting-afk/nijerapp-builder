@@ -223,6 +223,7 @@ function isFullHtmlDocument(html) {
 }
 
 const PRINTER_SETTINGS_KEY = 'sds_printer_settings';
+const PRINTER_PROFILES_KEY = 'sds_printer_profiles';
 
 function getPrinterSettings() {
     return readStore(PRINTER_SETTINGS_KEY, {
@@ -232,6 +233,11 @@ function getPrinterSettings() {
         autoCut: true,
         bridgeName: 'auto',
         methodName: 'auto',
+        printerType: 'SUNMI',
+        connectionMode: 'native',
+        printerName: '',
+        printerAddress: '',
+        activeProfileId: '',
     });
 }
 
@@ -246,12 +252,103 @@ function savePrinterSettings(nextSettings = {}) {
         requireNative: nextSettings.requireNative ?? current.requireNative ?? true,
         bridgeName: String(nextSettings.bridgeName ?? current.bridgeName ?? 'auto'),
         methodName: String(nextSettings.methodName ?? current.methodName ?? 'auto'),
+        printerType: String(nextSettings.printerType ?? current.printerType ?? 'SUNMI'),
+        connectionMode: String(nextSettings.connectionMode ?? current.connectionMode ?? 'native'),
+        printerName: String(nextSettings.printerName ?? current.printerName ?? ''),
+        printerAddress: String(nextSettings.printerAddress ?? current.printerAddress ?? ''),
+        activeProfileId: String(nextSettings.activeProfileId ?? current.activeProfileId ?? ''),
     };
     writeStore(PRINTER_SETTINGS_KEY, merged);
     return merged;
 }
 
-function getNativePrintBridge() {
+function getPrinterProfiles() {
+    const data = readStore(PRINTER_PROFILES_KEY, []);
+    return Array.isArray(data) ? data : [];
+}
+
+function savePrinterProfiles(profiles) {
+    const list = Array.isArray(profiles) ? profiles : [];
+    writeStore(PRINTER_PROFILES_KEY, list);
+    return list;
+}
+
+function makePrinterProfileId(profile = {}) {
+    const seed = `${profile.printerName || ''}|${profile.printerAddress || ''}|${profile.connectionMode || ''}|${profile.printerType || ''}`;
+    return `prn_${Math.abs(hashCode(seed)).toString(36)}_${Date.now().toString(36)}`;
+}
+
+function hashCode(value) {
+    const str = String(value || '');
+    let hash = 0;
+    for (let i = 0; i < str.length; i += 1) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+    }
+    return hash;
+}
+
+function upsertPrinterProfile(profile = {}) {
+    const profiles = getPrinterProfiles();
+    const normalized = {
+        id: String(profile.id || makePrinterProfileId(profile)),
+        printerType: String(profile.printerType || 'SUNMI'),
+        connectionMode: String(profile.connectionMode || 'native'),
+        printerName: String(profile.printerName || '').trim(),
+        printerAddress: String(profile.printerAddress || '').trim(),
+        bridgeName: String(profile.bridgeName || 'auto'),
+        methodName: String(profile.methodName || 'auto'),
+        paperWidthMm: parseInt(profile.paperWidthMm || 58, 10) || 58,
+        autoCut: profile.autoCut !== false,
+        enabled: profile.enabled !== false,
+        requireNative: profile.requireNative !== false,
+        isDefault: profile.isDefault === true,
+    };
+    const next = profiles.slice();
+    const index = next.findIndex(p => p.id === normalized.id);
+    if (normalized.isDefault) {
+        next.forEach(p => { p.isDefault = false; });
+    }
+    if (index >= 0) next[index] = { ...next[index], ...normalized };
+    else next.push(normalized);
+    savePrinterProfiles(next);
+    return normalized;
+}
+
+function deletePrinterProfile(id) {
+    const next = getPrinterProfiles().filter(p => p.id !== id);
+    savePrinterProfiles(next);
+    return next;
+}
+
+function setDefaultPrinterProfile(id) {
+    const next = getPrinterProfiles().map(p => ({ ...p, isDefault: p.id === id }));
+    savePrinterProfiles(next);
+    const active = next.find(p => p.id === id) || null;
+    if (active) {
+        savePrinterSettings({
+            ...getPrinterSettings(),
+            ...active,
+            activeProfileId: active.id,
+        });
+    }
+    return active;
+}
+
+function getActivePrinterProfile() {
+    const settings = getPrinterSettings();
+    const profiles = getPrinterProfiles();
+    return profiles.find(p => p.id === settings.activeProfileId) || profiles.find(p => p.isDefault) || profiles[0] || null;
+}
+
+function getBridgeByName(name) {
+    if (!name || name === 'auto') return null;
+    return window[name] || null;
+}
+
+function getNativePrintBridge(preferredName = '') {
+    const preferred = getBridgeByName(preferredName);
+    if (preferred) return preferred;
     return window.NativePrintBridge ||
         window.AndroidPrintBridge ||
         window.NativePrintAPI ||
@@ -288,7 +385,7 @@ async function invokeNativePrintMethod(bridge, methodName, payload, html) {
 async function printHTMLContent(html, options = {}) {
     const printerSettings = getPrinterSettings();
     const requireNative = options.requireNative ?? (options.mode === 'thermal' ? printerSettings.requireNative !== false : false);
-    const bridge = getNativePrintBridge();
+    const bridge = getNativePrintBridge(options.bridgeName || printerSettings.bridgeName || '');
     const payload = {
         html,
         content: html,
@@ -299,6 +396,10 @@ async function printHTMLContent(html, options = {}) {
         paperWidthMm: options.paperWidthMm || options.paperWidth || printerSettings.paperWidthMm || 58,
         autoCut: options.autoCut ?? printerSettings.autoCut ?? true,
         copies: options.copies || 1,
+        printerType: options.printerType || printerSettings.printerType || 'SUNMI',
+        connectionMode: options.connectionMode || printerSettings.connectionMode || 'native',
+        printerName: options.printerName || printerSettings.printerName || '',
+        printerAddress: options.printerAddress || printerSettings.printerAddress || '',
     };
     if (bridge) {
         const preferredMethods = printerSettings.methodName && printerSettings.methodName !== 'auto'
