@@ -150,7 +150,15 @@
                 <div style="text-align:center;border-top:1px dashed #ccc;padding-top:8px;font-size:9px;color:#666;"><p>Authorized Signature</p><p>________________________</p><p>${esc(shopName)} | 📞 ${esc(shopPhone)}</p></div>
             </div>`; }
 
-        function printSingleReceipt(){ if(!currentReceiptData)return; printHTMLContent(buildVoucherHTML(currentReceiptData)); }
+        async function printSingleReceipt(){ 
+            if(!currentReceiptData)return; 
+            try {
+                await printHTMLContent(buildVoucherHTML(currentReceiptData), { mode: 'thermal', paperWidthMm: 58, requireNative: true });
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || 'Native printer bridge is not available', 'error');
+            }
+        }
 
         function printCategoryReport(){ const ms=monthStartDate(); const me=expenses.filter(e=>(e.expense_date||e.date)>=ms), tm=me.reduce((s,e)=>s+(parseFloat(e.amount||0)),0)||1; const cd=getAllCategories().map(cat=>({name:cat,amount:me.filter(e=>e.category===cat).reduce((s,e)=>s+(parseFloat(e.amount||0)),0)})).filter(x=>x.amount>0).sort((a,b)=>b.amount-a.amount); const rows=cd.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)}</td><td>${fmtCurrency(x.amount)}</td><td>${((x.amount/tm)*100).toFixed(1)}%</td></tr>`).join(''); const html=`<html><head><title>Category Report</title><style>@page{margin:15mm;}body{font-family:sans-serif;font-size:12px;}h2{text-align:center;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px;font-size:11px;}th{background:#f5f5f5;}</style></head><body><h2>${esc(SHOP_SETTINGS.name)} - Category Report</h2><p>Total: ${fmtCurrency(tm)}</p><table><thead><tr><th>#</th><th>Category</th><th>Amount</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></body></html>`; printHTMLContent(html); }
         function printExpenseList(){ const s=(document.getElementById('searchInput')?.value||'').trim().toLowerCase(), cf=document.getElementById('categoryFilter')?.value||'all'; let list=[...expenses].sort((a,b)=>(b.id||0)-(a.id||0)); if(s) list=list.filter(e=>(e.category||'').toLowerCase().includes(s)||(e.notes||'').toLowerCase().includes(s)); if(cf!=='all') list=list.filter(e=>e.category===cf); const total=list.reduce((s,e)=>s+(parseFloat(e.amount||0)),0); const rows=list.map(e=>`<tr><td>${e.expense_date||e.date||'-'}</td><td>${esc(e.category||'Other')}</td><td>${fmtCurrency(parseFloat(e.amount||0))}</td><td>${esc(e.paid_by||e.paidBy||'Cash')}</td><td>${esc(e.notes||'-')}</td></tr>`).join(''); const html=`<html><head><title>Expense List</title><style>@page{margin:15mm;}body{font-family:sans-serif;font-size:12px;}h2{text-align:center;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px;font-size:11px;}th{background:#f5f5f5;}</style></head><body><h2>${esc(SHOP_SETTINGS.name)} - Expense List</h2><p>Total: ${fmtCurrency(total)} | Records: ${list.length}</p><table><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Paid By</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table></body></html>`; printHTMLContent(html); }
