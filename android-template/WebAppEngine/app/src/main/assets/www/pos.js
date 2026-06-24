@@ -10,8 +10,33 @@
         let lastSavedSale = null;
         let menuDataReady = false;
 
+        function byId(id) {
+            return document.getElementById(id);
+        }
+
+        function setValue(id, value) {
+            const el = byId(id);
+            if (!el) return false;
+            el.value = value;
+            return true;
+        }
+
+        function setText(id, value) {
+            const el = byId(id);
+            if (!el) return false;
+            el.textContent = value;
+            return true;
+        }
+
+        function setHTML(id, value) {
+            const el = byId(id);
+            if (!el) return false;
+            el.innerHTML = value;
+            return true;
+        }
+
         async function init() {
-            document.getElementById('saleDate').value = todayDate();
+            setValue('saleDate', todayDate());
             await loadData();
             refreshInvoiceNo();
             renderMenu();
@@ -41,7 +66,7 @@
         }
 
         function refreshInvoiceNo() {
-            document.getElementById('invoiceNo').value = 'INV-' + String(sales.length + 1).padStart(3, '0');
+            setValue('invoiceNo', 'INV-' + String(sales.length + 1).padStart(3, '0'));
         }
 
         function clearCart() {
@@ -49,14 +74,14 @@
             selectedCustomerId = null;
             selectedCustomerName = '';
             selectedCustomerDisplay = '';
-            document.getElementById('discountType').value = 'fixed';
-            document.getElementById('discountValue').value = '0';
-            document.getElementById('paidAmount').value = '0';
-            document.getElementById('paymentMethod').value = 'Cash';
-            document.getElementById('saleNotes').value = '';
-            document.getElementById('customerSearch').value = '';
-            document.getElementById('customerId').value = '';
-            document.getElementById('customerHint').textContent = '';
+            setValue('discountType', 'fixed');
+            setValue('discountValue', '0');
+            setValue('paidAmount', '0');
+            setValue('paymentMethod', 'Cash');
+            setValue('saleNotes', '');
+            setValue('customerSearch', '');
+            setValue('customerId', '');
+            setText('customerHint', '');
             closeCustomerDropdown();
             renderCart();
             recalculateTotals();
@@ -66,12 +91,12 @@
 
         function resetPOS() {
             clearCart();
-            document.getElementById('saleDate').value = todayDate();
+            setValue('saleDate', todayDate());
             showToast('POS reset');
         }
 
         function getFilteredMenu() {
-            const q = (document.getElementById('menuSearch').value || '').trim().toLowerCase();
+            const q = (byId('menuSearch')?.value || '').trim().toLowerCase();
             const scored = menuItems.map(item => {
                 const name = (item.name || '').toLowerCase();
                 const category = (item.category || '').toLowerCase();
@@ -93,8 +118,9 @@
         }
 
         function renderMenu() {
-            const host = document.getElementById('menuGrid');
-            const q = (document.getElementById('menuSearch').value || '').trim();
+            const host = byId('menuGrid');
+            const q = (byId('menuSearch')?.value || '').trim();
+            if (!host) return;
             if (!menuDataReady) {
                 host.innerHTML = '<div class="empty-state"><p>Loading menu...</p></div>';
                 return;
@@ -120,7 +146,7 @@
                     <div class="empty-state">
                         <p>No menu items found for "${esc(q)}".</p>
                         <div class="empty-actions">
-                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('menuSearch').value=''; renderMenu();">Clear Search</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="setValue('menuSearch',''); renderMenu();">Clear Search</button>
                             <a class="btn btn-primary btn-sm" href="products.html">Add in Menu</a>
                         </div>
                     </div>
@@ -175,7 +201,8 @@
         }
 
         function renderCart() {
-            const host = document.getElementById('cartList');
+            const host = byId('cartList');
+            if (!host) return;
             if (!cart.length) {
                 host.innerHTML = '<div class="empty-state"><p>Cart is empty. Tap any menu item to start.</p></div>';
                 return;
@@ -221,12 +248,12 @@
 
         function getCartTotals() {
             const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
-            const discountType = document.getElementById('discountType').value;
-            const discountValue = parseFloat(document.getElementById('discountValue').value) || 0;
+            const discountType = byId('discountType')?.value || 'fixed';
+            const discountValue = parseFloat(byId('discountValue')?.value) || 0;
             const discount = discountType === 'percent' ? subtotal * (discountValue / 100) : discountValue;
             const grand = Math.max(0, subtotal - Math.min(discount, subtotal));
-            let paid = parseFloat(document.getElementById('paidAmount').value) || 0;
-            if (document.getElementById('paymentMethod').value === 'Due') {
+            let paid = parseFloat(byId('paidAmount')?.value) || 0;
+            if ((byId('paymentMethod')?.value || 'Cash') === 'Due') {
                 paid = 0;
             }
             paid = Math.max(0, Math.min(paid, grand));
@@ -236,37 +263,33 @@
 
         function recalculateTotals() {
             const totals = getCartTotals();
-            const setText = (id, value) => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = value;
-            };
             setText('subtotalValue', fmtCurrency(totals.subtotal));
             setText('discountValueLabel', fmtCurrency(totals.discount));
             setText('grandValue', fmtCurrency(totals.grand));
             setText('dueValue', fmtCurrency(totals.due));
-            const paidAmount = document.getElementById('paidAmount');
-            if (paidAmount) paidAmount.value = totals.paid;
-            if (document.getElementById('customerId')?.value) {
+            setValue('paidAmount', totals.paid);
+            if (byId('customerId')?.value) {
                 updateCustomerHint();
             }
         }
 
         function syncPaymentMethod() {
-            if (document.getElementById('paymentMethod').value === 'Due') {
-                document.getElementById('paidAmount').value = '0';
+            if ((byId('paymentMethod')?.value || 'Cash') === 'Due') {
+                setValue('paidAmount', '0');
             }
             recalculateTotals();
         }
 
         function filterCustomers() {
-            const input = document.getElementById('customerSearch');
+            const input = byId('customerSearch');
+            const host = byId('customerDropdown');
+            if (!input || !host) return;
             const q = (input.value || '').trim().toLowerCase();
             selectedCustomerId = null;
             selectedCustomerName = '';
             selectedCustomerDisplay = '';
-            document.getElementById('customerId').value = '';
+            setValue('customerId', '');
             const matches = getCustomerSearchMatches(customers, q, 5);
-            const host = document.getElementById('customerDropdown');
             let html = matches.map(c => `
                 <div class="customer-item" data-customer-id="${esc(c.id)}" data-customer-name="${esc(c.name || '')}" data-customer-mobile="${esc(c.mobile || '')}">
                     <div class="customer-avatar">${esc((c.mobile || c.name || 'C').replace(/\D/g, '').slice(-1) || (c.name || 'C').charAt(0).toUpperCase())}</div>
@@ -292,7 +315,7 @@
             host.classList.add('show');
         }
 
-        document.getElementById('customerDropdown').addEventListener('click', function(e) {
+        byId('customerDropdown')?.addEventListener('click', function(e) {
             const row = e.target.closest('.customer-item');
             if (!row) return;
             const customerId = row.dataset.customerId;
@@ -312,33 +335,34 @@
             selectedCustomerId = id ? String(id) : null;
             selectedCustomerName = name || '';
             selectedCustomerDisplay = mobile || name || '';
-            document.getElementById('customerId').value = selectedCustomerId || '';
-            document.getElementById('customerSearch').value = selectedCustomerDisplay;
+            setValue('customerId', selectedCustomerId || '');
+            setValue('customerSearch', selectedCustomerDisplay);
             closeCustomerDropdown();
             updateCustomerHint();
         }
 
         function openQuickCustomer(prefill = '') {
             closeCustomerDropdown();
-            const raw = String(prefill || document.getElementById('customerSearch').value || '').trim();
-            document.getElementById('qc_name').value = /[A-Za-z\u0980-\u09FF]/.test(raw) ? raw : '';
-            document.getElementById('qc_mobile').value = normalizeCustomerMobile(raw) || raw;
-            document.getElementById('qc_opening').value = '0';
-            document.getElementById('qc_address').value = '';
-            document.getElementById('quickCustomerModal').classList.add('show');
+            const raw = String(prefill || byId('customerSearch')?.value || '').trim();
+            setValue('qc_name', /[A-Za-z\u0980-\u09FF]/.test(raw) ? raw : '');
+            setValue('qc_mobile', normalizeCustomerMobile(raw) || raw);
+            setValue('qc_opening', '0');
+            setValue('qc_address', '');
+            byId('quickCustomerModal')?.classList.add('show');
         }
 
         function closeQuickCustomerModal() {
-            document.getElementById('quickCustomerModal').classList.remove('show');
+            byId('quickCustomerModal')?.classList.remove('show');
         }
 
         function closeCustomerDropdown() {
-            document.getElementById('customerDropdown').classList.remove('show');
+            byId('customerDropdown')?.classList.remove('show');
         }
 
         function updateCustomerHint() {
-            const cid = selectedCustomerId || parseInt(document.getElementById('customerId').value, 10);
-            const hint = document.getElementById('customerHint');
+            const cid = selectedCustomerId || parseInt(byId('customerId')?.value, 10);
+            const hint = byId('customerHint');
+            if (!hint) return;
             if (!cid) {
                 hint.textContent = '';
                 return;
@@ -347,13 +371,13 @@
             hint.textContent = summary.currentDue > 0 ? `Existing due: ${fmtCurrency(summary.currentDue)}` : 'Customer balance clear';
         }
 
-        document.getElementById('quickCustomerForm').addEventListener('submit', async function(e) {
+        byId('quickCustomerForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
             const data = {
-                name: document.getElementById('qc_name').value.trim(),
-                mobile: document.getElementById('qc_mobile').value.trim(),
-                opening_balance: parseFloat(document.getElementById('qc_opening').value) || 0,
-                address: document.getElementById('qc_address').value.trim(),
+                name: byId('qc_name')?.value.trim() || '',
+                mobile: byId('qc_mobile')?.value.trim() || '',
+                opening_balance: parseFloat(byId('qc_opening')?.value) || 0,
+                address: byId('qc_address')?.value.trim() || '',
                 notes: '',
                 createdAt: new Date().toISOString()
             };
@@ -501,7 +525,7 @@
         }
 
         function closeReceiptModal() {
-            document.getElementById('receiptModal').classList.remove('show');
+            byId('receiptModal')?.classList.remove('show');
         }
 
         async function printLastReceipt() {
@@ -532,8 +556,8 @@
                 total: item.total
             }));
             const totals = getCartTotals();
-            const customerSearchValue = document.getElementById('customerSearch').value.trim();
-            let customerId = selectedCustomerId || parseInt(document.getElementById('customerId').value, 10) || null;
+            const customerSearchValue = byId('customerSearch')?.value.trim() || '';
+            let customerId = selectedCustomerId || parseInt(byId('customerId')?.value, 10) || null;
             let matchedCustomer = customerId ? customers.find(c => c.id == customerId) : null;
             if (!customerId && customerSearchValue) {
                 const normalizedDigits = normalizeCustomerMobile(customerSearchValue).replace(/\D/g, '');
@@ -545,23 +569,23 @@
                 }) || null;
                 if (matchedCustomer) customerId = matchedCustomer.id;
             }
-            const paymentMethod = document.getElementById('paymentMethod').value;
+            const paymentMethod = byId('paymentMethod')?.value || 'Cash';
             const paidAmount = paymentMethod === 'Due' ? 0 : totals.paid;
             const saleData = {
-                invoice_no: document.getElementById('invoiceNo').value,
+                invoice_no: byId('invoiceNo')?.value || '',
                 customer_id: customerId,
                 customer_name: selectedCustomerName || matchedCustomer?.name || customerSearchValue || '',
-                sale_date: document.getElementById('saleDate').value || todayDate(),
+                sale_date: byId('saleDate')?.value || todayDate(),
                 due_date: null,
                 payment_method: paymentMethod,
                 items: JSON.stringify(validItems),
                 subtotal: totals.subtotal,
                 discount: totals.discount,
-                discount_type: document.getElementById('discountType').value,
+                discount_type: byId('discountType')?.value || 'fixed',
                 total_amount: totals.grand,
                 paid_amount: paidAmount,
                 due_amount: Math.max(0, totals.grand - paidAmount),
-                notes: document.getElementById('saleNotes').value.trim(),
+                notes: byId('saleNotes')?.value.trim() || '',
                 createdAt: new Date().toISOString()
             };
 
@@ -569,11 +593,16 @@
                 const result = await FrameworkDB.save('sales', saleData);
                 lastSavedSale = { ...saleData, id: result?.id || result, items: validItems };
                 showToast('Sale saved!');
-                await printHTMLContent(buildThermalReceiptHTML(lastSavedSale), {
-                    title: 'POS Receipt',
-                    mode: 'thermal',
-                    paperWidthMm: 58
-                });
+                try {
+                    await printHTMLContent(buildThermalReceiptHTML(lastSavedSale), {
+                        title: 'POS Receipt',
+                        mode: 'thermal',
+                        paperWidthMm: 58
+                    });
+                } catch (printErr) {
+                    console.warn('Receipt print skipped:', printErr);
+                    showToast('Saved, but print bridge is not available', 'warning');
+                }
                 cart = [];
                 await loadData();
                 clearCart();
@@ -589,11 +618,11 @@
             }
         });
 
-        document.getElementById('receiptModal').addEventListener('click', function(e) {
+        byId('receiptModal')?.addEventListener('click', function(e) {
             if (e.target === this) closeReceiptModal();
         });
 
-        document.getElementById('quickCustomerModal').addEventListener('click', function(e) {
+        byId('quickCustomerModal')?.addEventListener('click', function(e) {
             if (e.target === this) closeQuickCustomerModal();
         });
 
