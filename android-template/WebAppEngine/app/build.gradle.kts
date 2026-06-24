@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "rizq.restaurent.app"
+        applicationId = "app.rizq.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
