@@ -243,7 +243,15 @@
         }
 
         function closeReceiptModal() { document.getElementById('receiptModal').classList.remove('show'); }
-        function printReceipt() { if (!currentReceipt) return; printHTMLContent(buildReceiptHTML(currentReceipt)); }
+        async function printReceipt() { 
+            if (!currentReceipt) return; 
+            try {
+                await printHTMLContent(buildReceiptHTML(currentReceipt), { mode: 'thermal', paperWidthMm: 58, requireNative: true });
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || 'Native printer bridge is not available', 'error');
+            }
+        }
         async function exportReceipt(format) { if (!currentReceipt) return; const tempDiv = document.createElement('div');
             tempDiv.innerHTML = buildReceiptHTML(currentReceipt);
             tempDiv.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;'; document.body.appendChild(tempDiv); try { const canvas = await html2canvas(tempDiv, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }); document.body.removeChild(tempDiv); if (format === 'jpg') { const link = document.createElement('a');
