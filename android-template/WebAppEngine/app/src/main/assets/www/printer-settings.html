@@ -66,10 +66,45 @@
                             <div class="form-group full">
                                 <label>Printer Status</label>
                                 <div class="status-box">
-                                    <div class="status-label">Detected Bridge</div>
+                                    <div class="status-label">Bridge / Profile Status</div>
                                     <div class="status-value" id="bridgeStatus">Checking...</div>
                                     <div class="muted" id="bridgeDetail"></div>
                                 </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Printer Type</label>
+                                <select id="printerType">
+                                    <option value="SUNMI">SUNMI</option>
+                                    <option value="ESC/POS">ESC/POS Generic</option>
+                                    <option value="Bluetooth">Bluetooth Printer</option>
+                                    <option value="USB">USB Printer</option>
+                                    <option value="Wi-Fi">Wi-Fi Printer</option>
+                                    <option value="Network">Network Printer</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Connection Mode</label>
+                                <select id="connectionMode">
+                                    <option value="native">Android Wrapper Native</option>
+                                    <option value="bluetooth">Bluetooth</option>
+                                    <option value="usb">USB</option>
+                                    <option value="wifi">Wi-Fi</option>
+                                    <option value="network">Network / IP</option>
+                                    <option value="auto">Auto</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Printer Name</label>
+                                <input type="text" id="printerName" placeholder="e.g. SUNMI V2S / Front Counter Printer">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Printer Address / ID</label>
+                                <input type="text" id="printerAddress" placeholder="Bluetooth MAC, IP address, USB path, etc.">
                             </div>
 
                             <div class="form-group">
@@ -147,6 +182,8 @@
                         <div class="actions">
                             <button type="submit" class="btn btn-primary">Save Printer Settings</button>
                             <button type="button" class="btn btn-soft" id="testPrintBtn">Test Print</button>
+                            <button type="button" class="btn btn-outline" id="connectBtn">Connect Printer</button>
+                            <button type="button" class="btn btn-outline" id="defaultBtn">Set as Default</button>
                             <button type="button" class="btn btn-outline" id="resetBtn">Reset</button>
                         </div>
                     </form>
@@ -178,6 +215,11 @@
                         <div class="method"><strong>Supported Bridge Objects:</strong> NativePrintBridge, AndroidPrintBridge, NativePrintAPI, sunmiPrinter, SUNMIPrinter, NijerAppPrinter, AndroidPrinter, NativeBridge, Android, android, printer</div>
                         <div class="method"><strong>Supported Methods:</strong> printThermalReceipt, printReceiptHtml, printThermalHtml, printHtml, printHTML, printReceipt, printThermal, printTicket, printText, print</div>
                     </div>
+
+                    <div class="status-box" style="margin-top:14px;">
+                        <div class="status-label">Saved Printers</div>
+                        <div id="savedPrinters" class="methods" style="margin-top:10px;"></div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -192,13 +234,43 @@
                 autoCut: true,
                 bridgeName: 'auto',
                 methodName: 'auto',
+                printerType: 'SUNMI',
+                connectionMode: 'native',
+                printerName: '',
+                printerAddress: '',
+                activeProfileId: '',
             })),
             savePrinterSettings: window.savePrinterSettings || ((data) => data),
+            getPrinterProfiles: window.getPrinterProfiles || (() => []),
+            savePrinterProfiles: window.savePrinterProfiles || ((list) => list),
+            upsertPrinterProfile: window.upsertPrinterProfile || ((data) => data),
+            deletePrinterProfile: window.deletePrinterProfile || (() => []),
+            setDefaultPrinterProfile: window.setDefaultPrinterProfile || ((id) => id),
+            getActivePrinterProfile: window.getActivePrinterProfile || (() => null),
             printHTMLContent: window.printHTMLContent || (async () => { throw new Error('printHTMLContent helper is not loaded'); }),
             getNativePrintBridge: window.getNativePrintBridge || (() => null),
             showToast: window.showToast || ((msg) => { alert(msg); }),
             settings: window.SHOP_SETTINGS || { name: 'Rizq Restaurant' },
         };
+
+        function escapeHtml(text) {
+            return String(text || '').replace(/[&<>"']/g, s => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
+        }
+
+        function getFormState() {
+            return {
+                printerType: document.getElementById('printerType').value,
+                connectionMode: document.getElementById('connectionMode').value,
+                printerName: document.getElementById('printerName').value.trim(),
+                printerAddress: document.getElementById('printerAddress').value.trim(),
+                bridgeName: document.getElementById('bridgeName').value,
+                methodName: document.getElementById('methodName').value,
+                paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
+                autoCut: document.getElementById('autoCut').value === 'true',
+                requireNative: document.getElementById('requireNative').checked,
+                enabled: document.getElementById('enabled').checked,
+            };
+        }
 
         function loadForm() {
             const settings = printerShared.getPrinterSettings();
@@ -208,24 +280,27 @@
             document.getElementById('autoCut').value = settings.autoCut === false ? 'false' : 'true';
             document.getElementById('requireNative').checked = settings.requireNative !== false;
             document.getElementById('enabled').checked = settings.enabled !== false;
-            const bridge = printerShared.getNativePrintBridge();
-            const bridgeName = settings.bridgeName && settings.bridgeName !== 'auto' ? settings.bridgeName : 'auto detect';
-            const methodName = settings.methodName && settings.methodName !== 'auto' ? settings.methodName : 'auto detect';
-            document.getElementById('bridgeStatus').textContent = bridge ? `Bridge detected (${bridgeName})` : 'No bridge detected';
-            document.getElementById('bridgeDetail').textContent = bridge
-                ? `Native printing can be used from the wrapper. Method: ${methodName}.`
-                : 'Open this app inside your Android wrapper to enable thermal printing.';
-        }
-
-        function readForm() {
-            return {
-                bridgeName: document.getElementById('bridgeName').value,
-                methodName: document.getElementById('methodName').value,
-                paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
-                autoCut: document.getElementById('autoCut').value === 'true',
-                requireNative: document.getElementById('requireNative').checked,
-                enabled: document.getElementById('enabled').checked,
-            };
+            document.getElementById('printerType').value = settings.printerType || 'SUNMI';
+            document.getElementById('connectionMode').value = settings.connectionMode || 'native';
+            document.getElementById('printerName').value = settings.printerName || '';
+            document.getElementById('printerAddress').value = settings.printerAddress || '';
+            const activeProfile = printerShared.getActivePrinterProfile() || null;
+            const bridge = printerShared.getNativePrintBridge(settings.bridgeName);
+            const statusParts = [];
+            if (settings.enabled === false) statusParts.push('Disabled');
+            if (activeProfile) {
+                statusParts.push(`Selected: ${activeProfile.printerName || activeProfile.printerType || activeProfile.connectionMode || 'Printer'}`);
+            } else {
+                statusParts.push('No saved printer selected');
+            }
+            if (bridge) statusParts.push('Native bridge detected');
+            document.getElementById('bridgeStatus').textContent = statusParts.join(' · ');
+            document.getElementById('bridgeDetail').textContent = activeProfile
+                ? `Type: ${activeProfile.printerType || 'Unknown'} | Mode: ${activeProfile.connectionMode || 'native'} | Bridge: ${settings.bridgeName || 'auto'}`
+                : (bridge
+                    ? 'Native bridge is available. Save a printer profile below.'
+                    : 'Open this app inside your Android wrapper to enable thermal printing and save a printer profile.');
+            renderSavedPrinters();
         }
 
         function testPrintHtml() {
@@ -249,7 +324,9 @@
                         <div class="title">${printerShared.settings.name}</div>
                         <div class="line"></div>
                         <div class="row"><span>Printer test</span><span>${new Date().toLocaleString()}</span></div>
-                        <div class="row"><span>Bridge</span><span>${printerShared.getNativePrintBridge() ? 'OK' : 'Missing'}</span></div>
+                        <div class="row"><span>Bridge</span><span>${printerShared.getNativePrintBridge(document.getElementById('bridgeName').value) ? 'OK' : 'Missing'}</span></div>
+                        <div class="row"><span>Type</span><span>${escapeHtml(document.getElementById('printerType').value)}</span></div>
+                        <div class="row"><span>Mode</span><span>${escapeHtml(document.getElementById('connectionMode').value)}</span></div>
                         <div class="row"><span>Paper</span><span>${document.getElementById('paperWidthMm').value}mm</span></div>
                         <div class="line"></div>
                         <div style="text-align:center;font-size:8px;">SUNMI V2S test receipt</div>
@@ -259,28 +336,189 @@
             `;
         }
 
+        function buildProfilePayload() {
+            const form = getFormState();
+            return {
+                ...form,
+                enabled: true,
+                requireNative: form.requireNative,
+                isDefault: false,
+                id: printerShared.getPrinterSettings().activeProfileId || '',
+            };
+        }
+
+        function renderSavedPrinters() {
+            const host = document.getElementById('savedPrinters');
+            if (!host) return;
+            const profiles = printerShared.getPrinterProfiles();
+            if (!profiles.length) {
+                host.innerHTML = '<div class="method">No saved printer profiles yet. Save one to use connect / default actions.</div>';
+                return;
+            }
+            host.innerHTML = profiles.map(profile => `
+                <div class="method" style="display:grid;gap:8px;">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+                        <div>
+                            <strong>${escapeHtml(profile.printerName || 'Unnamed Printer')}</strong>
+                            ${profile.isDefault ? '<span class="badge" style="margin-left:8px;">Default</span>' : ''}
+                            <div class="muted" style="margin-top:4px;">${escapeHtml(profile.printerType || 'Unknown')} · ${escapeHtml(profile.connectionMode || 'native')}</div>
+                            <div class="muted" style="margin-top:2px;">${escapeHtml(profile.printerAddress || 'No address')}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                        <button type="button" class="btn btn-soft" onclick="loadSavedPrinter('${escapeHtml(profile.id)}')">Load</button>
+                        <button type="button" class="btn btn-outline" onclick="connectSavedPrinter('${escapeHtml(profile.id)}')">Connect</button>
+                        <button type="button" class="btn btn-outline" onclick="setDefaultSavedPrinter('${escapeHtml(profile.id)}')">Set Default</button>
+                        <button type="button" class="btn btn-outline" onclick="deleteSavedPrinter('${escapeHtml(profile.id)}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadSavedPrinter(id) {
+            const profile = printerShared.getPrinterProfiles().find(p => p.id === id);
+            if (!profile) return;
+            document.getElementById('printerType').value = profile.printerType || 'SUNMI';
+            document.getElementById('connectionMode').value = profile.connectionMode || 'native';
+            document.getElementById('printerName').value = profile.printerName || '';
+            document.getElementById('printerAddress').value = profile.printerAddress || '';
+            document.getElementById('bridgeName').value = profile.bridgeName || 'auto';
+            document.getElementById('methodName').value = profile.methodName || 'auto';
+            document.getElementById('paperWidthMm').value = String(profile.paperWidthMm || 58);
+            document.getElementById('autoCut').value = profile.autoCut === false ? 'false' : 'true';
+            document.getElementById('requireNative').checked = profile.requireNative !== false;
+            document.getElementById('enabled').checked = profile.enabled !== false;
+            printerShared.showToast('Printer loaded');
+        }
+
+        async function connectSavedPrinter(id) {
+            const profile = printerShared.getPrinterProfiles().find(p => p.id === id);
+            if (!profile) return;
+            printerShared.savePrinterSettings({ ...printerShared.getPrinterSettings(), ...profile, activeProfileId: profile.id });
+            try {
+                const bridge = printerShared.getNativePrintBridge(profile.bridgeName);
+                if (!bridge) throw new Error('Native bridge not detected in WebView');
+                const connectPayload = {
+                    ...profile,
+                    status: 'connect',
+                    action: 'connect',
+                };
+                const connectMethods = ['connectPrinter', 'connectDevice', 'selectPrinter', 'setPrinter', 'pairPrinter'];
+                let done = false;
+                for (const method of connectMethods) {
+                    if (bridge && typeof bridge[method] === 'function') {
+                        const result = await Promise.resolve(bridge[method](connectPayload));
+                        if (result && typeof result === 'object' && result.success === false) {
+                            throw new Error(result.error || `${method} failed`);
+                        }
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done) {
+                    printerShared.showToast('Profile selected. Wrapper will use it on print.', 'warning');
+                } else {
+                    printerShared.showToast('Printer connected');
+                }
+            } catch (err) {
+                console.error(err);
+                printerShared.showToast('Connect failed: ' + err.message, 'error');
+            }
+            loadForm();
+        }
+
+        function setDefaultSavedPrinter(id) {
+            printerShared.setDefaultPrinterProfile(id);
+            printerShared.savePrinterSettings({ ...printerShared.getPrinterSettings(), activeProfileId: id });
+            printerShared.showToast('Default printer saved');
+            loadForm();
+        }
+
+        function deleteSavedPrinter(id) {
+            printerShared.deletePrinterProfile(id);
+            const current = printerShared.getPrinterSettings();
+            if (current.activeProfileId === id) {
+                printerShared.savePrinterSettings({ ...current, activeProfileId: '' });
+            }
+            printerShared.showToast('Printer removed');
+            loadForm();
+        }
+
         document.getElementById('printerForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            printerShared.savePrinterSettings(readForm());
-            printerShared.showToast('Printer settings saved');
+            const form = getFormState();
+            const profile = printerShared.upsertPrinterProfile({
+                ...form,
+                isDefault: document.getElementById('enabled').checked,
+            });
+            printerShared.savePrinterSettings({
+                ...printerShared.getPrinterSettings(),
+                ...form,
+                activeProfileId: profile.id,
+            });
+            printerShared.showToast('Printer profile saved');
             loadForm();
         });
 
         document.getElementById('testPrintBtn').addEventListener('click', async function() {
             try {
-                printerShared.savePrinterSettings(readForm());
+                const form = getFormState();
+                const profile = printerShared.upsertPrinterProfile({
+                    ...form,
+                    isDefault: false,
+                });
+                printerShared.savePrinterSettings({
+                    ...printerShared.getPrinterSettings(),
+                    ...form,
+                    activeProfileId: profile.id,
+                });
                 await printerShared.printHTMLContent(testPrintHtml(), {
                     title: 'Printer Test',
                     mode: 'thermal',
                     paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
                     autoCut: document.getElementById('autoCut').value === 'true',
                     requireNative: true,
+                    bridgeName: document.getElementById('bridgeName').value,
+                    printerType: document.getElementById('printerType').value,
+                    connectionMode: document.getElementById('connectionMode').value,
+                    printerName: document.getElementById('printerName').value.trim(),
+                    printerAddress: document.getElementById('printerAddress').value.trim(),
                 });
                 printerShared.showToast('Test print sent');
             } catch (err) {
                 console.error(err);
                 printerShared.showToast('Test print failed: ' + err.message, 'error');
             }
+        });
+
+        document.getElementById('connectBtn').addEventListener('click', async function() {
+            const form = getFormState();
+            const profile = printerShared.upsertPrinterProfile({
+                ...form,
+                isDefault: false,
+            });
+            printerShared.savePrinterSettings({
+                ...printerShared.getPrinterSettings(),
+                ...form,
+                activeProfileId: profile.id,
+            });
+            await connectSavedPrinter(profile.id);
+        });
+
+        document.getElementById('defaultBtn').addEventListener('click', function() {
+            const form = getFormState();
+            const profile = printerShared.upsertPrinterProfile({
+                ...form,
+                isDefault: true,
+            });
+            printerShared.setDefaultPrinterProfile(profile.id);
+            printerShared.savePrinterSettings({
+                ...printerShared.getPrinterSettings(),
+                ...form,
+                activeProfileId: profile.id,
+            });
+            printerShared.showToast('Set as default printer');
+            loadForm();
         });
 
         document.getElementById('resetBtn').addEventListener('click', function() {
@@ -291,13 +529,19 @@
                 autoCut: true,
                 bridgeName: 'auto',
                 methodName: 'auto',
+                printerType: 'SUNMI',
+                connectionMode: 'native',
+                printerName: '',
+                printerAddress: '',
+                activeProfileId: '',
             });
+            printerShared.savePrinterProfiles([]);
             loadForm();
             printerShared.showToast('Printer settings reset');
         });
 
         loadForm();
-        setInterval(loadForm, 5000);
+        setInterval(loadForm, 8000);
     </script>
 </body>
 </html>
