@@ -82,6 +82,7 @@ extends AppCompatActivity {
     private BluetoothSocket bluetoothSocket;
     private OutputStream bluetoothOutputStream;
     private BluetoothDevice connectedBluetoothDevice;
+    private BroadcastReceiver bluetoothDiscoveryReceiver;
     private final ArrayList<JSONObject> discoveredPrinters =
         new ArrayList<>();
     private final Handler mainHandler =
