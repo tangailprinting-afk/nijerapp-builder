@@ -284,6 +284,9 @@ if(downloadData.success){
       <p>
         In the installed Android app, `window.print()` can be routed to the native printer bridge.
       </p>
+      <p>
+        Deployment sync marker: latest production build should come from the current `main` branch.
+      </p>
 {
 
 downloadUrl && (
