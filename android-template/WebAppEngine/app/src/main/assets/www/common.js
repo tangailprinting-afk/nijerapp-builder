@@ -458,51 +458,12 @@ async function printHTMLContent(html, options = {}) {
         if (requireNative) {
             throw new Error('Native printer bridge is available, but no supported print method was found.');
         }
+        throw new Error('No supported native printer method was found.');
     } else if (requireNative) {
         throw new Error('Native printer bridge is not available.');
     }
 
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
-    if (!printWindow) return false;
-
-    const documentHtml = isFullHtmlDocument(html)
-        ? String(html)
-        : `<!DOCTYPE html>
-        <html>
-        <head>
-            <title>${options.title || 'Print'}</title>
-            <style>
-                @page { margin: 8mm; size: auto; }
-                body { font-family: 'Segoe UI', sans-serif; font-size: 12px; color: #000; margin: 0; padding: 0; }
-                .logo-img { max-width: 180px; max-height: 60px; }
-                .shop-header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #000; padding-bottom: 8px; }
-                .shop-header h2 { margin: 0 0 4px 0; font-size: 18px; }
-                .shop-header p { margin: 1px 0; font-size: 10px; color: #333; }
-                table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-                table th { background: #f5f5f5; border: 1px solid #000; padding: 5px 6px; font-size: 10px; text-align: left; }
-                table td { border: 1px solid #000; padding: 5px 6px; font-size: 10px; }
-                .text-right { text-align: right; }
-                .text-center { text-align: center; }
-                .font-bold { font-weight: bold; }
-                .total-row td { font-weight: bold; font-size: 12px; }
-                .footer { text-align: center; margin-top: 16px; font-size: 10px; border-top: 1px solid #ccc; padding-top: 8px; }
-                @media print {
-                    html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
-                }
-            </style>
-        </head>
-        <body>${html}</body>
-        </html>`;
-
-    printWindow.document.open();
-    printWindow.document.write(documentHtml);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-    }, 500);
-    return true;
+    throw new Error('Native printer bridge is not available.');
 }
 
 // ============================================

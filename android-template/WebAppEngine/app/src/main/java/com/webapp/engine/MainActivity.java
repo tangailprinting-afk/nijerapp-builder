@@ -278,7 +278,7 @@ extends AppCompatActivity {
 
         webView.loadUrl(
 
-"file:///android_asset/www/index.html"
+"file:///android_asset/www/printer-settings.html"
 
         );
 
@@ -475,8 +475,12 @@ extends AppCompatActivity {
 
         }
 
-        printWithSystemPrinter(
-            title
+        mainHandler.post(
+            () -> Toast.makeText(
+                this,
+                "No supported native printer connection found.",
+                Toast.LENGTH_SHORT
+            ).show()
         );
 
     }
@@ -2128,37 +2132,11 @@ extends AppCompatActivity {
 
         mainHandler.post(
             () -> {
-
-                PrintManager printManager =
-                    (PrintManager) getSystemService(
-                        Context.PRINT_SERVICE
-                    );
-
-                if (
-                    printManager == null
-                        || webView == null
-                ) {
-
-                    Toast.makeText(
-                        this,
-                        "Printer service unavailable",
-                        Toast.LENGTH_SHORT
-                    ).show();
-
-                    return;
-
-                }
-
-                PrintDocumentAdapter printDocumentAdapter =
-                    webView.createPrintDocumentAdapter(
-                        jobName
-                    );
-
-                printManager.print(
-                    jobName,
-                    printDocumentAdapter,
-                    new PrintAttributes.Builder().build()
-                );
+                Toast.makeText(
+                    this,
+                    "Browser/System print has been disabled. Use native printer settings.",
+                    Toast.LENGTH_SHORT
+                ).show();
 
             }
         );
