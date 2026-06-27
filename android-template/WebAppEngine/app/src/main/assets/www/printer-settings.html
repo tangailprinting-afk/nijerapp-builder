@@ -73,33 +73,35 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Printer Type</label>
+                                <label>Printer Model</label>
                                 <select id="printerType">
-                                    <option value="SUNMI">SUNMI</option>
-                                    <option value="ESC/POS">ESC/POS Generic</option>
-                                    <option value="Bluetooth">Bluetooth Printer</option>
-                                    <option value="USB">USB Printer</option>
-                                    <option value="Wi-Fi">Wi-Fi Printer</option>
-                                    <option value="Network">Network Printer</option>
-                                    <option value="Other">Other</option>
+                                    <option value="AUTO">Auto / Generic ESC-POS</option>
+                                    <option value="SUNMI">SUNMI Built-in</option>
+                                    <option value="EPSON">Epson TM Series</option>
+                                    <option value="XPRINTER">XPrinter</option>
+                                    <option value="BIXOLON">Bixolon</option>
+                                    <option value="STAR">Star Micronics</option>
+                                    <option value="RONGTA">Rongta</option>
+                                    <option value="GPRINTER">GPrinter</option>
+                                    <option value="CUSTOM">Custom / Other</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label>Connection Mode</label>
                                 <select id="connectionMode">
+                                    <option value="auto">Auto</option>
                                     <option value="native">Android Wrapper Native</option>
                                     <option value="bluetooth">Bluetooth</option>
                                     <option value="usb">USB</option>
                                     <option value="wifi">Wi-Fi</option>
                                     <option value="network">Network / IP</option>
-                                    <option value="auto">Auto</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label>Printer Name</label>
-                                <input type="text" id="printerName" placeholder="e.g. SUNMI V2S / Front Counter Printer">
+                                <input type="text" id="printerName" placeholder="e.g. Front Counter Printer">
                             </div>
 
                             <div class="form-group">
@@ -143,10 +145,11 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Paper Width</label>
+                                <label>Paper Size</label>
                                 <select id="paperWidthMm">
                                     <option value="58">58 mm</option>
                                     <option value="80">80 mm</option>
+                                    <option value="104">104 mm</option>
                                 </select>
                             </div>
 
@@ -205,7 +208,7 @@
                     <div class="status-box">
                         <div class="status-label">2. Thermal Print</div>
                         <div class="status-value" style="font-size:16px;">Send receipt HTML to printer</div>
-                        <div class="muted">SUNMI V2S should receive the receipt via the native bridge method.</div>
+                        <div class="muted">The selected printer should receive the receipt through the native bridge or the chosen connection mode.</div>
                     </div>
                     <div class="status-box">
                         <div class="status-label">3. No Browser PDF</div>
@@ -235,8 +238,8 @@
                 autoCut: true,
                 bridgeName: 'auto',
                 methodName: 'auto',
-                printerType: 'SUNMI',
-                connectionMode: 'native',
+                printerType: 'AUTO',
+                connectionMode: 'auto',
                 printerName: '',
                 printerAddress: '',
                 activeProfileId: '',
@@ -281,8 +284,8 @@
             document.getElementById('autoCut').value = settings.autoCut === false ? 'false' : 'true';
             document.getElementById('requireNative').checked = settings.requireNative !== false;
             document.getElementById('enabled').checked = settings.enabled !== false;
-            document.getElementById('printerType').value = settings.printerType || 'SUNMI';
-            document.getElementById('connectionMode').value = settings.connectionMode || 'native';
+            document.getElementById('printerType').value = settings.printerType || 'AUTO';
+            document.getElementById('connectionMode').value = settings.connectionMode || 'auto';
             document.getElementById('printerName').value = settings.printerName || '';
             document.getElementById('printerAddress').value = settings.printerAddress || '';
             const activeProfile = printerShared.getActivePrinterProfile() || null;
@@ -297,7 +300,7 @@
             if (bridge) statusParts.push('Native bridge detected');
             document.getElementById('bridgeStatus').textContent = statusParts.join(' · ');
             document.getElementById('bridgeDetail').textContent = activeProfile
-                ? `Type: ${activeProfile.printerType || 'Unknown'} | Mode: ${activeProfile.connectionMode || 'native'} | Bridge: ${settings.bridgeName || 'auto'}`
+                ? `Model: ${activeProfile.printerType || 'Unknown'} | Mode: ${activeProfile.connectionMode || 'auto'} | Bridge: ${settings.bridgeName || 'auto'}`
                 : (bridge
                     ? 'Native bridge is available. Save a printer profile below.'
                     : 'Open this app inside your Android wrapper to enable thermal printing and save a printer profile.');
@@ -331,7 +334,7 @@
                         <div class="row"><span>Mode</span><span>${escapeHtml(document.getElementById('connectionMode').value)}</span></div>
                         <div class="row"><span>Paper</span><span>${document.getElementById('paperWidthMm').value}mm</span></div>
                         <div class="line"></div>
-                        <div style="text-align:center;font-size:8px;">SUNMI V2S test receipt</div>
+                        <div style="text-align:center;font-size:8px;">Printer test receipt</div>
                     </div>
                 </body>
                 </html>
@@ -363,7 +366,7 @@
                         <div>
                             <strong>${escapeHtml(profile.printerName || 'Unnamed Printer')}</strong>
                             ${profile.isDefault ? '<span class="badge" style="margin-left:8px;">Default</span>' : ''}
-                            <div class="muted" style="margin-top:4px;">${escapeHtml(profile.printerType || 'Unknown')} · ${escapeHtml(profile.connectionMode || 'native')}</div>
+                            <div class="muted" style="margin-top:4px;">${escapeHtml(profile.printerType || 'Unknown')} · ${escapeHtml(profile.connectionMode || 'auto')}</div>
                             <div class="muted" style="margin-top:2px;">${escapeHtml(profile.printerAddress || 'No address')}</div>
                         </div>
                     </div>
@@ -545,8 +548,8 @@
         function loadSavedPrinter(id) {
             const profile = printerShared.getPrinterProfiles().find(p => p.id === id);
             if (!profile) return;
-            document.getElementById('printerType').value = profile.printerType || 'SUNMI';
-            document.getElementById('connectionMode').value = profile.connectionMode || 'native';
+            document.getElementById('printerType').value = profile.printerType || 'AUTO';
+            document.getElementById('connectionMode').value = profile.connectionMode || 'auto';
             document.getElementById('printerName').value = profile.printerName || '';
             document.getElementById('printerAddress').value = profile.printerAddress || '';
             document.getElementById('bridgeName').value = profile.bridgeName || 'auto';
@@ -707,8 +710,8 @@
                 autoCut: true,
                 bridgeName: 'auto',
                 methodName: 'auto',
-                printerType: 'SUNMI',
-                connectionMode: 'native',
+                printerType: 'AUTO',
+                connectionMode: 'auto',
                 printerName: '',
                 printerAddress: '',
                 activeProfileId: '',
