@@ -6,14 +6,17 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
@@ -34,6 +37,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -83,6 +89,9 @@ extends AppCompatActivity {
     private OutputStream bluetoothOutputStream;
     private BluetoothDevice connectedBluetoothDevice;
     private BroadcastReceiver bluetoothDiscoveryReceiver;
+    private Object sunmiPrinterService;
+    private ServiceConnection sunmiServiceConnection;
+    private boolean sunmiServiceBound;
     private final ArrayList<JSONObject> discoveredPrinters =
         new ArrayList<>();
     private final Handler mainHandler =
@@ -104,6 +113,7 @@ extends AppCompatActivity {
             );
         bluetoothAdapter =
             BluetoothAdapter.getDefaultAdapter();
+        ensureSunmiPrinterService();
         registerBluetoothDiscoveryReceiver();
         requestRuntimePermissions();
 
@@ -279,6 +289,7 @@ extends AppCompatActivity {
 
         unregisterBluetoothDiscoveryReceiver();
         closeBluetoothConnection();
+        unbindSunmiPrinterService();
         super.onDestroy();
 
     }
@@ -334,6 +345,10 @@ extends AppCompatActivity {
         String html = "";
         String text = "";
         String url = "";
+        String printerType = "";
+        String connectionMode = "";
+        String printerName = "";
+        String printerAddress = "";
 
         try {
 
@@ -363,10 +378,37 @@ extends AppCompatActivity {
                     "url",
                     url
                 );
+            printerType =
+                payload.optString(
+                    "printerType",
+                    printerType
+                );
+            connectionMode =
+                payload.optString(
+                    "connectionMode",
+                    connectionMode
+                );
+            printerName =
+                payload.optString(
+                    "printerName",
+                    printerName
+                );
+            printerAddress =
+                payload.optString(
+                    "printerAddress",
+                    printerAddress
+                );
 
         } catch (JSONException ignored) {
 
         }
+
+        savePrinterRoutingPreferences(
+            printerType,
+            connectionMode,
+            printerName,
+            printerAddress
+        );
 
         String printableText =
             buildPrintableText(
@@ -376,10 +418,23 @@ extends AppCompatActivity {
                 url
             );
 
+        boolean preferSunmi =
+            shouldPreferSunmi(
+                printerType,
+                connectionMode
+            );
+        boolean preferBluetooth =
+            shouldPreferBluetooth(
+                printerType,
+                connectionMode
+            );
+
         if (
-            tryBluetoothPrint(
-                printableText
-            )
+            preferSunmi
+                && trySunmiPrint(
+                    title,
+                    printableText
+                )
         ) {
 
             return;
@@ -387,10 +442,33 @@ extends AppCompatActivity {
         }
 
         if (
-            trySunmiPrint(
-                title,
-                printableText
-            )
+            preferBluetooth
+                && tryBluetoothPrint(
+                    printableText
+                )
+        ) {
+
+            return;
+
+        }
+
+        if (
+            !preferSunmi
+                && trySunmiPrint(
+                    title,
+                    printableText
+                )
+        ) {
+
+            return;
+
+        }
+
+        if (
+            !preferBluetooth
+                && tryBluetoothPrint(
+                    printableText
+                )
         ) {
 
             return;
@@ -400,6 +478,443 @@ extends AppCompatActivity {
         printWithSystemPrinter(
             title
         );
+
+    }
+
+    private void savePrinterRoutingPreferences(
+        String printerType,
+        String connectionMode,
+        String printerName,
+        String printerAddress
+    ) {
+
+        SharedPreferences.Editor editor =
+            printerPreferences.edit();
+
+        if (!TextUtils.isEmpty(printerType)) {
+
+            editor.putString(
+                "selected_printer_type",
+                printerType
+            );
+
+        }
+
+        if (!TextUtils.isEmpty(connectionMode)) {
+
+            editor.putString(
+                "selected_connection_mode",
+                connectionMode
+            );
+
+        }
+
+        editor.putString(
+            PREF_PRINTER_MODE,
+            normalizePrinterMode(
+                connectionMode,
+                printerType
+            )
+        );
+
+        if (!TextUtils.isEmpty(printerName)) {
+
+            editor.putString(
+                PREF_BT_NAME,
+                printerName
+            );
+
+        }
+
+        if (!TextUtils.isEmpty(printerAddress)) {
+
+            editor.putString(
+                PREF_BT_ADDRESS,
+                printerAddress
+            );
+
+        }
+
+        editor.apply();
+
+    }
+
+    private String normalizePrinterMode(
+        String connectionMode,
+        String printerType
+    ) {
+
+        String mode =
+            TextUtils.isEmpty(connectionMode)
+                ? ""
+                : connectionMode.trim().toLowerCase();
+        String type =
+            TextUtils.isEmpty(printerType)
+                ? ""
+                : printerType.trim().toLowerCase();
+
+        if (
+            "bluetooth".equals(mode)
+                || "bluetooth".equals(type)
+                || "escpos".equals(type)
+        ) {
+
+            return MODE_BLUETOOTH;
+
+        }
+
+        if (
+            "sunmi".equals(mode)
+                || "sunmi".equals(type)
+                || "native".equals(mode)
+        ) {
+
+            return MODE_SUNMI;
+
+        }
+
+        if (
+            MODE_SYSTEM.equals(mode)
+                || "system".equals(type)
+        ) {
+
+            return MODE_SYSTEM;
+
+        }
+
+        return MODE_AUTO;
+
+    }
+
+    private boolean shouldPreferSunmi(
+        String printerType,
+        String connectionMode
+    ) {
+
+        if (!isSunmiDevice()) {
+
+            return false;
+
+        }
+
+        String normalizedMode =
+            normalizePrinterMode(
+                connectionMode,
+                printerType
+            );
+
+        return MODE_SUNMI.equals(normalizedMode);
+
+    }
+
+    private boolean shouldPreferBluetooth(
+        String printerType,
+        String connectionMode
+    ) {
+
+        String normalizedMode =
+            normalizePrinterMode(
+                connectionMode,
+                printerType
+            );
+
+        return MODE_BLUETOOTH.equals(normalizedMode);
+
+    }
+
+    private boolean ensureSunmiPrinterService() {
+
+        if (
+            sunmiPrinterService != null
+                && sunmiServiceBound
+        ) {
+
+            return true;
+
+        }
+
+        try {
+
+            Class<?> managerClass =
+                Class.forName(
+                    "com.sunmi.peripheral.printer.InnerPrinterManager"
+                );
+            Class<?> callbackClass =
+                Class.forName(
+                    "com.sunmi.peripheral.printer.InnerPrinterCallback"
+                );
+
+            if (sunmiServiceConnection == null) {
+
+                sunmiServiceConnection =
+                    new ServiceConnection() {
+                        @Override
+                        public void onServiceConnected(
+                            ComponentName name,
+                            IBinder service
+                        ) {
+
+                            sunmiPrinterService =
+                                resolveSunmiPrinterService(
+                                    service
+                                );
+                            sunmiServiceBound =
+                                sunmiPrinterService != null;
+
+                        }
+
+                        @Override
+                        public void onServiceDisconnected(
+                            ComponentName name
+                        ) {
+
+                            sunmiServiceBound = false;
+                            sunmiPrinterService = null;
+
+                        }
+                    };
+
+            }
+
+            Object innerPrinterManager =
+                managerClass
+                    .getMethod("getInstance")
+                    .invoke(null);
+
+            Object callbackProxy =
+                Proxy.newProxyInstance(
+                    callbackClass.getClassLoader(),
+                    new Class<?>[] {
+                        callbackClass
+                    },
+                    new InvocationHandler() {
+                        @Override
+                        public Object invoke(
+                            Object proxy,
+                            Method method,
+                            Object[] args
+                        ) {
+
+                            String methodName =
+                                method.getName();
+                            if (
+                                "onConnected".equals(methodName)
+                                && args != null
+                                && args.length > 0
+                            ) {
+
+                                sunmiPrinterService =
+                                    resolveSunmiPrinterService(
+                                        args[0]
+                                    );
+                                sunmiServiceBound =
+                                    sunmiPrinterService != null;
+
+                            } else if (
+                                "onDisconnected".equals(methodName)
+                            ) {
+
+                                sunmiServiceBound = false;
+                                sunmiPrinterService = null;
+
+                            }
+
+                            return null;
+
+                        }
+                    }
+                );
+
+            Method bindServiceMethod =
+                managerClass.getMethod(
+                    "bindService",
+                    Context.class,
+                    callbackClass
+                );
+            Object result =
+                bindServiceMethod.invoke(
+                    innerPrinterManager,
+                    this,
+                    callbackProxy
+                );
+
+            if (
+                result instanceof Boolean
+                && !((Boolean) result)
+            ) {
+
+                return sunmiPrinterService != null;
+
+            }
+
+            sunmiServiceBound = sunmiPrinterService != null;
+            return sunmiPrinterService != null;
+
+        } catch (Throwable ignored) {
+
+            return false;
+
+        }
+
+    }
+
+    private Object resolveSunmiPrinterService(
+        Object binder
+    ) {
+
+        if (binder == null) {
+
+            return null;
+
+        }
+
+        String[] interfaceNames =
+            new String[] {
+                "woyou.aidlservice.jiuiv5.IWoyouService$Stub",
+                "woyou.aidlservice.jiuiv5.IWoyouService"
+            };
+
+        for (String interfaceName : interfaceNames) {
+
+            try {
+
+                Class<?> serviceClass =
+                    Class.forName(
+                        interfaceName
+                    );
+                Method asInterface =
+                    serviceClass.getMethod(
+                        "asInterface",
+                        IBinder.class
+                    );
+                Object service =
+                    asInterface.invoke(
+                        null,
+                        binder
+                    );
+
+                if (service != null) {
+
+                    return service;
+
+                }
+
+            } catch (Throwable ignored) {
+
+            }
+
+        }
+
+        return binder;
+
+    }
+
+    private void unbindSunmiPrinterService() {
+
+        if (!sunmiServiceBound) {
+
+            sunmiPrinterService = null;
+            return;
+
+        }
+
+        try {
+
+            if (sunmiServiceConnection != null) {
+
+                unbindService(
+                    sunmiServiceConnection
+                );
+
+            }
+
+        } catch (Throwable ignored) {
+
+        } finally {
+
+            sunmiServiceBound = false;
+            sunmiPrinterService = null;
+
+        }
+
+    }
+
+    private boolean invokeSunmiPrinterMethod(
+        Object printer,
+        String methodName,
+        Object... args
+    ) {
+
+        if (printer == null) {
+
+            return false;
+
+        }
+
+        try {
+
+            Method[] methods =
+                printer.getClass().getMethods();
+
+            for (Method method : methods) {
+
+                if (!method.getName().equals(methodName)) {
+
+                    continue;
+
+                }
+
+                Class<?>[] parameterTypes =
+                    method.getParameterTypes();
+
+                if (
+                    parameterTypes.length == args.length
+                ) {
+
+                    method.invoke(
+                        printer,
+                        args
+                    );
+                    return true;
+
+                }
+
+                if (
+                    parameterTypes.length == args.length + 1
+                    && !parameterTypes[
+                        parameterTypes.length - 1
+                    ].isPrimitive()
+                ) {
+
+                    Object[] invocationArgs =
+                        new Object[
+                            parameterTypes.length
+                        ];
+                    System.arraycopy(
+                        args,
+                        0,
+                        invocationArgs,
+                        0,
+                        args.length
+                    );
+                    invocationArgs[
+                        invocationArgs.length - 1
+                    ] = null;
+                    method.invoke(
+                        printer,
+                        invocationArgs
+                    );
+                    return true;
+
+                }
+
+            }
+
+        } catch (Throwable ignored) {
+
+        }
+
+        return false;
 
     }
 
@@ -800,6 +1315,20 @@ extends AppCompatActivity {
                 )
             );
             state.put(
+                "printerType",
+                printerPreferences.getString(
+                    "selected_printer_type",
+                    ""
+                )
+            );
+            state.put(
+                "connectionMode",
+                printerPreferences.getString(
+                    "selected_connection_mode",
+                    ""
+                )
+            );
+            state.put(
                 "connected",
                 bluetoothSocket != null
                     && bluetoothSocket.isConnected()
@@ -1180,6 +1709,14 @@ extends AppCompatActivity {
             device.getName() == null ? "" : device.getName()
         );
         editor.putString(
+            "selected_printer_type",
+            MODE_BLUETOOTH
+        );
+        editor.putString(
+            "selected_connection_mode",
+            MODE_BLUETOOTH
+        );
+        editor.putString(
             PREF_PRINTER_MODE,
             mode
         );
@@ -1195,6 +1732,10 @@ extends AppCompatActivity {
             printerPreferences.edit();
         editor.putString(
             PREF_PRINTER_MODE,
+            MODE_AUTO
+        );
+        editor.putString(
+            "selected_connection_mode",
             MODE_AUTO
         );
         editor.apply();
@@ -1491,160 +2032,71 @@ extends AppCompatActivity {
 
         }
 
-        try {
-
-            Class<?> printerClass =
-                findSunmiPrinterClass();
-
-            if (printerClass == null) {
-
-                return false;
-
-            }
-
-            Object printer =
-                getSunmiPrinterInstance(
-                    printerClass
-                );
-
-            if (printer == null) {
-
-                return false;
-
-            }
-
-            boolean printed =
-                invokePrinterMethod(
-                    printer,
-                    "printText",
-                    printableText
-                )
-                || invokePrinterMethod(
-                    printer,
-                    "printString",
-                    printableText
-                )
-                || invokePrinterMethod(
-                    printer,
-                    "print",
-                    printableText
-                );
-
-            if (printed) {
-
-                invokePrinterMethod(
-                    printer,
-                    "lineWrap",
-                    2
-                );
-
-                invokePrinterMethod(
-                    printer,
-                    "cutPaper"
-                );
-
-            }
-
-            return printed;
-
-        } catch (Throwable throwable) {
+        if (!ensureSunmiPrinterService()) {
 
             return false;
 
         }
 
-    }
+        Object printer =
+            sunmiPrinterService;
 
-    private Class<?> findSunmiPrinterClass() {
+        if (printer == null) {
 
-        String[] classNames = new String[] {
-            "com.sunmi.peripheral.printer.SunmiPrinter",
-            "com.sunmi.peripheral.printer.InnerPrinterManager"
-        };
-
-        for (String className : classNames) {
-
-            try {
-
-                return Class.forName(
-                    className
-                );
-
-            } catch (ClassNotFoundException ignored) {
-
-            }
+            return false;
 
         }
 
-        return null;
+        boolean printed =
+            invokeSunmiPrinterMethod(
+                printer,
+                "printText",
+                printableText
+            )
+            || invokeSunmiPrinterMethod(
+                printer,
+                "printOriginalText",
+                printableText
+            )
+            || invokeSunmiPrinterMethod(
+                printer,
+                "printString",
+                printableText
+            )
+            || invokeSunmiPrinterMethod(
+                printer,
+                "print",
+                printableText
+            );
 
-    }
+        if (!printed) {
 
-    private Object getSunmiPrinterInstance(
-        Class<?> printerClass
-    ) {
-
-        try {
-
-            return printerClass
-                .getMethod("getInstance")
-                .invoke(null);
-
-        } catch (Throwable ignored) {
-
-            return null;
-
-        }
-
-    }
-
-    private boolean invokePrinterMethod(
-        Object printer,
-        String methodName,
-        Object... args
-    ) {
-
-        try {
-
-            for (
-                java.lang.reflect.Method method :
-                    printer.getClass().getMethods()
-            ) {
-
-                if (
-                    !method.getName().equals(methodName)
-                ) {
-
-                    continue;
-
-                }
-
-                Class<?>[] parameterTypes =
-                    method.getParameterTypes();
-
-                if (
-                    parameterTypes.length
-                    != args.length
-                ) {
-
-                    continue;
-
-                }
-
-                method.invoke(
+            printed =
+                invokeSunmiPrinterMethod(
                     printer,
-                    args
+                    "sendRAWData",
+                    buildEscPosBytes(
+                        printableText
+                    )
                 );
-
-                return true;
-
-            }
-
-        } catch (Throwable ignored) {
 
         }
 
-        return false;
+        if (printed) {
+
+            invokeSunmiPrinterMethod(
+                printer,
+                "lineWrap",
+                2
+            );
+            invokeSunmiPrinterMethod(
+                printer,
+                "cutPaper"
+            );
+
+        }
+
+        return printed;
 
     }
 
@@ -1815,6 +2267,14 @@ extends AppCompatActivity {
                         PREF_PRINTER_MODE,
                         MODE_BLUETOOTH
                     )
+                    .putString(
+                        "selected_printer_type",
+                        MODE_BLUETOOTH
+                    )
+                    .putString(
+                        "selected_connection_mode",
+                        MODE_BLUETOOTH
+                    )
                     .apply();
 
                 response.put(
@@ -1838,11 +2298,21 @@ extends AppCompatActivity {
 
             SharedPreferences.Editor editor =
                 printerPreferences.edit();
-            editor.putString(
-                PREF_PRINTER_MODE,
+            String normalizedMode =
                 TextUtils.isEmpty(mode)
                     ? MODE_AUTO
-                    : mode
+                    : mode;
+            editor.putString(
+                PREF_PRINTER_MODE,
+                normalizedMode
+            );
+            editor.putString(
+                "selected_connection_mode",
+                normalizedMode
+            );
+            editor.putString(
+                "selected_printer_type",
+                normalizedMode
             );
             editor.apply();
 
