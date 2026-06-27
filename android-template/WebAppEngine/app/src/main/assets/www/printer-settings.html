@@ -491,6 +491,10 @@
             if (!bridge) {
                 throw new Error('Native printer bridge not detected');
             }
+            const selectedPrinterType = document.getElementById('printerType').value || 'AUTO';
+            const selectedConnectionMode = document.getElementById('connectionMode').value || 'auto';
+            const printerType = selectedPrinterType === 'AUTO' ? 'SUNMI' : selectedPrinterType;
+            const connectionMode = selectedConnectionMode === 'auto' ? 'native' : selectedConnectionMode;
             const payload = {
                 title: 'Printer Test',
                 mode: 'thermal',
@@ -498,12 +502,13 @@
                 content: testPrintHtml(),
                 receiptHtml: testPrintHtml(),
                 rawHtml: testPrintHtml(),
-                printerType: document.getElementById('printerType').value,
-                connectionMode: document.getElementById('connectionMode').value,
+                printerType,
+                connectionMode,
                 printerName: document.getElementById('printerName').value.trim(),
                 printerAddress: document.getElementById('printerAddress').value.trim(),
                 paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
                 autoCut: document.getElementById('autoCut').value === 'true',
+                requireNative: true,
             };
             const payloadJson = JSON.stringify(payload);
             const methods = ['printDocument', 'printThermalReceipt', 'printReceiptHtml', 'printThermalHtml', 'printHtml', 'printHTML', 'printReceipt', 'printThermal', 'printTicket', 'printText', 'print'];
