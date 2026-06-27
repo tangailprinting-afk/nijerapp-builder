@@ -70,6 +70,7 @@
                                     <div class="status-label">Bridge / Profile Status</div>
                                     <div class="status-value" id="bridgeStatus">Checking...</div>
                                     <div class="muted" id="bridgeDetail"></div>
+                                    <div class="methods" id="sunmiDebugPanel" style="margin-top:12px;"></div>
                                 </div>
                             </div>
 
@@ -270,7 +271,7 @@
             };
         }
 
-        function loadForm() {
+        async function loadForm() {
             const settings = printerShared.getPrinterSettings();
             document.getElementById('bridgeName').value = settings.bridgeName || 'auto';
             document.getElementById('methodName').value = settings.methodName || 'auto';
@@ -284,6 +285,7 @@
             document.getElementById('printerAddress').value = settings.printerAddress || '';
             const activeProfile = printerShared.getActivePrinterProfile() || null;
             const bridge = printerShared.getNativePrintBridge(settings.bridgeName);
+            const printerState = await getPrinterStateFromBridge(bridge);
             const statusParts = [];
             if (settings.enabled === false) statusParts.push('Disabled');
             if (activeProfile) {
@@ -298,8 +300,70 @@
                 : (bridge
                     ? 'Native bridge is available. Save a printer profile below.'
                     : 'Open this app inside your Android wrapper to enable thermal printing and save a printer profile.');
+            renderSunmiDebug(bridge, printerState);
             renderSavedPrinters();
             renderBridgeLists();
+        }
+
+        async function getPrinterStateFromBridge(bridge) {
+            const rawState = await callBridgeMethod(bridge, 'getPrinterState');
+            if (!rawState) return null;
+            if (typeof rawState === 'object') return rawState;
+            if (typeof rawState !== 'string') return null;
+            try {
+                return JSON.parse(rawState);
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function renderSunmiDebug(bridge, state) {
+            const host = document.getElementById('sunmiDebugPanel');
+            if (!host) return;
+            if (!bridge) {
+                host.innerHTML = `
+                    <div class="method">
+                        <strong>Sunmi Debug</strong>
+                        <div class="muted" style="margin-top:6px;">No native bridge detected yet.</div>
+                    </div>
+                `;
+                return;
+            }
+            const ready = state?.sunmiReady ? 'Ready' : 'Not ready';
+            const serviceBound = state?.sunmiServiceBound ? 'Bound' : 'Not bound';
+            const serviceConnected = state?.sunmiServiceConnected ? 'Connected' : 'Disconnected';
+            const printerFound = state?.sunmiPrinterFound ? 'Detected' : 'Not detected';
+            const lastError = state?.sunmiLastError || 'No error recorded';
+            const lastStatus = state?.sunmiLastStatus || 'No status recorded';
+            const paper = state?.sunmiPaper || 'Unknown';
+            const serial = state?.sunmiSerialNo || 'Unknown';
+            host.innerHTML = `
+                <div class="method">
+                    <strong>Sunmi Debug</strong>
+                    <div class="methods" style="margin-top:8px;">
+                        <div class="method" style="background:#f8fafc;">
+                            <strong>Ready</strong>
+                            <div class="muted">${escapeHtml(ready)}</div>
+                        </div>
+                        <div class="method" style="background:#f8fafc;">
+                            <strong>Service</strong>
+                            <div class="muted">${escapeHtml(serviceBound)} · ${escapeHtml(serviceConnected)} · ${escapeHtml(printerFound)}</div>
+                        </div>
+                        <div class="method" style="background:#f8fafc;">
+                            <strong>Last Status</strong>
+                            <div class="muted">${escapeHtml(lastStatus)}</div>
+                        </div>
+                        <div class="method" style="background:#f8fafc;">
+                            <strong>Last Error</strong>
+                            <div class="muted">${escapeHtml(lastError)}</div>
+                        </div>
+                        <div class="method" style="background:#f8fafc;">
+                            <strong>Paper / Serial</strong>
+                            <div class="muted">${escapeHtml(paper)} · ${escapeHtml(serial)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function testPrintHtml() {

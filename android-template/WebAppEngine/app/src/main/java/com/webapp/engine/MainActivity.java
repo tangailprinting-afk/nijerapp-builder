@@ -1406,6 +1406,38 @@ extends AppCompatActivity {
                 "bluetoothPermissionsGranted",
                 hasBluetoothPermissions()
             );
+            state.put(
+                "sunmiReady",
+                sunmiPrinterHelper.isReady()
+            );
+            state.put(
+                "sunmiServiceBound",
+                sunmiPrinterHelper.isServiceBound()
+            );
+            state.put(
+                "sunmiServiceConnected",
+                sunmiPrinterHelper.isPrinterConnected()
+            );
+            state.put(
+                "sunmiPrinterFound",
+                sunmiPrinterHelper.isPrinterFound()
+            );
+            state.put(
+                "sunmiLastError",
+                sunmiPrinterHelper.getLastErrorMessage()
+            );
+            state.put(
+                "sunmiLastStatus",
+                sunmiPrinterHelper.getLastStatusMessage()
+            );
+            state.put(
+                "sunmiPaper",
+                sunmiPrinterHelper.getPrinterPaperLabel()
+            );
+            state.put(
+                "sunmiSerialNo",
+                sunmiPrinterHelper.getPrinterSerialNo()
+            );
 
             JSONArray paired =
                 new JSONArray();
@@ -2139,6 +2171,13 @@ extends AppCompatActivity {
         public String getPrinterState() {
 
             return getPrinterStateJson();
+
+        }
+
+        @JavascriptInterface
+        public String getSunmiDebugState() {
+
+            return sunmiPrinterHelper.getDebugStateJson();
 
         }
 
