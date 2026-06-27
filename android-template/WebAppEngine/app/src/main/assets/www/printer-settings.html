@@ -183,6 +183,7 @@
                             <button type="submit" class="btn btn-primary">Save Printer Settings</button>
                             <button type="button" class="btn btn-soft" id="testPrintBtn">Test Print</button>
                             <button type="button" class="btn btn-outline" id="connectBtn">Connect Printer</button>
+                            <button type="button" class="btn btn-outline" id="scanBtn">Scan Bluetooth</button>
                             <button type="button" class="btn btn-outline" id="defaultBtn">Set as Default</button>
                             <button type="button" class="btn btn-outline" id="resetBtn">Reset</button>
                         </div>
@@ -301,6 +302,7 @@
                     ? 'Native bridge is available. Save a printer profile below.'
                     : 'Open this app inside your Android wrapper to enable thermal printing and save a printer profile.');
             renderSavedPrinters();
+            renderBridgeLists();
         }
 
         function testPrintHtml() {
@@ -375,6 +377,171 @@
             `).join('');
         }
 
+        function renderBridgeLists() {
+            const bridge = printerShared.getNativePrintBridge(document.getElementById('bridgeName').value);
+            const host = document.getElementById('savedPrinters');
+            if (!host) return;
+            if (!bridge) return;
+            Promise.resolve().then(async () => {
+                const paired = await callBridgeMethod(bridge, 'getPairedPrinters') || [];
+                const discovered = await callBridgeMethod(bridge, 'getDiscoveredPrinters') || [];
+                const saved = await callBridgeMethod(bridge, 'getSavedBluetoothPrinter') || null;
+                const sections = [];
+                if (saved) {
+                    sections.push(`
+                        <div class="method" style="border-style:solid;border-color:#dbeafe;background:#eff6ff;">
+                            <strong>Saved Bluetooth Printer</strong>
+                            <div class="muted">${escapeHtml(typeof saved === 'object' ? (saved.name || saved.deviceName || saved.address || JSON.stringify(saved)) : String(saved))}</div>
+                        </div>
+                    `);
+                }
+                if (Array.isArray(paired) && paired.length) {
+                    sections.push(`
+                        <div class="method">
+                            <strong>Paired Printers</strong>
+                            <div class="methods" style="margin-top:8px;">
+                                ${paired.map(p => printerDeviceRow(p, 'paired')).join('')}
+                            </div>
+                        </div>
+                    `);
+                }
+                if (Array.isArray(discovered) && discovered.length) {
+                    sections.push(`
+                        <div class="method">
+                            <strong>Discovered Printers</strong>
+                            <div class="methods" style="margin-top:8px;">
+                                ${discovered.map(p => printerDeviceRow(p, 'discovered')).join('')}
+                            </div>
+                        </div>
+                    `);
+                }
+                if (sections.length) {
+                    host.insertAdjacentHTML('beforeend', sections.join(''));
+                }
+            });
+        }
+
+        function printerDeviceRow(device, source) {
+            const name = device?.name || device?.deviceName || device?.printerName || device?.title || 'Unknown printer';
+            const address = device?.address || device?.macAddress || device?.id || device?.deviceAddress || '';
+            return `
+                <div class="method" style="display:grid;gap:6px;">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+                        <div>
+                            <strong>${escapeHtml(name)}</strong>
+                            <div class="muted">${escapeHtml(address || source)}</div>
+                        </div>
+                        <button type="button" class="btn btn-soft" onclick="selectPrinterDevice('${escapeHtml(name)}','${escapeHtml(address)}','${escapeHtml(source)}')">Select</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function callBridgeMethod(bridge, methodName, payload) {
+            if (!bridge || typeof bridge[methodName] !== 'function') return null;
+            const attempts = [];
+            let lastError = null;
+            if (typeof payload === 'string' || typeof payload === 'number' || typeof payload === 'boolean') {
+                attempts.push(payload);
+            } else if (payload && typeof payload === 'object') {
+                if (methodName === 'setPrinterMode') {
+                    attempts.push(
+                        String(payload.connectionMode || payload.printerType || 'auto'),
+                        JSON.stringify(payload)
+                    );
+                } else if (methodName === 'connectBluetoothPrinter') {
+                    attempts.push(
+                        String(payload.printerAddress || payload.address || ''),
+                        JSON.stringify(payload)
+                    );
+                } else {
+                    attempts.push(JSON.stringify(payload));
+                }
+            }
+            for (const attempt of attempts.length ? attempts : [payload]) {
+                try {
+                    const result = bridge[methodName](attempt);
+                    const resolved = await Promise.resolve(result);
+                    if (resolved && typeof resolved === 'object' && resolved.success === false) {
+                        throw new Error(resolved.error || `${methodName} failed`);
+                    }
+                    if (resolved && typeof resolved === 'object' && 'data' in resolved) return resolved.data;
+                    return resolved;
+                } catch (err) {
+                    lastError = err;
+                }
+            }
+            if (attempts.length > 1) {
+                console.error(`${methodName} failed`, lastError);
+            }
+            return null;
+        }
+
+        async function selectPrinterDevice(name, address, source) {
+            const bridge = printerShared.getNativePrintBridge(document.getElementById('bridgeName').value);
+            if (!bridge) {
+                printerShared.showToast('Native bridge not detected', 'error');
+                return;
+            }
+            const payload = {
+                printerName: name,
+                printerAddress: address,
+                connectionMode: source === 'paired' ? 'bluetooth' : 'auto',
+                printerType: document.getElementById('printerType').value,
+                bridgeName: document.getElementById('bridgeName').value,
+                methodName: document.getElementById('methodName').value,
+                paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
+                autoCut: document.getElementById('autoCut').value === 'true',
+            };
+            document.getElementById('printerName').value = name || '';
+            document.getElementById('printerAddress').value = address || '';
+            try {
+                if (typeof bridge.setPrinterMode === 'function') {
+                    await callBridgeMethod(bridge, 'setPrinterMode', payload);
+                }
+                if (source === 'paired' && typeof bridge.connectBluetoothPrinter === 'function') {
+                    await callBridgeMethod(bridge, 'connectBluetoothPrinter', payload);
+                    printerShared.showToast('Bluetooth printer selected');
+                } else if (source === 'discovered' && typeof bridge.connectBluetoothPrinter === 'function') {
+                    await callBridgeMethod(bridge, 'connectBluetoothPrinter', payload);
+                    printerShared.showToast('Printer connect requested');
+                } else {
+                    printerShared.showToast('Printer selected');
+                }
+                printerShared.savePrinterSettings({
+                    ...printerShared.getPrinterSettings(),
+                    ...getFormState(),
+                    printerName: name || '',
+                    printerAddress: address || '',
+                    connectionMode: source === 'paired' ? 'bluetooth' : document.getElementById('connectionMode').value,
+                    activeProfileId: printerShared.getActivePrinterProfile()?.id || '',
+                });
+                loadForm();
+            } catch (err) {
+                console.error(err);
+                printerShared.showToast('Select failed: ' + err.message, 'error');
+            }
+        }
+
+        async function refreshPrinterDiscovery() {
+            const bridge = printerShared.getNativePrintBridge(document.getElementById('bridgeName').value);
+            if (!bridge) {
+                printerShared.showToast('Native bridge not detected', 'error');
+                return;
+            }
+            const methods = ['startDiscovery', 'startPrinterDiscovery', 'scanBluetoothPrinters'];
+            let ok = false;
+            for (const methodName of methods) {
+                if (typeof bridge[methodName] === 'function') {
+                    await Promise.resolve(bridge[methodName]({}));
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok) printerShared.showToast('Discovery method not available', 'warning');
+            loadForm();
+        }
+
         function loadSavedPrinter(id) {
             const profile = printerShared.getPrinterProfiles().find(p => p.id === id);
             if (!profile) return;
@@ -394,7 +561,8 @@
         async function connectSavedPrinter(id) {
             const profile = printerShared.getPrinterProfiles().find(p => p.id === id);
             if (!profile) return;
-            printerShared.savePrinterSettings({ ...printerShared.getPrinterSettings(), ...profile, activeProfileId: profile.id });
+            const current = printerShared.getPrinterSettings();
+            printerShared.savePrinterSettings({ ...current, ...profile, activeProfileId: profile.id });
             try {
                 const bridge = printerShared.getNativePrintBridge(profile.bridgeName);
                 if (!bridge) throw new Error('Native bridge not detected in WebView');
@@ -403,11 +571,17 @@
                     status: 'connect',
                     action: 'connect',
                 };
-                const connectMethods = ['connectPrinter', 'connectDevice', 'selectPrinter', 'setPrinter', 'pairPrinter'];
+                if (typeof bridge.setPrinterMode === 'function') {
+                    await callBridgeMethod(bridge, 'setPrinterMode', connectPayload);
+                }
+                const connectMethods = ['connectBluetoothPrinter', 'connectPrinter', 'connectDevice', 'selectPrinter', 'setPrinter', 'pairPrinter'];
                 let done = false;
                 for (const method of connectMethods) {
                     if (bridge && typeof bridge[method] === 'function') {
-                        const result = await Promise.resolve(bridge[method](connectPayload));
+                        const payload = method === 'connectBluetoothPrinter'
+                            ? (connectPayload.printerAddress || '')
+                            : connectPayload;
+                        const result = await callBridgeMethod(bridge, method, payload);
                         if (result && typeof result === 'object' && result.success === false) {
                             throw new Error(result.error || `${method} failed`);
                         }
@@ -503,6 +677,10 @@
                 activeProfileId: profile.id,
             });
             await connectSavedPrinter(profile.id);
+        });
+
+        document.getElementById('scanBtn').addEventListener('click', async function() {
+            await refreshPrinterDiscovery();
         });
 
         document.getElementById('defaultBtn').addEventListener('click', function() {
