@@ -402,6 +402,20 @@ async function printHTMLContent(html, options = {}) {
         printerAddress: options.printerAddress || printerSettings.printerAddress || '',
     };
     if (bridge) {
+        if (typeof bridge.setPrinterMode === 'function') {
+            try {
+                const printerMode = String(
+                    payload.connectionMode
+                    || printerSettings.connectionMode
+                    || payload.printerType
+                    || printerSettings.printerType
+                    || 'native'
+                );
+                await Promise.resolve(bridge.setPrinterMode(printerMode));
+            } catch (err) {
+                // Non-fatal. Some bridges only support the print methods below.
+            }
+        }
         const preferredMethods = printerSettings.methodName && printerSettings.methodName !== 'auto'
             ? [printerSettings.methodName]
             : [
