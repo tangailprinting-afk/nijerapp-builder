@@ -32,6 +32,25 @@ function esc(t) {
     return d.innerHTML;
 }
 
+function readStore(key, fallback) {
+    try {
+        const raw = window.localStorage.getItem(key);
+        if (raw === null || raw === undefined || raw === '') return fallback;
+        return JSON.parse(raw);
+    } catch (error) {
+        console.warn(`Failed to read store key: ${key}`, error);
+        return fallback;
+    }
+}
+
+function writeStore(key, value) {
+    try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+        console.warn(`Failed to write store key: ${key}`, error);
+    }
+}
+
 function normalizeCustomerSearchQuery(value) {
     return String(value || '').trim().toLowerCase();
 }

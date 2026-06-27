@@ -43,6 +43,7 @@
         .methods{display:grid;gap:8px;margin-top:10px}
         .method{padding:10px 12px;border:1px dashed var(--border);border-radius:14px;font-size:13px;background:#fff}
         .badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-weight:800;font-size:11px}
+        .advanced-only{display:none}
         @media (max-width: 900px){.grid,.form-grid{grid-template-columns:1fr}.hero{flex-direction:column}}
     </style>
 </head>
@@ -87,7 +88,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group advanced-only">
                                 <label>Connection Mode</label>
                                 <select id="connectionMode">
                                     <option value="auto">Auto</option>
@@ -104,12 +105,12 @@
                                 <input type="text" id="printerName" placeholder="e.g. Front Counter Printer">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group advanced-only">
                                 <label>Printer Address / ID</label>
                                 <input type="text" id="printerAddress" placeholder="Bluetooth MAC, IP address, USB path, etc.">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group advanced-only">
                                 <label>Bridge Name</label>
                                 <select id="bridgeName">
                                     <option value="auto">Auto detect</option>
@@ -127,7 +128,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group advanced-only">
                                 <label>Method Name</label>
                                 <select id="methodName">
                                     <option value="auto">Auto detect</option>
@@ -153,7 +154,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group advanced-only">
                                 <label>Auto Cut</label>
                                 <select id="autoCut">
                                     <option value="true">Enabled</option>
@@ -161,7 +162,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group full">
+                            <div class="form-group full advanced-only">
                                 <div class="switch-row">
                                     <div>
                                         <strong>Require Native Printing</strong>
@@ -171,7 +172,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group full">
+                            <div class="form-group full advanced-only">
                                 <div class="switch-row">
                                     <div>
                                         <strong>Printer Enabled</strong>
@@ -185,19 +186,12 @@
                         <div class="actions">
                             <button type="submit" class="btn btn-primary">Save Printer Settings</button>
                             <button type="button" class="btn btn-soft" id="testPrintBtn">Test Print</button>
-                            <button type="button" class="btn btn-outline" id="connectBtn">Connect Printer</button>
-                            <button type="button" class="btn btn-outline" id="scanBtn">Scan Bluetooth</button>
-                            <button type="button" class="btn btn-outline" id="defaultBtn">Set as Default</button>
-                            <button type="button" class="btn btn-outline" id="resetBtn">Reset</button>
                         </div>
                     </form>
-                    <div class="hint">
-                        Note: actual printer pairing happens in your Android wrapper. This page only stores which bridge/method to use and sends a test receipt when the wrapper bridge is present.
-                    </div>
                 </div>
             </section>
 
-            <section class="card">
+            <section class="card advanced-only">
                 <div class="card-h">How It Works</div>
                 <div class="card-b status">
                     <div class="status-box">
@@ -667,62 +661,7 @@
                 printerShared.showToast('Test print failed: ' + err.message, 'error');
             }
         });
-
-        document.getElementById('connectBtn').addEventListener('click', async function() {
-            const form = getFormState();
-            const profile = printerShared.upsertPrinterProfile({
-                ...form,
-                isDefault: false,
-            });
-            printerShared.savePrinterSettings({
-                ...printerShared.getPrinterSettings(),
-                ...form,
-                activeProfileId: profile.id,
-            });
-            await connectSavedPrinter(profile.id);
-        });
-
-        document.getElementById('scanBtn').addEventListener('click', async function() {
-            await refreshPrinterDiscovery();
-        });
-
-        document.getElementById('defaultBtn').addEventListener('click', function() {
-            const form = getFormState();
-            const profile = printerShared.upsertPrinterProfile({
-                ...form,
-                isDefault: true,
-            });
-            printerShared.setDefaultPrinterProfile(profile.id);
-            printerShared.savePrinterSettings({
-                ...printerShared.getPrinterSettings(),
-                ...form,
-                activeProfileId: profile.id,
-            });
-            printerShared.showToast('Set as default printer');
-            loadForm();
-        });
-
-        document.getElementById('resetBtn').addEventListener('click', function() {
-            printerShared.savePrinterSettings({
-                enabled: true,
-                requireNative: true,
-                paperWidthMm: 58,
-                autoCut: true,
-                bridgeName: 'auto',
-                methodName: 'auto',
-                printerType: 'AUTO',
-                connectionMode: 'auto',
-                printerName: '',
-                printerAddress: '',
-                activeProfileId: '',
-            });
-            printerShared.savePrinterProfiles([]);
-            loadForm();
-            printerShared.showToast('Printer settings reset');
-        });
-
         loadForm();
-        setInterval(loadForm, 8000);
     </script>
 </body>
 </html>
