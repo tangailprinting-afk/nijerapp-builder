@@ -474,6 +474,18 @@
             return null;
         }
 
+        async function invokeBridgeMethod(bridge, methodName, payload) {
+            if (!bridge || typeof bridge[methodName] !== 'function') return false;
+            try {
+                const result = bridge[methodName](payload);
+                await Promise.resolve(result);
+                return true;
+            } catch (err) {
+                console.error(`${methodName} failed`, err);
+                return false;
+            }
+        }
+
         async function sendNativeTestPrint() {
             const bridge = printerShared.getNativePrintBridge(document.getElementById('bridgeName').value);
             if (!bridge) {
@@ -496,8 +508,8 @@
             const payloadJson = JSON.stringify(payload);
             const methods = ['printDocument', 'printThermalReceipt', 'printReceiptHtml', 'printThermalHtml', 'printHtml', 'printHTML', 'printReceipt', 'printThermal', 'printTicket', 'printText', 'print'];
             for (const methodName of methods) {
-                const result = await callBridgeMethod(bridge, methodName, methodName === 'printText' ? 'Printer test' : payloadJson);
-                if (result !== null && result !== undefined) {
+                const invoked = await invokeBridgeMethod(bridge, methodName, methodName === 'printText' ? 'Printer test' : payloadJson);
+                if (invoked) {
                     return true;
                 }
             }
