@@ -78,7 +78,7 @@ public class SunmiPrinterHelper {
         if (!isReady()) {
             if (context != null) {
                 initSunmiPrinterService(context);
-                waitForReady(4000L);
+                waitForReady(8000L);
             }
         }
 
