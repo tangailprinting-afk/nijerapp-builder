@@ -607,7 +607,16 @@ extends AppCompatActivity {
                 printerType
             );
 
-        return MODE_SUNMI.equals(normalizedMode);
+        if (
+            MODE_BLUETOOTH.equals(normalizedMode)
+                || MODE_SYSTEM.equals(normalizedMode)
+        ) {
+
+            return false;
+
+        }
+
+        return true;
 
     }
 
