@@ -474,6 +474,36 @@
             return null;
         }
 
+        async function sendNativeTestPrint() {
+            const bridge = printerShared.getNativePrintBridge(document.getElementById('bridgeName').value);
+            if (!bridge) {
+                throw new Error('Native printer bridge not detected');
+            }
+            const payload = {
+                title: 'Printer Test',
+                mode: 'thermal',
+                html: testPrintHtml(),
+                content: testPrintHtml(),
+                receiptHtml: testPrintHtml(),
+                rawHtml: testPrintHtml(),
+                printerType: document.getElementById('printerType').value,
+                connectionMode: document.getElementById('connectionMode').value,
+                printerName: document.getElementById('printerName').value.trim(),
+                printerAddress: document.getElementById('printerAddress').value.trim(),
+                paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
+                autoCut: document.getElementById('autoCut').value === 'true',
+            };
+            const payloadJson = JSON.stringify(payload);
+            const methods = ['printDocument', 'printThermalReceipt', 'printReceiptHtml', 'printThermalHtml', 'printHtml', 'printHTML', 'printReceipt', 'printThermal', 'printTicket', 'printText', 'print'];
+            for (const methodName of methods) {
+                const result = await callBridgeMethod(bridge, methodName, methodName === 'printText' ? 'Printer test' : payloadJson);
+                if (result !== null && result !== undefined) {
+                    return true;
+                }
+            }
+            throw new Error('Native print bridge found, but no supported print method was available');
+        }
+
         async function selectPrinterDevice(name, address, source) {
             const bridge = printerShared.getNativePrintBridge(document.getElementById('bridgeName').value);
             if (!bridge) {
@@ -643,18 +673,7 @@
                     ...form,
                     activeProfileId: profile.id,
                 });
-                await printerShared.printHTMLContent(testPrintHtml(), {
-                    title: 'Printer Test',
-                    mode: 'thermal',
-                    paperWidthMm: parseInt(document.getElementById('paperWidthMm').value, 10) || 58,
-                    autoCut: document.getElementById('autoCut').value === 'true',
-                    requireNative: true,
-                    bridgeName: document.getElementById('bridgeName').value,
-                    printerType: document.getElementById('printerType').value,
-                    connectionMode: document.getElementById('connectionMode').value,
-                    printerName: document.getElementById('printerName').value.trim(),
-                    printerAddress: document.getElementById('printerAddress').value.trim(),
-                });
+                await sendNativeTestPrint();
                 printerShared.showToast('Test print sent');
             } catch (err) {
                 console.error(err);
