@@ -116,7 +116,7 @@ extends AppCompatActivity {
         bluetoothAdapter =
             BluetoothAdapter.getDefaultAdapter();
         sunmiPrinterHelper.initSunmiPrinterService(
-            this
+            getApplicationContext()
         );
         registerBluetoothDiscoveryReceiver();
         requestRuntimePermissions();

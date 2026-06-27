@@ -78,7 +78,7 @@ public class SunmiPrinterHelper {
         if (!isReady()) {
             if (context != null) {
                 initSunmiPrinterService(context);
-                waitForReady(1500L);
+                waitForReady(4000L);
             }
         }
 
@@ -109,6 +109,13 @@ public class SunmiPrinterHelper {
             Toast.makeText(
                 context,
                 "Sunmi print failed: " + error.getMessage(),
+                Toast.LENGTH_SHORT
+            ).show();
+            return false;
+        } catch (Throwable error) {
+            Toast.makeText(
+                context,
+                "Sunmi print error: " + error.getMessage(),
                 Toast.LENGTH_SHORT
             ).show();
             return false;
