@@ -10,6 +10,8 @@ import com.sunmi.peripheral.printer.InnerPrinterManager;
 import com.sunmi.peripheral.printer.SunmiPrinterService;
 import com.sunmi.peripheral.printer.WoyouConsts;
 
+import java.lang.reflect.Method;
+
 public class SunmiPrinterHelper {
 
     private Context context;
@@ -106,8 +108,15 @@ public class SunmiPrinterHelper {
         }
 
         try {
-            return sunmiPrinterService.printerPaper == 1 ? "58mm" : "80mm";
-        } catch (RemoteException error) {
+            Integer paperCode = invokeIntGetter(
+                sunmiPrinterService,
+                "getPrinterPaper"
+            );
+            if (paperCode == null) {
+                return "";
+            }
+            return paperCode == 1 ? "58mm" : "80mm";
+        } catch (Throwable error) {
             return "";
         }
     }
@@ -118,8 +127,12 @@ public class SunmiPrinterHelper {
         }
 
         try {
-            return sunmiPrinterService.printerSerialNo;
-        } catch (RemoteException error) {
+            String serial = invokeStringGetter(
+                sunmiPrinterService,
+                "getPrinterSerialNo"
+            );
+            return serial == null ? "" : serial;
+        } catch (Throwable error) {
             return "";
         }
     }
@@ -129,6 +142,44 @@ public class SunmiPrinterHelper {
             printerFound = InnerPrinterManager.getInstance().hasPrinter(service);
         } catch (InnerPrinterException error) {
             printerFound = false;
+        }
+    }
+
+    private Integer invokeIntGetter(
+        Object target,
+        String methodName
+    ) {
+        Object value = invokeGetter(target, methodName);
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return null;
+    }
+
+    private String invokeStringGetter(
+        Object target,
+        String methodName
+    ) {
+        Object value = invokeGetter(target, methodName);
+        return value == null ? null : String.valueOf(value);
+    }
+
+    private Object invokeGetter(
+        Object target,
+        String methodName
+    ) {
+        if (target == null) {
+            return null;
+        }
+        try {
+            Method method =
+                target.getClass().getMethod(methodName);
+            return method.invoke(target);
+        } catch (Throwable error) {
+            return null;
         }
     }
 }
