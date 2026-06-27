@@ -176,18 +176,10 @@
 
         function printCashFlow() {
             const snapshot = cashFlowSnapshot || buildCashFlowSnapshot();
-            const printableHtml = buildCashFlowStatementDocument(snapshot);
-            if (typeof window.printHTMLContent === 'function') {
-                Promise.resolve(window.printHTMLContent(printableHtml, { title: 'Cash Flow Statement', mode: 'thermal', requireNative: true }))
-                    .catch(err => showToast('Print failed: ' + err.message, 'error'));
-                return;
-            }
-            const nativePrinter = window.NijerAppPrinter || window.AndroidPrinter;
-            if (nativePrinter && typeof nativePrinter.printDocument === 'function') {
-                nativePrinter.printDocument(JSON.stringify({ title: 'Cash Flow Statement', html: printableHtml, text: '', url: window.location.href, requireNative: true }));
-                return;
-            }
-            showToast('Native printer bridge not available.', 'error');
+            const w = window.open('', '_blank', 'width=900,height=700');
+            w.document.write(buildCashFlowStatementDocument(snapshot));
+            w.document.close();
+            setTimeout(() => { w.print(); }, 500);
         }
 
         function getSupplierPayableAmount(supplierId) {
@@ -328,17 +320,10 @@
             <div class="print-footer">Generated: ${new Date().toLocaleString()} | ${esc(SHOP_SETTINGS.name)}</div>
             </body></html>`;
 
-            if (typeof window.printHTMLContent === 'function') {
-                Promise.resolve(window.printHTMLContent(printHTML, { title: titles[tab], mode: 'thermal', requireNative: true }))
-                    .catch(err => showToast('Print failed: ' + err.message, 'error'));
-                return;
-            }
-            const nativePrinter = window.NijerAppPrinter || window.AndroidPrinter;
-            if (nativePrinter && typeof nativePrinter.printDocument === 'function') {
-                nativePrinter.printDocument(JSON.stringify({ title: titles[tab], html: printHTML, text: '', url: window.location.href, requireNative: true }));
-                return;
-            }
-            showToast('Native printer bridge not available.', 'error');
+            const w = window.open('', '_blank', 'width=800,height=600');
+            w.document.write(printHTML);
+            w.document.close();
+            setTimeout(() => { w.print(); }, 500);
         }
 
         // SALES REPORT
