@@ -17,12 +17,14 @@ public class SunmiPrinterHelper {
     private Context context;
     private SunmiPrinterService sunmiPrinterService;
     private boolean printerFound;
+    private volatile boolean printerConnected;
 
     private final InnerPrinterCallback innerPrinterCallback =
         new InnerPrinterCallback() {
             @Override
             public void onConnected(SunmiPrinterService service) {
                 sunmiPrinterService = service;
+                printerConnected = true;
                 checkPrinterAvailability(service);
             }
 
@@ -30,6 +32,7 @@ public class SunmiPrinterHelper {
             public void onDisconnected() {
                 sunmiPrinterService = null;
                 printerFound = false;
+                printerConnected = false;
             }
         };
 
@@ -43,9 +46,11 @@ public class SunmiPrinterHelper {
                 );
             if (!bound) {
                 printerFound = false;
+                printerConnected = false;
             }
         } catch (InnerPrinterException error) {
             printerFound = false;
+            printerConnected = false;
         }
     }
 
@@ -61,14 +66,22 @@ public class SunmiPrinterHelper {
         } finally {
             sunmiPrinterService = null;
             printerFound = false;
+            printerConnected = false;
         }
     }
 
     public boolean isReady() {
-        return sunmiPrinterService != null && printerFound;
+        return sunmiPrinterService != null && printerConnected;
     }
 
     public boolean printText(String content) {
+        if (!isReady()) {
+            if (context != null) {
+                initSunmiPrinterService(context);
+                waitForReady(1500L);
+            }
+        }
+
         if (!isReady()) {
             return false;
         }
@@ -142,6 +155,21 @@ public class SunmiPrinterHelper {
             printerFound = InnerPrinterManager.getInstance().hasPrinter(service);
         } catch (InnerPrinterException error) {
             printerFound = false;
+        }
+    }
+
+    private void waitForReady(long timeoutMs) {
+        long startedAt = System.currentTimeMillis();
+        while (
+            !isReady()
+            && System.currentTimeMillis() - startedAt < timeoutMs
+        ) {
+            try {
+                Thread.sleep(100L);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+                return;
+            }
         }
     }
 

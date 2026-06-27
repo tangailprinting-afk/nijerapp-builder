@@ -2067,12 +2067,6 @@ extends AppCompatActivity {
 
         }
 
-        if (!sunmiPrinterHelper.isReady()) {
-
-            return false;
-
-        }
-
         return sunmiPrinterHelper.printText(
             printableText
         );
