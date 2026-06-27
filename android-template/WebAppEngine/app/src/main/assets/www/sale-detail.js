@@ -218,18 +218,10 @@ let customers = [], sales = [], collections = [], currentSale = null;
             const cust = customers.find(c => c.id == (currentSale.customer_id || currentSale.customerId));
             let items = [];
             try { items = JSON.parse(currentSale.items || '[]'); } catch (e) {}
-            const printableHtml = buildInvoiceHTMLClean(currentSale, cust, items);
-            if (typeof window.printHTMLContent === 'function') {
-                Promise.resolve(window.printHTMLContent(printableHtml, { title: 'Print Invoice', mode: 'thermal', requireNative: true }))
-                    .catch(err => showToast('Print failed: ' + err.message, 'error'));
-                return;
-            }
-            const nativePrinter = window.NijerAppPrinter || window.AndroidPrinter;
-            if (nativePrinter && typeof nativePrinter.printDocument === 'function') {
-                nativePrinter.printDocument(JSON.stringify({ title: 'Print Invoice', html: printableHtml, text: '', url: window.location.href, requireNative: true }));
-                return;
-            }
-            showToast('Native printer bridge not available.', 'error');
+            const w = window.open('', '_blank', 'width=900,height=700');
+            w.document.write(`<!doctype html><html><head><title>Print Invoice</title></head><body style="margin:0;padding:0;">${buildInvoiceHTMLClean(currentSale, cust, items)}</body></html>`);
+            w.document.close();
+            setTimeout(() => { w.print(); }, 800);
         }
 
         init();
