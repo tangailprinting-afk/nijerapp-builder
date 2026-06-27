@@ -76,8 +76,8 @@
                             <div class="form-group">
                                 <label>Printer Model</label>
                                 <select id="printerType">
-                                    <option value="AUTO">Auto / Generic ESC-POS</option>
                                     <option value="SUNMI">SUNMI Built-in</option>
+                                    <option value="AUTO">Auto / Generic ESC-POS</option>
                                     <option value="EPSON">Epson TM Series</option>
                                     <option value="XPRINTER">XPrinter</option>
                                     <option value="BIXOLON">Bixolon</option>
@@ -91,8 +91,8 @@
                             <div class="form-group advanced-only">
                                 <label>Connection Mode</label>
                                 <select id="connectionMode">
-                                    <option value="auto">Auto</option>
                                     <option value="native">Android Wrapper Native</option>
+                                    <option value="auto">Auto</option>
                                     <option value="bluetooth">Bluetooth</option>
                                     <option value="usb">USB</option>
                                     <option value="wifi">Wi-Fi</option>
@@ -232,8 +232,8 @@
                 autoCut: true,
                 bridgeName: 'auto',
                 methodName: 'auto',
-                printerType: 'AUTO',
-                connectionMode: 'auto',
+                printerType: 'SUNMI',
+                connectionMode: 'native',
                 printerName: '',
                 printerAddress: '',
                 activeProfileId: '',
@@ -278,8 +278,8 @@
             document.getElementById('autoCut').value = settings.autoCut === false ? 'false' : 'true';
             document.getElementById('requireNative').checked = settings.requireNative !== false;
             document.getElementById('enabled').checked = settings.enabled !== false;
-            document.getElementById('printerType').value = settings.printerType || 'AUTO';
-            document.getElementById('connectionMode').value = settings.connectionMode || 'auto';
+            document.getElementById('printerType').value = settings.printerType || 'SUNMI';
+            document.getElementById('connectionMode').value = settings.connectionMode || 'native';
             document.getElementById('printerName').value = settings.printerName || '';
             document.getElementById('printerAddress').value = settings.printerAddress || '';
             const activeProfile = printerShared.getActivePrinterProfile() || null;

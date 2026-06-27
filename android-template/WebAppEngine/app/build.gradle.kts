@@ -37,6 +37,7 @@ android {
 
 dependencies {
    implementation("com.onesignal:OneSignal:4.8.6")
+    implementation("com.sunmi:printerlibrary:1.0.18")
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)

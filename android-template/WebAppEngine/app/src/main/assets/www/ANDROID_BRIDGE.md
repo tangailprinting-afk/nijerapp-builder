@@ -82,4 +82,8 @@ Recommended payload fields:
 - `autoCut`
 - `copies`
 
-The web app will try these method names in order and fall back to browser print only when no native bridge exists.
+The web app will try these method names in order and requires a native bridge for thermal printing. Browser/PDF fallback is disabled in this build.
+
+For SUNMI V2S, the Android wrapper should use the official printer library:
+
+- `com.sunmi:printerlibrary:1.0.18`

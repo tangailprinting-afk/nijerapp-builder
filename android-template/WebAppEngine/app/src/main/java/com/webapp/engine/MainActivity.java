@@ -92,6 +92,8 @@ extends AppCompatActivity {
     private Object sunmiPrinterService;
     private ServiceConnection sunmiServiceConnection;
     private boolean sunmiServiceBound;
+    private final SunmiPrinterHelper sunmiPrinterHelper =
+        new SunmiPrinterHelper();
     private final ArrayList<JSONObject> discoveredPrinters =
         new ArrayList<>();
     private final Handler mainHandler =
@@ -113,7 +115,9 @@ extends AppCompatActivity {
             );
         bluetoothAdapter =
             BluetoothAdapter.getDefaultAdapter();
-        ensureSunmiPrinterService();
+        sunmiPrinterHelper.initSunmiPrinterService(
+            this
+        );
         registerBluetoothDiscoveryReceiver();
         requestRuntimePermissions();
 
@@ -289,7 +293,9 @@ extends AppCompatActivity {
 
         unregisterBluetoothDiscoveryReceiver();
         closeBluetoothConnection();
-        unbindSunmiPrinterService();
+        sunmiPrinterHelper.deInitSunmiPrinterService(
+            this
+        );
         super.onDestroy();
 
     }
@@ -429,47 +435,63 @@ extends AppCompatActivity {
                 connectionMode
             );
 
-        if (
-            preferSunmi
-                && trySunmiPrint(
+        if (preferSunmi) {
+
+            if (
+                trySunmiPrint(
                     title,
                     printableText
                 )
-        ) {
+            ) {
+
+                return;
+
+            }
+
+            mainHandler.post(
+                () -> Toast.makeText(
+                    this,
+                    "Sunmi printer is not ready.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            );
 
             return;
 
         }
 
-        if (
-            preferBluetooth
-                && tryBluetoothPrint(
-                    printableText
-                )
-        ) {
+        if (preferBluetooth) {
+
+            if (tryBluetoothPrint(printableText)) {
+
+                return;
+
+            }
+
+            mainHandler.post(
+                () -> Toast.makeText(
+                    this,
+                    "Bluetooth printer is not ready.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            );
 
             return;
 
         }
 
-        if (
-            !preferSunmi
-                && trySunmiPrint(
-                    title,
-                    printableText
-                )
-        ) {
+        if (trySunmiPrint(
+            title,
+            printableText
+        )) {
 
             return;
 
         }
 
-        if (
-            !preferBluetooth
-                && tryBluetoothPrint(
-                    printableText
-                )
-        ) {
+        if (tryBluetoothPrint(
+            printableText
+        )) {
 
             return;
 
@@ -2045,71 +2067,15 @@ extends AppCompatActivity {
 
         }
 
-        if (!ensureSunmiPrinterService()) {
+        if (!sunmiPrinterHelper.isReady()) {
 
             return false;
 
         }
 
-        Object printer =
-            sunmiPrinterService;
-
-        if (printer == null) {
-
-            return false;
-
-        }
-
-        boolean printed =
-            invokeSunmiPrinterMethod(
-                printer,
-                "printText",
-                printableText
-            )
-            || invokeSunmiPrinterMethod(
-                printer,
-                "printOriginalText",
-                printableText
-            )
-            || invokeSunmiPrinterMethod(
-                printer,
-                "printString",
-                printableText
-            )
-            || invokeSunmiPrinterMethod(
-                printer,
-                "print",
-                printableText
-            );
-
-        if (!printed) {
-
-            printed =
-                invokeSunmiPrinterMethod(
-                    printer,
-                    "sendRAWData",
-                    buildEscPosBytes(
-                        printableText
-                    )
-                );
-
-        }
-
-        if (printed) {
-
-            invokeSunmiPrinterMethod(
-                printer,
-                "lineWrap",
-                2
-            );
-            invokeSunmiPrinterMethod(
-                printer,
-                "cutPaper"
-            );
-
-        }
-
-        return printed;
+        return sunmiPrinterHelper.printText(
+            printableText
+        );
 
     }
 
