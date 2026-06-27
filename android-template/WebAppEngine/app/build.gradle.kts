@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "werwer.sdfsd.sdfsdf"
+        applicationId = "sdfdsf.sdfsd.sdfsdf"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
