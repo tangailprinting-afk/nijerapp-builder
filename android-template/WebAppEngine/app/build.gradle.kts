@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "rizq.admin.app"
+        applicationId = "rizq.adminapp.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
