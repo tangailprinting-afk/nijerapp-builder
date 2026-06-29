@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rizq Restaurant — অ্যাডমিন প্যানেল</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E55A2B;
+            --secondary: #2C3E50;
+            --accent: #F7C948;
+            --bg: #F1F5F9;
+            --surface: #FFFFFF;
+            --text: #1E293B;
+            --text-light: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background: var(--bg); color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Login Screen */
+        .login-screen {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 16px; background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%);
+        }
+        .login-card {
+            background: var(--surface); border-radius: 24px;
+            width: 100%; max-width: 420px; padding: 40px 32px;
+            box-shadow: var(--shadow-lg);
+        }
+        .login-logo {
+            text-align: center; margin-bottom: 32px;
+        }
+        .login-logo img { width: 56px; height: 56px; object-fit: contain; }
+        .login-logo h1 { font-size: 1.5rem; margin-top: 12px; }
+        .login-logo p { color: var(--text-light); font-size: 0.9rem; margin-top: 4px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+        .form-input {
+            width: 100%; padding: 12px 16px; border-radius: 12px;
+            border: 2px solid var(--border); font-family: inherit;
+            font-size: 1rem; transition: all 0.2s; background: var(--bg);
+        }
+        .form-input:focus { outline: none; border-color: var(--primary); background: var(--surface); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 24px; border-radius: 12px; border: none;
+            font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-block { width: 100%; }
+        .btn-primary {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 14px rgba(255,107,53,0.3);
+        }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+        .btn-icon {
+            width: 36px; height: 36px; padding: 0;
+            border-radius: 10px; background: var(--bg);
+            color: var(--text); display: inline-flex;
+            align-items: center; justify-content: center;
+        }
+        .btn-icon:hover { background: var(--border); }
+        .form-error {
+            color: var(--danger); font-size: 0.85rem;
+            margin-top: 12px; text-align: center; display: none;
+        }
+        .form-error.show { display: block; }
+        /* App Layout */
+        .app { display: none; min-height: 100vh; }
+        .app.active { display: flex; }
+        /* Sidebar */
+        .sidebar {
+            width: 260px; background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            position: fixed; left: 0; top: 0; bottom: 0; z-index: 50;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-header {
+            padding: 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-header img { width: 36px; height: 36px; object-fit: contain; display: block; }
+        .sidebar-header h2 { font-size: 1.2rem; }
+        .sidebar-nav { flex: 1; padding: 12px; overflow-y: auto; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 12px;
+            cursor: pointer; margin-bottom: 4px;
+            color: var(--text-light); font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { background: var(--bg); color: var(--text); }
+        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item svg { width: 20px; height: 20px; }
+        .sidebar-footer {
+            padding: 16px; border-top: 1px solid var(--border);
+        }
+        .user-info {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 12px;
+        }
+        .user-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.9rem;
+        }
+        .user-meta { flex: 1; min-width: 0; }
+        .user-meta p { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-meta span { font-size: 0.75rem; color: var(--text-light); }
+        /* Main */
+        .main {
+            flex: 1; margin-left: 0;
+            display: flex; flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            height: 64px; background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; position: sticky; top: 0; z-index: 40;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-title { font-size: 1.15rem; font-weight: 700; }
+        .menu-btn {
+            width: 40px; height: 40px; border: none; background: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; cursor: pointer; border-radius: 8px;
+        }
+        .menu-btn:hover { background: var(--bg); }
+        .menu-btn span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; }
+        .content {
+            flex: 1; padding: 20px; overflow-y: auto;
+        }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* Stats */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 16px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--surface); border-radius: 16px;
+            padding: 20px; box-shadow: var(--shadow);
+        }
+        .stat-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .stat-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stat-icon.primary { background: rgba(255,107,53,0.1); color: var(--primary); }
+        .stat-icon.success { background: rgba(16,185,129,0.1); color: var(--success); }
+        .stat-icon.warning { background: rgba(245,158,11,0.1); color: var(--warning); }
+        .stat-icon.info { background: rgba(59,130,246,0.1); color: var(--info); }
+        .stat-icon svg { width: 22px; height: 22px; }
+        .stat-change { font-size: 0.75rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; }
+        .stat-change.up { background: #D1FAE5; color: var(--success); }
+        .stat-value { font-size: 1.6rem; font-weight: 700; }
+        .stat-label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
+        /* Cards */
+        .card {
+            background: var(--surface); border-radius: 16px;
+            box-shadow: var(--shadow); margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 20px 20px 0; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .card-title { font-size: 1.1rem; font-weight: 700; }
+        .card-body { padding: 20px; }
+        /* Table */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; font-size: 0.9rem; }
+        th { font-weight: 600; color: var(--text-light); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+        td { border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
+        .table-img {
+            width: 48px; height: 48px; border-radius: 10px;
+            object-fit: cover; background: var(--bg);
+        }
+        .badge {
+            display: inline-block; padding: 4px 10px;
+            border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+        }
+        .badge-success { background: #D1FAE5; color: var(--success); }
+        .badge-danger { background: #FEE2E2; color: var(--danger); }
+        .badge-warning { background: #FEF3C7; color: var(--warning); }
+        /* Form */
+        .form-row {
+            display: grid; grid-template-columns: 1fr;
+            gap: 16px; margin-bottom: 16px;
+        }
+        .form-textarea {
+            min-height: 100px; resize: vertical;
+        }
+        .form-select {
+            appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+        }
+        .toggle {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .toggle-switch {
+            width: 48px; height: 26px; border-radius: 13px;
+            background: var(--border); position: relative;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .toggle-switch.on { background: var(--primary); }
+        .toggle-switch::after {
+            content: ''; position: absolute; top: 3px; left: 3px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: white; transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.on::after { transform: translateX(22px); }
+        .image-upload {
+            border: 2px dashed var(--border); border-radius: 12px;
+            padding: 32px; text-align: center; cursor: pointer;
+            transition: all 0.2s; position: relative;
+        }
+        .image-upload:hover { border-color: var(--primary); background: rgba(255,107,53,0.02); }
+        .image-upload.has-image { padding: 0; border-style: solid; }
+        .image-upload img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .image-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .upload-placeholder { color: var(--text-light); }
+        .upload-placeholder svg { width: 40px; height: 40px; margin-bottom: 8px; color: var(--text-light); }
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px); z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal {
+            background: var(--surface); border-radius: 20px;
+            width: 100%; max-width: 520px; max-height: 90vh;
+            overflow-y: auto; box-shadow: var(--shadow-lg);
+            transform: translateY(20px); transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal { transform: translateY(0); }
+        .modal-header {
+            padding: 20px 24px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 1.15rem; font-weight: 700; }
+        .modal-body { padding: 24px; }
+        .modal-footer {
+            padding: 16px 24px; border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: 10px;
+        }
+        .close-btn {
+            width: 32px; height: 32px; border-radius: 8px;
+            border: none; background: var(--bg); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .close-btn:hover { background: var(--border); }
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: var(--secondary); color: white;
+            padding: 14px 24px; border-radius: 12px;
+            font-size: 0.9rem; z-index: 200;
+            transform: translateY(100px); opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        /* Empty */
+        .empty-state { text-align: center; padding: 48px 20px; color: var(--text-light); }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.3; }
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+            z-index: 45; display: none;
+        }
+        .sidebar-overlay.show { display: block; }
+        /* Responsive */
+        @media (min-width: 1024px) {
+            .sidebar { position: relative; transform: translateX(0); }
+            .main { margin-left: 0; }
+            .menu-btn { display: none; }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .form-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 1023px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .loading-dots {
+            display: inline-flex; gap: 4px;
+        }
+        .loading-dots span {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: currentColor; animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="image/logo.png" alt="Rizq Restaurant">
+                <h1>Rizq Restaurant Admin</h1>
+                <p>অ্যাডমিন প্যানেলে প্রবেশ করুন</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">ইমেইল</label>
+                    <input type="email" class="form-input" id="loginEmail" required placeholder="admin@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">পাসওয়ার্ড</label>
+                    <input type="password" class="form-input" id="loginPassword" required placeholder="••••••••">
+                </div>
+                <div class="form-error" id="loginError"></div>
+                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                    <span id="loginBtnText">লগইন করুন</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App -->
+    <div class="app" id="app">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="image/logo.png" alt="Rizq Restaurant">
+                <h2>Rizq Restaurant</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active" onclick="navigate('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    ড্যাশবোর্ড
+                </div>
+                <div class="nav-item" onclick="navigate('menu')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                    মেনু ম্যানেজমেন্ট
+                </div>
+                <div class="nav-item" onclick="navigate('orders')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    অর্ডারস
+                </div>
+                <div class="nav-item" onclick="navigate('feedback')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h6"/></svg>
+                    ফিডব্যাক
+                </div>
+                <div class="nav-item" onclick="navigate('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.51-1H11a2 2 0 0 1 2-2 2 2 0 0 1 2 2h.09a1.65 1.65 0 0 0 1.51 1 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1 1.51V11a2 2 0 0 1 2 2 2 2 0 0 1-2 2v.09a1.65 1.65 0 0 0-1 1.51z"/></svg>
+                    সেটিংস
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-meta">
+                        <p id="userEmail">Admin</p>
+                        <span>অ্যাডমিন</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm btn-block" onclick="logout()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    লগআউট
+                </button>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- Main -->
+        <div class="main">
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-btn" onclick="toggleSidebar()">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <h1 class="header-title" id="pageTitle">ড্যাশবোর্ড</h1>
+                </div>
+            </header>
+            <div class="content">
+
+                <!-- Dashboard -->
+                <div class="page active" id="page-dashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon primary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                                </div>
+                                <span class="stat-change up">মোট</span>
+                            </div>
+                            <div class="stat-value" id="statMenu">0</div>
+                            <div class="stat-label">মেনু আইটেম</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon success">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                </div>
+                                <span class="stat-change up">আজ</span>
+                            </div>
+                            <div class="stat-value" id="statOrders">0</div>
+                            <div class="stat-label">অর্ডার</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon warning">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <span class="stat-change up">সক্রিয়</span>
+                            </div>
+                            <div class="stat-value" id="statAvailable">0</div>
+                            <div class="stat-label">উপলব্ধ আইটেম</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon info">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                </div>
+                                <span class="stat-change up">জনপ্রিয়</span>
+                            </div>
+                            <div class="stat-value" id="statPopular">0</div>
+                            <div class="stat-label">জনপ্রিয় আইটেম</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">সাম্প্রতিক অর্ডার</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-wrap">
+                                <table id="recentOrdersTable">
+                                    <thead>
+                                        <tr><th>অর্ডার আইডি</th><th>গ্রাহক</th><th>মোট</th><th>স্ট্যাটাস</th></tr>
+                                    </thead>
+                                    <tbody id="recentOrdersBody">
+                                        <tr><td colspan="4" class="empty-state">কোনো অর্ডার নেই</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Management -->
+                <div class="page" id="page-menu">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">মেনু আইটেমস</h3>
+                            <button class="btn btn-primary btn-sm" onclick="openMenuModal()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                নতুন আইটেম
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-wrap">
+                                <table id="menuTable">
+                                    <thead>
+                                        <tr><th>ছবি</th><th>নাম</th><th>ক্যাটাগরি</th><th>দাম</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>
+                                    </thead>
+                                    <tbody id="menuTableBody">
+                                        <tr><td colspan="6" class="empty-state">লোড হচ্ছে...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders -->
+                <div class="page" id="page-orders">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">সকল অর্ডার</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr><th>আইডি</th><th>গ্রাহক</th><th>আইটেম</th><th>মোট</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>
+                                    </thead>
+                                    <tbody id="ordersTableBody">
+                                        <tr><td colspan="6" class="empty-state">কোনো অর্ডার নেই</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="page" id="page-feedback">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">ফিডব্যাক ম্যানেজমেন্ট</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr><th>ID</th><th>গ্রাহক</th><th>মোবাইল</th><th>রেটিং</th><th>ফিডব্যাক</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>
+                                    </thead>
+                                    <tbody id="feedbackTableBody">
+                                        <tr><td colspan="7" class="empty-state">কোনো ফিডব্যাক নেই</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="page" id="page-settings">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">রেস্টুরেন্ট সেটিংস</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="settingsForm" onsubmit="saveSettings(event)">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">রেস্টুরেন্টের নাম</label>
+                                        <input type="text" class="form-input" id="setName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">ফোন নম্বর</label>
+                                        <input type="text" class="form-input" id="setPhone" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">ইমেইল</label>
+                                        <input type="email" class="form-input" id="setEmail" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">খোলার সময়</label>
+                                        <input type="text" class="form-input" id="setHours" placeholder="সকাল ১০টা - রাত ১০টা" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">ঠিকানা</label>
+                                    <textarea class="form-input form-textarea" id="setAddress" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">হিরো ইমেজ (ImgBB URL)</label>
+                                    <input type="url" class="form-input" id="setHeroImage" placeholder="https://i.ibb.co/...">
+                                </div>
+                                <button type="submit" class="btn btn-primary" id="saveSettingsBtn">
+                                    <span id="saveSettingsText">সেভ করুন</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Item Modal -->
+    <div class="modal-overlay" id="menuModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="menuModalTitle">নতুন মেনু আইটেম</h3>
+                <button class="close-btn" onclick="closeMenuModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="menuForm" onsubmit="saveMenuItem(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="menuId">
+                    <div class="form-group">
+                        <label class="form-label">ছবি আপলোড</label>
+                        <div class="image-upload" id="imageUpload" onclick="document.getElementById('menuImageFile').click()">
+                            <div class="upload-placeholder" id="uploadPlaceholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <div>ছবি আপলোড করতে ক্লিক করুন</div>
+                                <small style="color:var(--text-light)">ImgBB তে আপলোড হবে</small>
+                            </div>
+                            <img id="menuImagePreview" style="display:none;" alt="Preview">
+                            <input type="file" id="menuImageFile" accept="image/*" onchange="handleImageSelect(event)">
+                        </div>
+                        <input type="hidden" id="menuImageUrl">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">আইটেমের নাম</label>
+                            <input type="text" class="form-input" id="menuName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ক্যাটাগরি</label>
+                            <input type="text" class="form-input" id="menuCategory" placeholder="যেমন: বিরিয়ানি, ফাস্ট ফুড" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">দাম (৳)</label>
+                            <input type="number" class="form-input" id="menuPrice" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">জনপ্রিয়?</label>
+                            <div class="toggle" onclick="toggleSwitch('isPopular')" style="margin-top:8px;">
+                                <div class="toggle-switch" id="isPopular"></div>
+                                <span id="isPopularLabel">না</span>
+                            </div>
+                            <input type="hidden" id="menuPopular" value="false">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">বিবরণ</label>
+                        <textarea class="form-input form-textarea" id="menuDesc" placeholder="আইটেমের বিবরণ লিখুন..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">উপলব্ধ?</label>
+                        <div class="toggle" onclick="toggleSwitch('isAvailable')">
+                            <div class="toggle-switch on" id="isAvailable"></div>
+                            <span id="isAvailableLabel">হ্যাঁ</span>
+                        </div>
+                        <input type="hidden" id="menuAvailable" value="true">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeMenuModal()">বাতিল</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="saveMenuBtn">
+                        <span id="saveMenuText">সেভ করুন</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getDatabase, ref, get, set, push, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+             const firebaseConfig = {
+
+  apiKey: "AIzaSyBv3sZ4XvvQUj_z-U9zppnQiLRBVWQSWQk",
+
+  authDomain: "rizq-reastaurant.firebaseapp.com",
+
+  databaseURL: "https://rizq-reastaurant-default-rtdb.firebaseio.com",
+
+  projectId: "rizq-reastaurant",
+
+  storageBucket: "rizq-reastaurant.firebasestorage.app",
+
+  messagingSenderId: "940992973211",
+
+  appId: "1:940992973211:web:ed12df3ea4cde0f5c2393e",
+
+  measurementId: "G-PWESWC2Q0G"
+
+};
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        window.db = db;
+        window.auth = auth;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.rtdbRef = ref;
+        window.rtdbGet = get;
+        window.rtdbSet = set;
+        window.rtdbPush = push;
+        window.rtdbUpdate = update;
+        window.rtdbRemove = remove;
+
+        function normalizePhone(phone) {
+            return String(phone || '').replace(/\D/g, '');
+        }
+
+        function snapshotToArray(snapshot) {
+            if (!snapshot.exists()) return [];
+            const value = snapshot.val() || {};
+            return Object.entries(value).map(([id, data]) => ({ id, ...(data || {}) }));
+        }
+
+        function getTimeValue(value) {
+            if (typeof value === 'number') return value;
+            if (value && typeof value === 'object' && typeof value.seconds === 'number') return value.seconds * 1000;
+            return 0;
+        }
+
+        function isSerialCustomerId(value) {
+            const n = toNumericCustomerId(value);
+            return Number.isFinite(n) && n > 0 && n <= 999999;
+        }
+
+        async function migrateCustomersToSerialIds() {
+            try {
+                const snap = await get(ref(db, "customers"));
+                const customers = snapshotToArray(snap);
+                if (customers.length === 0) return;
+
+                const numericIds = customers
+                    .filter(c => isSerialCustomerId(c.id))
+                    .map(c => toNumericCustomerId(c.id));
+                let nextId = numericIds.length ? Math.max(...numericIds) + 1 : 1;
+
+                for (const customer of customers) {
+                    if (isSerialCustomerId(customer.id)) continue;
+
+                    const mobile = String(customer.mobile || customer.phone || '');
+                    const hasNumericSameMobile = customers.some(other =>
+                        isSerialCustomerId(other.id) &&
+                        String(other.mobile || other.phone || '') === mobile
+                    );
+
+                    if (hasNumericSameMobile) {
+                        await remove(ref(db, `customers/${customer.id}`));
+                        continue;
+                    }
+
+                    while (customers.some(other => String(other.id) === String(nextId))) {
+                        nextId += 1;
+                    }
+
+                    const newId = String(nextId);
+                    nextId += 1;
+
+                    await set(ref(db, `customers/${newId}`), {
+                        id: Number(newId),
+                        name: customer.name || '',
+                        mobile: customer.mobile || customer.phone || '',
+                        address: customer.address || '',
+                        notes: customer.notes || '',
+                        opening_balance: Number(customer.opening_balance || 0),
+                        updatedAt: customer.updatedAt || new Date().toISOString(),
+                    });
+                    await remove(ref(db, `customers/${customer.id}`));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Auth state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('app').classList.add('active');
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = user.email.charAt(0).toUpperCase();
+                migrateCustomersToSerialIds();
+                loadDashboard();
+                loadMenuItems();
+                loadOrders();
+                loadSettings();
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('app').classList.remove('active');
+            }
+        });
+
+        // Load data
+        async function loadDashboard() {
+            try {
+                const menuSnap = await get(window.rtdbRef(db, "menuItems"));
+                const items = snapshotToArray(menuSnap);
+                document.getElementById('statMenu').textContent = items.length;
+                document.getElementById('statAvailable').textContent = items.filter(i => i.isAvailable !== false).length;
+                document.getElementById('statPopular').textContent = items.filter(i => i.isPopular).length;
+                
+                const orderSnap = await get(window.rtdbRef(db, "orders"));
+                const recent = snapshotToArray(orderSnap);
+                document.getElementById('statOrders').textContent = recent.length;
+                recent.sort((a,b) => getTimeValue(b.createdAt) - getTimeValue(a.createdAt));
+                renderRecentOrders(recent.slice(0, 5));
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadMenuItems() {
+            try {
+                const snap = await get(window.rtdbRef(db, "menuItems"));
+                const items = snapshotToArray(snap);
+                window.menuItems = items;
+                renderMenuTable(items);
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadOrders() {
+            try {
+                const snap = await get(window.rtdbRef(db, "orders"));
+                const orders = snapshotToArray(snap);
+                orders.sort((a,b) => getTimeValue(b.createdAt) - getTimeValue(a.createdAt));
+                renderOrdersTable(orders);
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadFeedbacks() {
+            try {
+                const snap = await get(window.rtdbRef(db, "feedbacks"));
+                const feedbacks = snapshotToArray(snap);
+                feedbacks.sort((a,b) => getTimeValue(b.createdAt) - getTimeValue(a.createdAt));
+                renderFeedbackTable(feedbacks);
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadSettings() {
+            try {
+                const snapshot = await get(window.rtdbRef(db, "settings/restaurant"));
+                if (snapshot.exists()) {
+                    const data = snapshot.val() || {};
+                    document.getElementById('setName').value = data.name || '';
+                    document.getElementById('setPhone').value = data.phone || '';
+                    document.getElementById('setEmail').value = data.email || '';
+                    document.getElementById('setHours').value = data.openingHours || '';
+                    document.getElementById('setAddress').value = data.address || '';
+                    document.getElementById('setHeroImage').value = data.heroImage || '';
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function renderRecentOrders(orders) {
+            const tbody = document.getElementById('recentOrdersBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">কোনো অর্ডার নেই</td></tr>';
+                return;
+            }
+            tbody.innerHTML = orders.map(o => `
+                <tr>
+                    <td>#${o.id.slice(-6)}</td>
+                    <td>${o.customerName || 'অজানা'}</td>
+                    <td>৳${o.total || 0}</td>
+                    <td><span class="badge badge-${o.status === 'completed' ? 'success' : o.status === 'pending' ? 'warning' : 'danger'}">${o.status || 'pending'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderMenuTable(items) {
+            const tbody = document.getElementById('menuTableBody');
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">কোনো আইটেম নেই</td></tr>';
+                return;
+            }
+            tbody.innerHTML = items.map(item => `
+                <tr>
+                    <td><img src="${item.imageUrl || 'https://via.placeholder.com/48?text=No+Image'}" class="table-img" alt=""></td>
+                    <td><strong>${item.name}</strong><br><small style="color:var(--text-light)">${item.description?.substring(0, 30) || ''}...</small></td>
+                    <td>${item.category}</td>
+                    <td>৳${item.price}</td>
+                    <td><span class="badge ${item.isAvailable !== false ? 'badge-success' : 'badge-danger'}">${item.isAvailable !== false ? 'উপলব্ধ' : 'অনুপলব্ধ'}</span></td>
+                    <td>
+                        <button class="btn btn-icon" onclick="editMenuItem('${item.id}')" title="এডিট">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="btn btn-icon" onclick="deleteMenuItem('${item.id}')" title="ডিলিট" style="color:var(--danger)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderOrdersTable(orders) {
+            const tbody = document.getElementById('ordersTableBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">কোনো অর্ডার নেই</td></tr>';
+                return;
+            }
+            tbody.innerHTML = orders.map(o => {
+                const itemText = (o.items || []).map(i => `${i.name}${i.quantity ? ` x${i.quantity}` : ''}`).join(', ');
+                return `
+                <tr>
+                    <td>#${o.id.slice(-6)}</td>
+                    <td>${o.customerName || 'অজানা'}<br><small>${o.phone || ''}</small></td>
+                    <td>${itemText || 'কোনো আইটেম নেই'}</td>
+                    <td>৳${o.total || 0}</td>
+                    <td><span class="badge badge-${o.status === 'completed' ? 'success' : o.status === 'pending' ? 'warning' : 'danger'}">${o.status || 'pending'}</span></td>
+                    <td>
+                        <button class="btn btn-icon" onclick="updateOrderStatus('${o.id}', 'completed')" title="সম্পন্ন">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function renderFeedbackTable(feedbacks) {
+            const tbody = document.getElementById('feedbackTableBody');
+            if (feedbacks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">কোনো ফিডব্যাক নেই</td></tr>';
+                return;
+            }
+            tbody.innerHTML = feedbacks.map(f => `
+                <tr>
+                    <td>#${String(f.id).slice(-6)}</td>
+                    <td>${f.customerName || 'অজানা'}</td>
+                    <td>${f.mobile || ''}</td>
+                    <td>${'★'.repeat(Number(f.rating || 0))}</td>
+                    <td>${f.message || ''}</td>
+                    <td><span class="badge badge-${f.status === 'approved' ? 'success' : f.status === 'rejected' ? 'danger' : 'warning'}">${f.status || 'pending'}</span></td>
+                    <td>—</td>
+                </tr>
+            `).join('');
+        }
+
+        window.loadMenuItems = loadMenuItems;
+        window.loadOrders = loadOrders;
+        window.loadFeedbacks = loadFeedbacks;
+        window.loadDashboard = loadDashboard;
+        window.renderMenuTable = renderMenuTable;
+        window.renderFeedbackTable = renderFeedbackTable;
+    </script>
+
+    <script>
+        const IMGBB_API_KEY = '54be6a546843ad33762fa8da6870d5ca';
+
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type;
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('loginBtnText');
+            const error = document.getElementById('loginError');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+            
+            try {
+                await window.signInWithEmailAndPassword(window.auth, email, password);
+            } catch (err) {
+                error.textContent = 'ইমেইল বা পাসওয়ার্ড ভুল!';
+                error.classList.add('show');
+                btn.disabled = false;
+                btnText.textContent = 'লগইন করুন';
+            }
+        }
+
+        function logout() {
+            window.signOut(window.auth);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+        }
+
+        function navigate(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            const titles = { dashboard: 'ড্যাশবোর্ড', menu: 'মেনু ম্যানেজমেন্ট', orders: 'অর্ডারস', feedback: 'ফিডব্যাক', settings: 'সেটিংস' };
+            document.getElementById('pageTitle').textContent = titles[page];
+            
+            if (window.innerWidth < 1024) toggleSidebar();
+            
+            if (page === 'menu') window.loadMenuItems();
+            if (page === 'orders') window.loadOrders();
+            if (page === 'feedback') window.loadFeedbacks();
+            if (page === 'dashboard') window.loadDashboard();
+        }
+
+        // Menu Modal
+        function openMenuModal() {
+            document.getElementById('menuModalTitle').textContent = 'নতুন মেনু আইটেম';
+            document.getElementById('menuForm').reset();
+            document.getElementById('menuId').value = '';
+            document.getElementById('menuImageUrl').value = '';
+            document.getElementById('menuImagePreview').style.display = 'none';
+            document.getElementById('uploadPlaceholder').style.display = 'block';
+            document.getElementById('imageUpload').classList.remove('has-image');
+            document.getElementById('isPopular').classList.remove('on');
+            document.getElementById('isPopularLabel').textContent = 'না';
+            document.getElementById('menuPopular').value = 'false';
+            document.getElementById('isAvailable').classList.add('on');
+            document.getElementById('isAvailableLabel').textContent = 'হ্যাঁ';
+            document.getElementById('menuAvailable').value = 'true';
+            document.getElementById('menuModal').classList.add('active');
+        }
+
+        function closeMenuModal() {
+            document.getElementById('menuModal').classList.remove('active');
+        }
+
+        function toggleSwitch(id) {
+            const el = document.getElementById(id);
+            const label = document.getElementById(id + 'Label');
+            const input = document.getElementById(id === 'isPopular' ? 'menuPopular' : 'menuAvailable');
+            el.classList.toggle('on');
+            const isOn = el.classList.contains('on');
+            label.textContent = isOn ? 'হ্যাঁ' : 'না';
+            input.value = isOn.toString();
+        }
+
+        function handleImageSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('menuImagePreview').src = ev.target.result;
+                document.getElementById('menuImagePreview').style.display = 'block';
+                document.getElementById('uploadPlaceholder').style.display = 'none';
+                document.getElementById('imageUpload').classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadToImgBB(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('key', IMGBB_API_KEY);
+            
+            const res = await fetch('https://api.imgbb.com/1/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) return data.data.url;
+            throw new Error('Upload failed');
+        }
+
+        async function saveMenuItem(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveMenuBtn');
+            const btnText = document.getElementById('saveMenuText');
+            const id = document.getElementById('menuId').value;
+            const fileInput = document.getElementById('menuImageFile');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+            
+            try {
+                let imageUrl = document.getElementById('menuImageUrl').value;
+                if (fileInput.files[0]) {
+                    imageUrl = await uploadToImgBB(fileInput.files[0]);
+                }
+
+                const now = Date.now();
+                
+                const data = {
+                    name: document.getElementById('menuName').value,
+                    category: document.getElementById('menuCategory').value,
+                    price: parseFloat(document.getElementById('menuPrice').value),
+                    description: document.getElementById('menuDesc').value,
+                    isPopular: document.getElementById('menuPopular').value === 'true',
+                    isAvailable: document.getElementById('menuAvailable').value === 'true',
+                    imageUrl: imageUrl || '',
+                    updatedAt: now
+                };
+                
+                if (id) {
+                    await window.rtdbUpdate(window.rtdbRef(db, `menuItems/${id}`), data);
+                    showToast('আইটেম আপডেট হয়েছে');
+                } else {
+                    data.createdAt = now;
+                    const newRef = window.rtdbPush(window.rtdbRef(db, 'menuItems'));
+                    await window.rtdbSet(newRef, data);
+                    showToast('নতুন আইটেম যোগ হয়েছে');
+                }
+                
+                closeMenuModal();
+                window.loadMenuItems();
+                window.loadDashboard();
+            } catch (err) {
+                console.error(err);
+                showToast('সমস্যা হয়েছে: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'সেভ করুন';
+            }
+        }
+
+        function editMenuItem(id) {
+            const item = window.menuItems.find(i => i.id === id);
+            if (!item) return;
+            
+            document.getElementById('menuModalTitle').textContent = 'আইটেম এডিট';
+            document.getElementById('menuId').value = id;
+            document.getElementById('menuName').value = item.name;
+            document.getElementById('menuCategory').value = item.category;
+            document.getElementById('menuPrice').value = item.price;
+            document.getElementById('menuDesc').value = item.description || '';
+            document.getElementById('menuImageUrl').value = item.imageUrl || '';
+            
+            if (item.imageUrl) {
+                document.getElementById('menuImagePreview').src = item.imageUrl;
+                document.getElementById('menuImagePreview').style.display = 'block';
+                document.getElementById('uploadPlaceholder').style.display = 'none';
+                document.getElementById('imageUpload').classList.add('has-image');
+            }
+            
+            const popEl = document.getElementById('isPopular');
+            if (item.isPopular) { popEl.classList.add('on'); document.getElementById('isPopularLabel').textContent = 'হ্যাঁ'; document.getElementById('menuPopular').value = 'true'; }
+            else { popEl.classList.remove('on'); document.getElementById('isPopularLabel').textContent = 'না'; document.getElementById('menuPopular').value = 'false'; }
+            
+            const avEl = document.getElementById('isAvailable');
+            if (item.isAvailable !== false) { avEl.classList.add('on'); document.getElementById('isAvailableLabel').textContent = 'হ্যাঁ'; document.getElementById('menuAvailable').value = 'true'; }
+            else { avEl.classList.remove('on'); document.getElementById('isAvailableLabel').textContent = 'না'; document.getElementById('menuAvailable').value = 'false'; }
+            
+            document.getElementById('menuModal').classList.add('active');
+        }
+
+        async function deleteMenuItem(id) {
+            if (!confirm('আপনি কি নিশ্চিতভাবে এই আইটেম ডিলিট করতে চান?')) return;
+            try {
+                await window.rtdbRemove(window.rtdbRef(db, `menuItems/${id}`));
+                showToast('আইটেম ডিলিট হয়েছে');
+                window.loadMenuItems();
+                window.loadDashboard();
+            } catch (err) {
+                showToast('ডিলিট করতে সমস্যা হয়েছে', 'error');
+            }
+        }
+
+        async function saveSettings(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveSettingsBtn');
+            const btnText = document.getElementById('saveSettingsText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+            
+            try {
+                const now = Date.now();
+                const data = {
+                    name: document.getElementById('setName').value,
+                    phone: document.getElementById('setPhone').value,
+                    email: document.getElementById('setEmail').value,
+                    openingHours: document.getElementById('setHours').value,
+                    address: document.getElementById('setAddress').value,
+                    heroImage: document.getElementById('setHeroImage').value,
+                    updatedAt: now
+                };
+                await window.rtdbSet(window.rtdbRef(db, 'settings/restaurant'), data);
+                showToast('সেটিংস সেভ হয়েছে');
+            } catch (err) {
+                showToast('সমস্যা হয়েছে', 'error');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'সেভ করুন';
+            }
+        }
+
+        async function updateOrderStatus(id, status) {
+            try {
+                await window.rtdbUpdate(window.rtdbRef(db, `orders/${id}`), { status, updatedAt: Date.now() });
+                showToast('অর্ডার আপডেট হয়েছে');
+                window.loadOrders();
+                window.loadDashboard();
+            } catch (err) {
+                showToast('সমস্যা হয়েছে', 'error');
+            }
+        }
+
+    </script>
+</body>
+</html>
