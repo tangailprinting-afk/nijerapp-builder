@@ -282,7 +282,7 @@ extends AppCompatActivity {
 
         webView.loadUrl(
 
-"file:///android_asset/www/Project/index.html"
+"file:///android_asset/project/index.html"
 
         );
 

@@ -123,7 +123,7 @@ export async function POST(
 
         await uploadBinaryFile(
 
-`android-template/WebAppEngine/app/src/main/assets/www/Project/${fileName}`,
+`android-template/WebAppEngine/app/src/main/assets/project/${fileName}`,
 
           base64,
 
@@ -137,7 +137,7 @@ export async function POST(
 
       await updateGitHubFile(
 
-"android-template/WebAppEngine/app/src/main/assets/www/Project/index.html",
+"android-template/WebAppEngine/app/src/main/assets/project/index.html",
 
         htmlCode ||
 
@@ -292,7 +292,7 @@ export async function POST(
     // APP NAME UPDATE
 
     const commonJsPath =
-      "android-template/WebAppEngine/app/src/main/assets/www/Project/common.js";
+      "android-template/WebAppEngine/app/src/main/assets/project/common.js";
 
     const commonJsContent =
       await readFile(
@@ -304,8 +304,7 @@ export async function POST(
           "src",
           "main",
           "assets",
-          "www",
-          "Project",
+          "project",
           "common.js"
         ),
         "utf8"
@@ -337,7 +336,7 @@ export async function POST(
 
     if (selectedFeatures.printer === true) {
       await updateGitHubFile(
-        "android-template/WebAppEngine/app/src/main/assets/www/Project/printer-settings.html",
+        "android-template/WebAppEngine/app/src/main/assets/project/printer-settings.html",
         await readFile(
           join(
             process.cwd(),
@@ -347,7 +346,7 @@ export async function POST(
             "src",
             "main",
             "assets",
-            "www",
+            "project",
             "printer-settings.html"
           ),
           "utf8"

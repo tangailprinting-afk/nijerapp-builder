@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Sultan Digital Sign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="common.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #eef2ff;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --info: #3b82f6;
+            --info-light: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-light: #f5f3ff;
+            --teal: #14b8a6;
+            --teal-light: #f0fdfa;
+            --orange: #f97316;
+            --orange-light: #fff7ed;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.08);
+            --radius-xs: 6px;
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+        /* NAVBAR */
+        .navbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 50; gap: 16px; flex-wrap: wrap; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .navbar-brand img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; }
+        .navbar-brand .brand-icon-fallback { width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .navbar-brand .brand-text { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.1; }
+        .navbar-brand .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+        .navbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-family: inherit; white-space: nowrap; text-decoration: none; letter-spacing: -0.1px; line-height: 1.4; }
+        .btn-primary { background: var(--primary); color: white; } .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(99,102,241,0.3); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; } .btn-success:hover { background: #059669; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transform: translateY(-1px); }
+        .btn-outline { background: white; color: var(--text); border: 1.5px solid var(--border); } .btn-outline:hover { background: #f8fafc; border-color: #94a3b8; }
+        .btn-ghost { background: transparent; color: var(--text-secondary); } .btn-ghost:hover { background: #f1f5f9; color: var(--text); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: var(--radius-xs); }
+
+        .main-container { max-width: 1440px; margin: 0 auto; padding: 24px; }
+
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .page-header .subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .live-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--success); background: var(--success-light); padding: 5px 10px; border-radius: 20px; }
+        .live-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* KPI CARDS */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 20px 24px; box-shadow: var(--shadow); transition: var(--transition); cursor: default; position: relative; overflow: hidden; border: 1px solid transparent; }
+        .kpi-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--border); }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .kpi-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+        .kpi-card.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .kpi-card.orange::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .kpi-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .kpi-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .kpi-card.teal::before { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
+        .kpi-card.indigo::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+        .kpi-card.pink::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+
+        .kpi-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+        .kpi-icon.green { background: var(--success-light); } .kpi-icon.blue { background: var(--info-light); }
+        .kpi-icon.orange { background: var(--orange-light); } .kpi-icon.purple { background: var(--purple-light); }
+        .kpi-icon.red { background: var(--danger-light); } .kpi-icon.teal { background: var(--teal-light); }
+        .kpi-icon.indigo { background: var(--primary-light); } .kpi-icon.pink { background: #fdf2f8; }
+
+        .kpi-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+        .kpi-value { font-size: 28px; font-weight: 900; letter-spacing: -0.8px; line-height: 1.1; }
+        .kpi-value.green-text { color: #10b981; } .kpi-value.red-text { color: #ef4444; } .kpi-value.orange-text { color: #f97316; }
+        .kpi-footer { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+
+        /* GRID LAYOUTS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+        /* CARD */
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; border: 1px solid transparent; }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fafbfc; }
+        .card-header h3 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .card-body { overflow-x: auto; }
+        .card-body.no-padding { padding: 0; }
+
+        /* TABLE */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        table thead { background: #f8fafc; }
+        table th { padding: 11px 16px; text-align: left; font-weight: 700; color: var(--text-secondary); font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap; border-bottom: 1px solid var(--border); }
+        table td { padding: 11px 16px; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
+        table tbody tr { transition: var(--transition); } table tbody tr:hover { background: #f8fafc; }
+        .cname { font-weight: 600; }
+        .amount { font-weight: 700; } .amount.green { color: #10b981; } .amount.red { color: #ef4444; } .amount.orange { color: #f97316; }
+
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        .badge-success { background: #d1fae5; color: #065f46; } .badge-warning { background: #fef3c7; color: #92400e; } .badge-danger { background: #fee2e2; color: #991b1b; } .badge-info { background: #dbeafe; color: #1e40af; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.6; } .empty-state p { font-size: 13px; font-weight: 500; }
+
+        .alert-box { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .alert-danger { background: var(--danger-light); border: 1px solid #fecaca; color: #991b1b; }
+        .alert-warning { background: var(--warning-light); border: 1px solid #fde68a; color: #92400e; }
+        .alert-info { background: var(--info-light); border: 1px solid #bfdbfe; color: #1e40af; }
+
+        @media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) {
+            .navbar { height: auto; padding: 12px 16px; } .navbar-actions { width: 100%; } .navbar-actions .btn { flex: 1; justify-content: center; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); } .main-container { padding: 16px; } .page-header h1 { font-size: 22px; }
+        }
+        @media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; } .kpi-card { padding: 14px; } .kpi-value { font-size: 22px; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <img src="image/logo.jpg" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" style="display:block;">
+            <div class="brand-icon-fallback" style="display:none;">🖨️</div>
+            <div>
+                <div class="brand-text">Sultan Digital Sign</div>
+                <div class="brand-sub">Management System</div>
+            </div>
+        </a>
+        <div class="navbar-actions">
+            <a href="customers.html" class="btn btn-outline btn-sm">👥 Customers</a>
+            <a href="sales.html" class="btn btn-primary btn-sm">➕ New Sale</a>
+            <a href="collections.html" class="btn btn-success btn-sm">💵 Collection</a>
+            <a href="expenses.html" class="btn btn-outline btn-sm">💸 Expenses</a>
+            <a href="suppliers.html" class="btn btn-outline btn-sm">🏭 Suppliers</a>
+            <a href="reports.html" class="btn btn-outline btn-sm">📊 Reports</a>
+            <button class="btn btn-ghost btn-sm" onclick="refreshDashboard()">🔄</button>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header">
+            <div><h1>Dashboard</h1><p class="subtitle">Real-time business overview</p></div>
+            <div class="live-indicator" id="dateBadge"><span class="live-dot"></span> Loading...</div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card green"><div class="kpi-icon green">💰</div><div class="kpi-label">Today's Sales</div><div class="kpi-value" id="kpiTodaySales">৳ 0</div><div class="kpi-footer">আজকের বিক্রি</div></div>
+            <div class="kpi-card blue"><div class="kpi-icon blue">✅</div><div class="kpi-label">Today's Collection</div><div class="kpi-value green-text" id="kpiTodayCollection">৳ 0</div><div class="kpi-footer">আজকের জমা</div></div>
+            <div class="kpi-card orange"><div class="kpi-icon orange">💸</div><div class="kpi-label">Today's Expense</div><div class="kpi-value orange-text" id="kpiTodayExpense">৳ 0</div><div class="kpi-footer">আজকের খরচ</div></div>
+            <div class="kpi-card purple"><div class="kpi-icon purple">📥</div><div class="kpi-label">Today's Due Collection</div><div class="kpi-value" id="kpiTodayDueCollection">৳ 0</div><div class="kpi-footer">আজকের বাকি আদায়</div></div>
+            <div class="kpi-card red"><div class="kpi-icon red">📋</div><div class="kpi-label">Total Due (Receivable)</div><div class="kpi-value red-text" id="kpiTotalDue">৳ 0</div><div class="kpi-footer">মোট বাকি পাওনা</div></div>
+            <div class="kpi-card red"><div class="kpi-icon red">📤</div><div class="kpi-label">Total Payable (Supplier)</div><div class="kpi-value red-text" id="kpiTotalPayable">৳ 0</div><div class="kpi-footer">সাপ্লায়ারকে দিতে হবে</div></div>
+            <div class="kpi-card purple"><div class="kpi-icon purple">👥</div><div class="kpi-label">Total Payable (Staff)</div><div class="kpi-value red-text" id="kpiTotalStaffPayable">৳ 0</div><div class="kpi-footer">স্টাফদের বাকি বেতন</div></div>
+            <div class="kpi-card indigo"><div class="kpi-icon indigo">💵</div><div class="kpi-label">Cash Balance</div><div class="kpi-value" id="kpiCashBalance">৳ 0</div><div class="kpi-footer">হাতে নগদ</div></div>
+            <div class="kpi-card pink"><div class="kpi-icon pink">📈</div><div class="kpi-label">Monthly Profit</div><div class="kpi-value green-text" id="kpiMonthlyProfit">৳ 0</div><div class="kpi-footer">এই মাসের লাভ</div></div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card"><div class="card-header"><h3>🕐 Recent Sales</h3><a href="sales.html" class="btn btn-outline btn-xs">View All</a></div><div class="card-body no-padding"><div class="table-wrapper"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Total</th><th>Paid</th><th>Due</th><th>Date</th></tr></thead><tbody id="recentSalesTable"><tr><td colspan="6"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody></table></div></div></div>
+            <div class="card"><div class="card-header"><h3>💵 Recent Collections</h3><a href="collections.html" class="btn btn-outline btn-xs">View All</a></div><div class="card-body no-padding"><div class="table-wrapper"><table><thead><tr><th>Customer</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead><tbody id="recentCollectionsTable"><tr><td colspan="4"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody></table></div></div></div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card"><div class="card-header"><h3>💸 Recent Expenses</h3><a href="expenses.html" class="btn btn-outline btn-xs">View All</a></div><div class="card-body no-padding"><div class="table-wrapper"><table><thead><tr><th>Category</th><th>Amount</th><th>Notes</th><th>Date</th></tr></thead><tbody id="recentExpensesTable"><tr><td colspan="4"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody></table></div></div></div>
+            <div class="card"><div class="card-header"><h3>⚠️ Alerts</h3></div><div class="card-body" id="alertsContainer" style="padding:12px 16px;"><div class="empty-state"><p>Loading...</p></div></div></div>
+        </div>
+    </div>
+
+    <script src="../frameworkdb.js"></script>
+    <script>
+        let sales = [], collections = [], expenses = [], customers = [], suppliers = [], purchases = [], supplierPayments = [], staffs = [], staffSalaryEntries = [];
+
+        async function init() { await loadAllData(); updateDateBadge(); setInterval(updateDateBadge, 1000); }
+
+        async function loadAllData() {
+            try {
+                const [sd, cd, ed, cud, spd, pud, sppd, std, ssd] = await Promise.all([
+                    FrameworkDB.get('sales'), FrameworkDB.get('collections'), FrameworkDB.get('expenses'),
+                    FrameworkDB.get('customers'), FrameworkDB.get('suppliers'), FrameworkDB.get('purchases'),
+                    FrameworkDB.get('supplier_payments'), FrameworkDB.get('staffs'), FrameworkDB.get('staff_salary_entries')
+                ]);
+                sales = ensureArray(sd); collections = ensureArray(cd); expenses = ensureArray(ed);
+                customers = ensureArray(cud); suppliers = ensureArray(spd); purchases = ensureArray(pud);
+                supplierPayments = ensureArray(sppd); staffs = ensureArray(std); staffSalaryEntries = ensureArray(ssd);
+                updateAllUI();
+            } catch (e) { console.error('Load error:', e); }
+        }
+
+        function updateAllUI() { updateKPIs(); updateRecentSales(); updateRecentCollections(); updateRecentExpenses(); updateAlerts(); }
+
+        function updateDateBadge() {
+            const el = document.getElementById('dateBadge');
+            if (!el) return;
+            const now = new Date();
+            const weekday = new Intl.DateTimeFormat('bn-BD', { weekday: 'long' }).format(now);
+            const dateText = new Intl.DateTimeFormat('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }).format(now);
+            const timeText = new Intl.DateTimeFormat('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).format(now);
+            el.innerHTML = `<span class="live-dot"></span> আজ ${weekday}, ${dateText} | সময় ${timeText}`;
+        }
+
+        function today() { return new Date().toISOString().split('T')[0]; }
+        function monthStart() { return new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]; }
+
+        function updateKPIs() {
+            const t = today(), ms = monthStart();
+            const todaySales = sales.filter(s => (s.sale_date || s.date) === t).reduce((sum, s) => sum + (parseFloat(s.total_amount || s.grandTotal || 0)), 0);
+            const todayCollection = sales.filter(s => (s.sale_date || s.date) === t).reduce((sum, s) => sum + (parseFloat(s.paid_amount || s.paid || 0)), 0) + collections.filter(c => (c.collection_date || c.date) === t && !(c.sale_id || c.saleId)).reduce((sum, c) => sum + (parseFloat(c.amount || 0)), 0);
+            const todayExpense = expenses.filter(e => (e.expense_date || e.date) === t).reduce((sum, e) => sum + (parseFloat(e.amount || 0)), 0);
+            const todayDueCollection = collections.filter(c => (c.collection_date || c.date) === t && !(c.sale_id || c.saleId)).reduce((sum, c) => sum + (parseFloat(c.amount || 0)), 0);
+
+            let totalDue = 0;
+            customers.forEach(c => {
+                totalDue += getCustomerFinancialSummary(c.id, sales, collections, customers).currentDue;
+            });
+
+            let totalPayable = 0;
+            suppliers.forEach(s => {
+                const ps = purchases.filter(p => (p.supplier_id || p.supplierId) == s.id).reduce((sum, p) => sum + (parseFloat(p.total_amount || p.grandTotal || 0)), 0);
+                const pp = supplierPayments.filter(sp => (sp.supplier_id || sp.supplierId) == s.id).reduce((sum, sp) => sum + (parseFloat(sp.amount || 0)), 0);
+                totalPayable += Math.max(0, ps - pp);
+            });
+
+            let totalStaffPayable = 0;
+            staffs.forEach(st => {
+                const opening = parseFloat(st.opening_balance || st.opening || 0) || 0;
+                const due = staffSalaryEntries.filter(se => (se.staff_id || se.staffId) == st.id && (se.entry_type || se.type || se.paid_by || se.paidBy) === 'Due').reduce((sum, se) => sum + (parseFloat(se.amount || 0)), 0);
+                const paid = staffSalaryEntries.filter(se => (se.staff_id || se.staffId) == st.id && (se.entry_type || se.type || se.paid_by || se.paidBy) !== 'Due').reduce((sum, se) => sum + (parseFloat(se.amount || 0)), 0);
+                totalStaffPayable += Math.max(0, opening + due - paid);
+            });
+
+            const totalCollected = sales.reduce((s, sl) => s + (parseFloat(sl.paid_amount || sl.paid || 0)), 0) + collections.filter(c => !(c.sale_id || c.saleId)).reduce((s, c) => s + (parseFloat(c.amount || 0)), 0);
+            const totalExpenses = expenses.reduce((s, e) => s + (parseFloat(e.amount || 0)), 0);
+            const totalSuppPayments = supplierPayments.reduce((s, sp) => s + (parseFloat(sp.amount || 0)), 0);
+            const cashBalance = totalCollected - totalExpenses - totalSuppPayments;
+
+            const monthSales = sales.filter(s => (s.sale_date || s.date) >= ms).reduce((sum, s) => sum + (parseFloat(s.total_amount || s.grandTotal || 0)), 0);
+            const monthExpenses = expenses.filter(e => (e.expense_date || e.date) >= ms).reduce((sum, e) => sum + (parseFloat(e.amount || 0)), 0);
+            const monthSuppPay = supplierPayments.filter(sp => (sp.payment_date || sp.date) >= ms).reduce((sum, sp) => sum + (parseFloat(sp.amount || 0)), 0);
+            const monthlyProfit = monthSales - monthExpenses - monthSuppPay;
+
+            document.getElementById('kpiTodaySales').textContent = fmtCurrency(todaySales);
+            document.getElementById('kpiTodayCollection').textContent = fmtCurrency(todayCollection);
+            document.getElementById('kpiTodayExpense').textContent = fmtCurrency(todayExpense);
+            document.getElementById('kpiTodayDueCollection').textContent = fmtCurrency(todayDueCollection);
+            document.getElementById('kpiTotalDue').innerHTML = `<a href="${getCollectionEntryUrl()}" class="inline-link inline-due">${fmtCurrency(totalDue)}</a>`;
+            document.getElementById('kpiTotalPayable').textContent = fmtCurrency(totalPayable);
+            document.getElementById('kpiTotalStaffPayable').textContent = fmtCurrency(totalStaffPayable);
+            document.getElementById('kpiCashBalance').textContent = fmtCurrency(cashBalance);
+            document.getElementById('kpiMonthlyProfit').textContent = fmtCurrency(monthlyProfit);
+        }
+
+        function updateRecentSales() {
+            const tbody = document.getElementById('recentSalesTable');
+            const list = [...sales].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10);
+            if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No sales yet</p></div></td></tr>'; return; }
+            tbody.innerHTML = list.map(s => `<tr>
+                <td style="font-family:monospace;">${saleLink(s.id, s.invoice_no || s.invoiceNo || '-')}</td>
+                <td class="cname">${customerLink(s.customer_id || s.customerId, getCustName(s.customer_id || s.customerId))}</td>
+                <td>${fmtCurrency(parseFloat(s.total_amount || s.grandTotal || 0))}</td>
+                <td class="amount green">${fmtCurrency(getSalePaidAmount(s))}</td>
+                <td class="amount red">${getSaleDueAmount(s) > 0 ? dueAmountLink(getCollectionEntryUrl({ customerId: s.customer_id || s.customerId, saleId: s.id, amount: getSaleDueAmount(s) }), fmtCurrency(getSaleDueAmount(s))) : '<span class="amount red">৳ 0</span>'}</td>
+                <td>${s.sale_date || s.date || '-'}</td>
+            </tr>`).join('');
+        }
+
+        function updateRecentCollections() {
+            const tbody = document.getElementById('recentCollectionsTable');
+            const list = [...collections].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10);
+            if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><p>No collections yet</p></div></td></tr>'; return; }
+            tbody.innerHTML = list.map(c => `<tr>
+                <td class="cname">${customerLink(c.customer_id || c.customerId, getCustName(c.customer_id || c.customerId))}</td>
+                <td class="amount green">${fmtCurrency(parseFloat(c.amount || 0))}</td>
+                <td>${esc(c.payment_method || 'Cash')}</td>
+                <td>${c.collection_date || c.date || '-'}</td>
+            </tr>`).join('');
+        }
+
+        function updateRecentExpenses() {
+            const tbody = document.getElementById('recentExpensesTable');
+            const list = [...expenses].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10);
+            if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><p>No expenses yet</p></div></td></tr>'; return; }
+            tbody.innerHTML = list.map(e => `<tr>
+                <td><span class="badge badge-info">${esc(e.category || 'Other')}</span></td>
+                <td class="amount orange">${fmtCurrency(parseFloat(e.amount || 0))}</td>
+                <td>${esc(e.notes || '-')}</td>
+                <td>${e.expense_date || e.date || '-'}</td>
+            </tr>`).join('');
+        }
+
+        function updateAlerts() {
+            const container = document.getElementById('alertsContainer');
+            let alerts = [];
+            const t = today();
+            customers.forEach(c => {
+                const fs = getCustomerFinancialSummary(c.id, sales, collections, customers);
+                const overdueSales = sales.filter(s => (s.customer_id || s.customerId) == c.id && (s.due_date || s.dueDate) && (s.due_date || s.dueDate) < t && getSaleDueAmount(s) > 0);
+                if (fs.currentDue > 0 && overdueSales.length > 0) alerts.push({ type: 'danger', msg: `${customerLink(c.id, c.name)} — Overdue ${dueAmountLink(getCollectionEntryUrl({ customerId: c.id, amount: fs.currentDue }), fmtCurrency(fs.currentDue))}` });
+            });
+            customers.forEach(c => {
+                const dueToday = sales.filter(s => (s.customer_id || s.customerId) == c.id && (s.due_date || s.dueDate) === t && getSaleDueAmount(s) > 0);
+                if (dueToday.length > 0) {
+                    const amt = dueToday.reduce((s, sl) => s + getSaleDueAmount(sl), 0);
+                    alerts.push({ type: 'warning', msg: `${customerLink(c.id, c.name)} — Due Today ${dueAmountLink(getCollectionEntryUrl({ customerId: c.id, amount: amt }), fmtCurrency(amt))}` });
+                }
+            });
+            if (alerts.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>All clear! No alerts.</p></div>'; return; }
+            container.innerHTML = alerts.slice(0, 8).map(a => `<div class="alert-box alert-${a.type}"><span>${a.type === 'danger' ? '⚠️' : '🔔'}</span> ${a.msg}</div>`).join('');
+        }
+
+        function getCustName(cid) { const c = customers.find(x => x.id == cid); return c?.name || 'Walk-in'; }
+
+        function refreshDashboard() { loadAllData().then(() => showToast('Dashboard refreshed!')); }
+        init();
+    </script>
+</body>
+</html>
