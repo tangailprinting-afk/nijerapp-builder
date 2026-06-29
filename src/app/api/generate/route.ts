@@ -47,6 +47,11 @@ export async function POST(
         "htmlCode"
       ) as string;
 
+    const featuresRaw =
+      formData.get(
+        "features"
+      ) as string;
+
     const icon =
       formData.get(
         "icon"
@@ -56,6 +61,10 @@ export async function POST(
       formData.get(
         "zipFile"
       ) as File;
+
+    const selectedFeatures = featuresRaw
+      ? JSON.parse(featuresRaw)
+      : {};
 
     // VALIDATE PACKAGE
 
@@ -281,6 +290,49 @@ export async function POST(
     );
 
     // APP NAME UPDATE
+
+    const commonJsPath =
+      "android-template/WebAppEngine/app/src/main/assets/www/common.js";
+
+    const commonJsContent =
+      await readFile(
+        join(
+          process.cwd(),
+          "android-template",
+          "WebAppEngine",
+          "app",
+          "src",
+          "main",
+          "assets",
+          "www",
+          "common.js"
+        ),
+        "utf8"
+      );
+
+    const updatedCommonJs =
+      commonJsContent.replace(
+        /const APP_FEATURES = \{[\s\S]*?\};/,
+        `const APP_FEATURES = {
+    dashboard: ${selectedFeatures.dashboard !== false},
+    customers: ${selectedFeatures.customers !== false},
+    sales: ${selectedFeatures.sales !== false},
+    pos: ${selectedFeatures.pos !== false},
+    collections: ${selectedFeatures.collections !== false},
+    expenses: ${selectedFeatures.expenses !== false},
+    products: ${selectedFeatures.products !== false},
+    staff: ${selectedFeatures.staff !== false},
+    suppliers: ${selectedFeatures.suppliers !== false},
+    reports: ${selectedFeatures.reports !== false},
+    printer: ${selectedFeatures.printer === true}
+};`
+      );
+
+    await updateGitHubFile(
+      commonJsPath,
+      updatedCommonJs,
+      "updated feature flags"
+    );
 
     const strings =
 `<?xml version="1.0" encoding="utf-8"?>
