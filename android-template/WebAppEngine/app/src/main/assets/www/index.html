@@ -1,109 +1,1311 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
-}
-
-body{
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
-    overflow:hidden;
-}
-
-.container{
-    width:90%;
-    max-width:380px;
-    text-align:center;
-    color:#fff;
-}
-
-.logo{
-    width:110px;
-    height:110px;
-    margin:auto;
-    border-radius:28px;
-    background:rgba(255,255,255,.15);
-    backdrop-filter:blur(10px);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:48px;
-    margin-bottom:25px;
-    box-shadow:0 15px 40px rgba(0,0,0,.25);
-}
-
-h1{
-    font-size:32px;
-    margin-bottom:10px;
-}
-
-p{
-    font-size:16px;
-    color:#dbeafe;
-    line-height:1.6;
-    margin-bottom:40px;
-}
-
-.btn{
-    display:inline-block;
-    width:100%;
-    padding:18px;
-    border-radius:16px;
-    background:#fff;
-    color:#2563eb;
-    text-decoration:none;
-    font-size:18px;
-    font-weight:bold;
-    transition:.3s;
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
-
-.btn:hover{
-    transform:translateY(-3px);
-}
-
-.footer{
-    margin-top:30px;
-    font-size:13px;
-    color:#cbd5e1;
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rizq Restaurant — আপনার প্রিয় রেস্টুরেন্ট</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E55A2B;
+            --secondary: #2C3E50;
+            --accent: #F7C948;
+            --bg: #F8F9FA;
+            --surface: #FFFFFF;
+            --text: #1A1A2E;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --danger: #EF4444;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Loading */
+        .loader {
+            position: fixed; inset: 0; background: var(--surface);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.4s ease;
+        }
+        .loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-spinner {
+            width: 48px; height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Header */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        .header.scrolled { box-shadow: var(--shadow); }
+        .header-inner {
+            max-width: 1200px; margin: 0 auto;
+            padding: 0 16px; height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo {
+            font-size: 1.5rem; font-weight: 700; color: var(--primary);
+            display: flex; align-items: center; gap: 8px;
+        }
+            .logo img { width: 32px; height: 32px; object-fit: contain; }
+        .nav-links { display: none; gap: 24px; }
+        .nav-links a {
+            text-decoration: none; color: var(--text);
+            font-weight: 500; font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 10px 20px; border-radius: 12px; border: none;
+            font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 14px rgba(255,107,53,0.3);
+        }
+        .btn-primary:active { transform: scale(0.96); background: var(--primary-dark); }
+        .btn-outline {
+            background: transparent; color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+        .menu-toggle {
+            width: 40px; height: 40px; border: none; background: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 5px; cursor: pointer;
+        }
+        .menu-toggle span {
+            display: block; width: 24px; height: 2.5px;
+            background: var(--text); border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .mobile-menu {
+            position: fixed; inset: 0; background: var(--surface);
+            z-index: 99; padding: 80px 24px 24px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .mobile-menu.open { transform: translateX(0); }
+        .mobile-menu a {
+            display: block; padding: 16px 0;
+            font-size: 1.1rem; font-weight: 500;
+            color: var(--text); text-decoration: none;
+            border-bottom: 1px solid var(--border);
+        }
+        /* Hero */
+        .hero {
+            margin-top: 60px;
+            background: linear-gradient(135deg, var(--secondary) 0%, #1a1a2e 100%);
+            color: white; padding: 60px 16px;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -20%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-content { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 0.8rem; margin-bottom: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .hero h1 { font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+        .hero p { font-size: 1rem; color: rgba(255,255,255,0.8); margin-bottom: 28px; max-width: 500px; }
+        .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .hero-img {
+            margin-top: 32px; border-radius: 20px;
+            overflow: hidden; box-shadow: var(--shadow-lg);
+            aspect-ratio: 16/10;
+        }
+        .hero-img img { width: 100%; height: 100%; object-fit: cover; }
+        /* Section */
+        .section { padding: 60px 16px; max-width: 1200px; margin: 0 auto; }
+        .section-title {
+            font-size: 1.6rem; font-weight: 700; text-align: center;
+            margin-bottom: 8px;
+        }
+        .section-subtitle {
+            text-align: center; color: var(--text-light);
+            font-size: 0.95rem; margin-bottom: 40px;
+        }
+        /* Menu */
+        .menu-tabs {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding-bottom: 8px; margin-bottom: 24px;
+            scrollbar-width: none;
+        }
+        .menu-tabs::-webkit-scrollbar { display: none; }
+        .menu-tab {
+            padding: 8px 20px; border-radius: 20px;
+            border: 1px solid var(--border); background: var(--surface);
+            white-space: nowrap; cursor: pointer; font-family: inherit;
+            font-size: 0.85rem; font-weight: 500; color: var(--text-light);
+            transition: all 0.2s;
+        }
+        .menu-tab.active {
+            background: var(--primary); color: white;
+            border-color: var(--primary);
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .menu-card {
+            background: var(--surface); border-radius: 16px;
+            overflow: hidden; box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .menu-card:active { transform: scale(0.98); }
+        .menu-card-img {
+            width: 100%; height: 200px; position: relative;
+            background: var(--bg);
+        }
+        .menu-card-img img { width: 100%; height: 100%; object-fit: cover; }
+        .menu-card-badge {
+            position: absolute; top: 12px; left: 12px;
+            background: var(--accent); color: var(--text);
+            padding: 4px 10px; border-radius: 8px;
+            font-size: 0.7rem; font-weight: 700;
+        }
+        .menu-card-body { padding: 16px; }
+        .menu-card-title {
+            font-size: 1.05rem; font-weight: 600;
+            margin-bottom: 6px; display: flex; justify-content: space-between;
+        }
+        .menu-card-price { color: var(--primary); font-weight: 700; }
+        .menu-card-desc {
+            font-size: 0.85rem; color: var(--text-light);
+            margin-bottom: 12px; line-height: 1.5;
+        }
+        .menu-card-footer {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .menu-card-status {
+            font-size: 0.75rem; padding: 4px 10px; border-radius: 6px;
+            font-weight: 600;
+        }
+        .status-available { background: #D1FAE5; color: var(--success); }
+        .status-unavailable { background: #FEE2E2; color: var(--danger); }
+        .menu-card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .menu-card-actions .btn {
+            flex: 1;
+        }
+        /* Features */
+        .features-grid {
+            display: grid; grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .feature-card {
+            background: var(--surface); padding: 28px;
+            border-radius: 16px; box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .feature-icon {
+            width: 56px; height: 56px; margin: 0 auto 16px;
+            background: rgba(255,107,53,0.1); border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .feature-icon svg { width: 28px; height: 28px; color: var(--primary); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .feature-card p { font-size: 0.85rem; color: var(--text-light); }
+        /* Contact */
+        .contact-box {
+            background: var(--surface); border-radius: 20px;
+            padding: 32px; box-shadow: var(--shadow);
+        }
+        .contact-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px 0; border-bottom: 1px solid var(--border);
+        }
+        .contact-item:last-child { border-bottom: none; }
+        .contact-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: rgba(255,107,53,0.1);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .contact-icon svg { width: 24px; height: 24px; color: var(--primary); }
+        .contact-info h4 { font-size: 0.95rem; margin-bottom: 2px; }
+        .contact-info p { font-size: 0.85rem; color: var(--text-light); }
+        /* Feedback */
+        .feedback-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .feedback-section {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .feedback-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .feedback-summary {
+            display: grid;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feedback-summary-row {
+            display: grid;
+            grid-template-columns: 52px 1fr 40px;
+            gap: 10px;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        .feedback-summary-track {
+            height: 10px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .feedback-summary-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #f59e0b);
+            border-radius: inherit;
+        }
+        .feedback-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            background: var(--bg);
+        }
+        .feedback-card-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .feedback-author {
+            font-weight: 700;
+            font-size: 0.98rem;
+        }
+        .feedback-meta {
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .feedback-rating {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .feedback-pagination {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        /* Footer */
+        .footer {
+            background: var(--secondary); color: white;
+            padding: 40px 16px 24px;
+        }
+        .footer-inner { max-width: 1200px; margin: 0 auto; }
+        .footer-top {
+            display: flex; flex-direction: column;
+            gap: 24px; margin-bottom: 32px;
+        }
+        .footer-brand { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
+        .footer-links a {
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px; text-align: center;
+            font-size: 0.8rem; color: rgba(255,255,255,0.5);
+        }
+        /* Login Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px); z-index: 200;
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal {
+            background: var(--surface); border-radius: 20px;
+            width: 100%; max-width: 400px; padding: 32px;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-overlay.active .modal { transform: translateY(0); }
+        .modal h2 { font-size: 1.4rem; margin-bottom: 8px; text-align: center; }
+        .modal p { text-align: center; color: var(--text-light); font-size: 0.9rem; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; }
+        .form-input {
+            width: 100%; padding: 12px 16px; border-radius: 12px;
+            border: 2px solid var(--border); font-family: inherit;
+            font-size: 0.95rem; transition: border-color 0.2s;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary); }
+        .form-btn { width: 100%; margin-top: 8px; }
+        .form-error {
+            color: var(--danger); font-size: 0.8rem;
+            margin-top: 8px; text-align: center; display: none;
+        }
+        .form-error.show { display: block; }
+        /* Order Modal */
+        .modal.order-modal {
+            max-width: 560px;
+        }
+        .order-summary {
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 18px;
+        }
+        .order-summary-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            font-size: 0.92rem;
+        }
+        .order-summary-item small {
+            color: var(--text-light);
+            display: block;
+        }
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border);
+            font-weight: 700;
+        }
+        .order-empty {
+            color: var(--text-light);
+            font-size: 0.92rem;
+        }
+        .order-actions {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 150;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .order-actions.show { display: flex; }
+        .order-count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.18);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--secondary); color: white;
+            padding: 12px 24px; border-radius: 12px;
+            font-size: 0.9rem; z-index: 300;
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            color: var(--text-light);
+        }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.3; }
+        /* Responsive */
+        @media (min-width: 768px) {
+            .nav-links { display: flex; }
+            .menu-toggle { display: none; }
+            .hero { padding: 100px 24px; }
+            .hero h1 { font-size: 3rem; }
+            .section { padding: 80px 24px; }
+            .features-grid { grid-template-columns: repeat(3, 1fr); }
+            .footer-top { flex-direction: row; justify-content: space-between; align-items: center; }
+            .hero-img { margin-top: 0; position: absolute; right: 24px; top: 50%; transform: translateY(-50%); width: 45%; max-width: 500px; }
+            .hero-content { max-width: 50%; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-
-    <div class="logo">🍽️</div>
-
-    <h1>Welcome</h1>
-
-    <p>
-        Welcome to Rizq Restaurant.<br>
-        Order delicious food quickly and easily.
-    </p>
-
-    <a class="btn" href="https://rizqreastaurant.pages.dev/admin">
-        Get Started →
-    </a>
-
-    <div class="footer">
-        © 2026 Rizq Restaurant
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <p style="margin-top:16px;color:var(--text-light);font-size:0.9rem;">লোড হচ্ছে...</p>
     </div>
 
-</div>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <img src="image/logo.png" alt="Rizq Restaurant">
+                Rizq Restaurant
+            </a>
+            <nav class="nav-links">
+                <a href="#menu">মেনু</a>
+                <a href="#features">সুবিধা</a>
+                <a href="#contact">যোগাযোগ</a>
+                <button class="btn btn-primary btn-sm" onclick="openLogin()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    লগইন
+                </button>
+            </nav>
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#menu" onclick="toggleMenu()">মেনু</a>
+        <a href="#feedback" onclick="toggleMenu()">ফিডব্যাক</a>
+        <a href="#features" onclick="toggleMenu()">সুবিধা</a>
+        <a href="#contact" onclick="toggleMenu()">যোগাযোগ</a>
+        <a href="#" onclick="toggleMenu(); openLogin();">অ্যাডমিন লগইন</a>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                ৫ তারকা রেটেড রেস্টুরেন্ট
+            </div>
+            <h1>স্বাদে অনন্য, পরিবেশে মনোমুগ্ধকর</h1>
+            <p>আমাদের বিশেষ শেফদের হাতে তৈরি স্বাদের রাজ্যে আপনাকে স্বাগতম। তাজা উপকরণ এবং প্রেমের ছোঁয়ায় প্রস্তুত প্রতিটি খাবার।</p>
+            <div class="hero-buttons">
+                <a href="#menu" class="btn btn-primary">মেনু দেখুন</a>
+                <a href="#contact" class="btn btn-outline">যোগাযোগ করুন</a>
+            </div>
+        </div>
+        <div class="hero-img">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80" alt="Restaurant" id="heroImage">
+        </div>
+    </section>
+
+    <!-- Menu -->
+    <section class="section" id="menu">
+        <h2 class="section-title">আমাদের বিশেষ মেনু</h2>
+        <p class="section-subtitle">তাজা এবং মজাদার খাবারের সংগ্রহ</p>
+        <div class="menu-tabs" id="menuTabs">
+            <button class="menu-tab active" onclick="filterMenu('all', this)">সব</button>
+        </div>
+        <div class="menu-grid" id="menuGrid">
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+                <p>মেনু লোড হচ্ছে...</p>
+            </div>
+        </div>
+
+        <div class="feedback-grid" id="feedback" style="margin-top:36px;">
+            <div class="feedback-section">
+                <h3 style="margin-bottom:12px;font-size:1.05rem;">ফিডব্যাক দিন</h3>
+                <p style="margin-bottom:18px;color:var(--text-light);font-size:0.95rem;">মোবাইল নম্বর কাস্টমারের সাথে মিললে ফিডব্যাক জমা হবে।</p>
+                <form id="feedbackForm" onsubmit="submitFeedback(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">মোবাইল নাম্বার</label>
+                            <input type="tel" class="form-input" id="feedbackPhone" required placeholder="01XXXXXXXXX" inputmode="tel">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">রেটিং</label>
+                            <select class="form-input" id="feedbackRating" required>
+                                <option value="5">5 - খুব ভালো</option>
+                                <option value="4">4 - ভালো</option>
+                                <option value="3">3 - মোটামুটি</option>
+                                <option value="2">2 - খারাপ</option>
+                                <option value="1">1 - খুব খারাপ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ফিডব্যাক</label>
+                        <textarea class="form-input form-textarea" id="feedbackMessage" required placeholder="আপনার মতামত লিখুন..."></textarea>
+                    </div>
+                    <div class="form-error" id="feedbackError"></div>
+                    <button type="submit" class="btn btn-primary" id="feedbackBtn">
+                        <span id="feedbackBtnText">ফিডব্যাক পাঠান</span>
+                    </button>
+                </form>
+            </div>
+            <div>
+                <h3 style="margin-bottom:12px;font-size:1.05rem;">পাবলিক ফিডব্যাক</h3>
+                <div class="feedback-summary" id="feedbackSummary"></div>
+                <div class="feedback-list" id="feedbackList">
+                    <div class="empty-state" style="padding:24px 16px;">লোড হচ্ছে...</div>
+                </div>
+                <div class="feedback-pagination">
+                    <button type="button" class="btn btn-outline btn-sm" id="feedbackPrevBtn" onclick="prevFeedbackPage()">পূর্বের পেজ</button>
+                    <button type="button" class="btn btn-outline btn-sm" id="feedbackNextBtn" onclick="nextFeedbackPage()">নেক্সট পেজ</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="features" style="background:var(--bg);">
+        <h2 class="section-title">কেন আমাদের বেছে নেবেন?</h2>
+        <p class="section-subtitle">আমরা সেরা সেবা এবং মান নিশ্চিত করি</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3>তাজা উপকরণ</h3>
+                <p>প্রতিদিন নতুন এবং তাজা উপকরণ ব্যবহার করে খাবার প্রস্তুত করা হয়।</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>দ্রুত ডেলিভারি</h3>
+                <p>আপনার অর্ডার সবচেয়ে কম সময়ে আপনার দোরগোপায় পৌঁছে দেওয়া হয়।</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3>বিশেষ শেফ</h3>
+                <p>অভিজ্ঞ শেফদের দ্বারা প্রস্তুত প্রতিটি খাবারে রয়েছে বৈশিষ্ট্য।</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="contact">
+        <h2 class="section-title">যোগাযোগ করুন</h2>
+        <p class="section-subtitle">আমাদের সাথে সংযোগে থাকুন</p>
+        <div class="contact-box" id="contactBox">
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <p>তথ্য লোড হচ্ছে...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">Rizq Restaurant</div>
+                <div class="footer-links">
+                    <a href="#menu">মেনু</a>
+                    <a href="#features">সুবিধা</a>
+                    <a href="#contact">যোগাযোগ</a>
+                    <a href="#" onclick="openLogin()">অ্যাডমিন</a>
+                </div>
+            </div>
+            <div class="footer-bottom">© <span id="year"></span> Rizq Restaurant. সর্বস্বত্ব সংরক্ষিত।</div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <h2>অ্যাডমিন লগইন</h2>
+            <p>অ্যাডমিন প্যানেলে প্রবেশ করতে লগইন করুন</p>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">ইমেইল</label>
+                    <input type="email" class="form-input" id="loginEmail" required placeholder="admin@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">পাসওয়ার্ড</label>
+                    <input type="password" class="form-input" id="loginPassword" required placeholder="••••••••">
+                </div>
+                <div class="form-error" id="loginError"></div>
+                <button type="submit" class="btn btn-primary form-btn" id="loginBtn">
+                    <span id="loginBtnText">লগইন করুন</span>
+                </button>
+            </form>
+            <button class="btn btn-outline" style="width:100%;margin-top:12px;" onclick="closeLogin()">বাতিল</button>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal order-modal">
+            <h2>অর্ডার নিশ্চিত করুন</h2>
+            <p>আপনার নাম, মোবাইল নাম্বার, এবং নির্বাচিত মেনু আইটেম পাঠান</p>
+            <form id="orderForm" onsubmit="placeOrder(event)">
+                <div class="form-group">
+                    <label class="form-label">কাস্টমারের নাম</label>
+                    <input type="text" class="form-input" id="orderName" required placeholder="আপনার নাম">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">মোবাইল নাম্বার</label>
+                    <input type="tel" class="form-input" id="orderPhone" required placeholder="01XXXXXXXXX" inputmode="tel">
+                </div>
+
+                <div class="order-summary">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+                        <h3 style="font-size:1rem;">নির্বাচিত আইটেম</h3>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="clearCart()">সব বাদ দিন</button>
+                    </div>
+                    <div class="order-summary-list" id="orderSummaryList">
+                        <div class="order-empty">এখনও কোনো আইটেম সিলেক্ট করা হয়নি</div>
+                    </div>
+                    <div class="order-total">
+                        <span>মোট</span>
+                        <span id="orderTotal">৳0</span>
+                    </div>
+                </div>
+
+                <div class="form-error" id="orderError"></div>
+                <div class="modal-footer" style="padding:0;margin-top:24px;border-top:none;">
+                    <button type="button" class="btn btn-outline" onclick="closeOrder()">বাতিল</button>
+                    <button type="submit" class="btn btn-primary" id="placeOrderBtn">
+                        <span id="placeOrderText">অর্ডার পাঠান</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="order-actions" id="orderActions">
+        <button class="btn btn-outline" onclick="openOrder()">
+            অর্ডার দেখুন <span class="order-count-badge" id="orderCountBadge">0</span>
+        </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+       const firebaseConfig = {
+
+  apiKey: "AIzaSyBv3sZ4XvvQUj_z-U9zppnQiLRBVWQSWQk",
+
+  authDomain: "rizq-reastaurant.firebaseapp.com",
+
+  databaseURL: "https://rizq-reastaurant-default-rtdb.firebaseio.com",
+
+  projectId: "rizq-reastaurant",
+
+  storageBucket: "rizq-reastaurant.firebasestorage.app",
+
+  messagingSenderId: "940992973211",
+
+  appId: "1:940992973211:web:ed12df3ea4cde0f5c2393e",
+
+  measurementId: "G-PWESWC2Q0G"
+
+};
+
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        window.db = db;
+        window.auth = auth;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.rtdbRef = ref;
+        window.rtdbGet = get;
+        window.rtdbSet = set;
+        window.rtdbPush = push;
+        window.rtdbRemove = remove;
+
+        const orderCart = [];
+        window.orderCart = orderCart;
+
+        function normalizePhone(phone) {
+            return String(phone || '').replace(/\D/g, '');
+        }
+
+        function snapshotToArray(snapshot) {
+            if (!snapshot.exists()) return [];
+            const value = snapshot.val() || {};
+            return Object.entries(value).map(([id, data]) => ({ id, ...(data || {}) }));
+        }
+
+        function toNumericCustomerId(value) {
+            const n = Number.parseInt(String(value), 10);
+            return Number.isFinite(n) ? n : null;
+        }
+
+        function isSerialCustomerId(value) {
+            const n = toNumericCustomerId(value);
+            return Number.isFinite(n) && n > 0 && n <= 999999;
+        }
+
+        function getNextSerialCustomerId(customers) {
+            const serialIds = customers
+                .map(c => toNumericCustomerId(c.id))
+                .filter(n => n !== null && n > 0 && n <= 999999);
+            return String(serialIds.length ? Math.max(...serialIds) + 1 : 1);
+        }
+
+        const feedbackState = {
+            page: 1,
+            pageSize: 5,
+            items: []
+        };
+
+        async function loadFeedbacks() {
+            try {
+                const snapshot = await get(ref(db, 'feedbacks'));
+                const allFeedbacks = snapshotToArray(snapshot);
+                const approved = allFeedbacks
+                    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                feedbackState.page = 1;
+                feedbackState.items = approved;
+                renderFeedbacks();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('feedbackList').innerHTML = '<div class="empty-state" style="padding:24px 16px;">ফিডব্যাক লোড করা যায়নি</div>';
+            }
+        }
+
+        // Load data
+        async function loadMenu() {
+            try {
+                const snapshot = await get(ref(db, "menuItems"));
+                const items = snapshotToArray(snapshot);
+                const categories = new Set(items.map(item => item.category).filter(Boolean));
+                window.menuItems = items;
+                window.menuCategories = Array.from(categories);
+                renderMenuTabs();
+                renderMenu(items);
+            } catch (e) {
+                console.error(e);
+                showToast("মেনু লোড করতে সমস্যা হয়েছে");
+            }
+        }
+
+        async function loadSettings() {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            try {
+                const snapshot = await get(ref(db, "settings/restaurant"));
+                if (snapshot.exists()) {
+                    const data = snapshot.val() || {};
+                    renderContact(data);
+                    if (data.heroImage) {
+                        document.getElementById('heroImage').src = data.heroImage;
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderMenuTabs() {
+            const tabs = document.getElementById('menuTabs');
+            const cats = window.menuCategories || [];
+            if (cats.length === 0) return;
+            tabs.innerHTML = '<button class="menu-tab active" onclick="filterMenu(\'all\', this)">সব</button>';
+            cats.forEach(cat => {
+                tabs.innerHTML += `<button class="menu-tab" onclick="filterMenu('${cat}', this)">${cat}</button>`;
+            });
+        }
+
+        function renderMenu(items) {
+            const grid = document.getElementById('menuGrid');
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+                        <p>কোনো মেনু আইটেম পাওয়া যায়নি</p>
+                    </div>`;
+                return;
+            }
+            grid.innerHTML = items.map(item => `
+                <div class="menu-card">
+                    <div class="menu-card-img">
+                        <img src="${item.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'}" alt="${item.name}" loading="lazy">
+                        ${item.isPopular ? '<span class="menu-card-badge">জনপ্রিয়</span>' : ''}
+                    </div>
+                    <div class="menu-card-body">
+                        <div class="menu-card-title">
+                            <span>${item.name}</span>
+                            <span class="menu-card-price">৳${item.price}</span>
+                        </div>
+                        <div class="menu-card-desc">${item.description || ''}</div>
+                        <div class="menu-card-footer">
+                            <span class="menu-card-status ${item.isAvailable !== false ? 'status-available' : 'status-unavailable'}">
+                                ${item.isAvailable !== false ? 'উপলব্ধ' : 'অনুপলব্ধ'}
+                            </span>
+                        </div>
+                        <div class="menu-card-actions">
+                            <button class="btn btn-primary btn-sm" ${item.isAvailable === false ? 'disabled' : ''} onclick="toggleOrderItem('${item.id}')">
+                                ${getCartItem(item.id) ? 'বাদ দিন' : 'অর্ডার করুন'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderContact(data) {
+            const box = document.getElementById('contactBox');
+            box.innerHTML = `
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div class="contact-info">
+                        <h4>ঠিকানা</h4>
+                        <p>${data.address || 'ঠিকানা সেট করা হয়নি'}</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <div class="contact-info">
+                        <h4>ফোন</h4>
+                        <p>${data.phone || 'ফোন নম্বর সেট করা হয়নি'}</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </div>
+                    <div class="contact-info">
+                        <h4>ইমেইল</h4>
+                        <p>${data.email || 'ইমেইল সেট করা হয়নি'}</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="contact-info">
+                        <h4>খোলার সময়</h4>
+                        <p>${data.openingHours || 'সময় সেট করা হয়নি'}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFeedbackSummary(items) {
+            const box = document.getElementById('feedbackSummary');
+            const counts = [5, 4, 3, 2, 1].map(stars => ({
+                stars,
+                count: items.filter(item => Number(item.rating || 0) === stars).length
+            }));
+            const max = Math.max(1, ...counts.map(item => item.count));
+            box.innerHTML = counts.map(item => `
+                <div class="feedback-summary-row">
+                    <div>${item.stars} ★</div>
+                    <div class="feedback-summary-track">
+                        <div class="feedback-summary-fill" style="width:${Math.round((item.count / max) * 100)}%"></div>
+                    </div>
+                    <div style="text-align:right;">${item.count}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderFeedbacks() {
+            const list = document.getElementById('feedbackList');
+            const items = feedbackState.items || [];
+            renderFeedbackSummary(items);
+
+            const total = items.length;
+            const totalPages = Math.max(1, Math.ceil(total / feedbackState.pageSize));
+            if (feedbackState.page > totalPages) feedbackState.page = totalPages;
+
+            const start = (feedbackState.page - 1) * feedbackState.pageSize;
+            const pageItems = items.slice(start, start + feedbackState.pageSize);
+
+            const prevBtn = document.getElementById('feedbackPrevBtn');
+            const nextBtn = document.getElementById('feedbackNextBtn');
+            prevBtn.disabled = feedbackState.page <= 1;
+            nextBtn.disabled = feedbackState.page >= totalPages;
+
+            if (!pageItems.length) {
+                list.innerHTML = '<div class="empty-state" style="padding:24px 16px;">এখনও কোনো ফিডব্যাক নেই</div>';
+                return;
+            }
+            list.innerHTML = pageItems.map(item => `
+                <article class="feedback-card">
+                    <div class="feedback-card-head">
+                        <div>
+                            <div class="feedback-author">${item.customerName || 'অজানা'}</div>
+                            <div class="feedback-meta">${item.mobile || ''}</div>
+                        </div>
+                        <div class="feedback-rating">${'★'.repeat(Number(item.rating || 0))}</div>
+                    </div>
+                    <div class="feedback-text">${item.message || ''}</div>
+                </article>
+            `).join('');
+        }
+
+        function nextFeedbackPage() {
+            const totalPages = Math.max(1, Math.ceil((feedbackState.items || []).length / feedbackState.pageSize));
+            if (feedbackState.page < totalPages) {
+                feedbackState.page += 1;
+                renderFeedbacks();
+            }
+        }
+
+        function prevFeedbackPage() {
+            if (feedbackState.page > 1) {
+                feedbackState.page -= 1;
+                renderFeedbacks();
+            }
+        }
+
+        function getCartItem(itemId) {
+            return orderCart.find(entry => entry.id === itemId) || null;
+        }
+
+        function updateOrderActions() {
+            const actions = document.getElementById('orderActions');
+            const badge = document.getElementById('orderCountBadge');
+            const count = orderCart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.textContent = String(count);
+            actions.classList.toggle('show', count > 0);
+        }
+
+        function renderOrderSummary() {
+            const list = document.getElementById('orderSummaryList');
+            const totalBox = document.getElementById('orderTotal');
+            if (orderCart.length === 0) {
+                list.innerHTML = '<div class="order-empty">এখনও কোনো আইটেম সিলেক্ট করা হয়নি</div>';
+                totalBox.textContent = '৳0';
+                updateOrderActions();
+                return;
+            }
+
+            let total = 0;
+            list.innerHTML = orderCart.map(item => {
+                const lineTotal = item.price * item.quantity;
+                total += lineTotal;
+                return `
+                    <div class="order-summary-item">
+                        <div>
+                            <strong>${item.name}</strong>
+                            <small>${item.quantity} x ৳${item.price}</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <strong>৳${lineTotal}</strong><br>
+                            <button type="button" class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="toggleOrderItem('${item.id}')">বাদ দিন</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            totalBox.textContent = `৳${total}`;
+            updateOrderActions();
+        }
+
+        function openOrder() {
+            renderOrderSummary();
+            document.getElementById('orderError').classList.remove('show');
+            document.getElementById('orderModal').classList.add('active');
+        }
+
+        function closeOrder() {
+            document.getElementById('orderModal').classList.remove('active');
+            document.getElementById('orderError').classList.remove('show');
+        }
+
+        function toggleOrderItem(itemId) {
+            const existing = orderCart.findIndex(entry => entry.id === itemId);
+            if (existing >= 0) {
+                orderCart.splice(existing, 1);
+            } else {
+                const item = (window.menuItems || []).find(menuItem => menuItem.id === itemId);
+                if (!item || item.isAvailable === false) return;
+                orderCart.push({
+                    id: item.id,
+                    name: item.name,
+                    price: Number(item.price) || 0,
+                    quantity: 1
+                });
+            }
+            renderMenu(window.menuItems || []);
+            renderOrderSummary();
+        }
+
+        function clearCart() {
+            orderCart.splice(0, orderCart.length);
+            renderMenu(window.menuItems || []);
+            renderOrderSummary();
+        }
+
+        async function placeOrder(e) {
+            e.preventDefault();
+            const error = document.getElementById('orderError');
+            const btn = document.getElementById('placeOrderBtn');
+            const btnText = document.getElementById('placeOrderText');
+            const customerName = document.getElementById('orderName').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const phoneKey = normalizePhone(phone);
+
+            error.classList.remove('show');
+
+            if (orderCart.length === 0) {
+                error.textContent = 'অন্তত একটি মেনু আইটেম সিলেক্ট করুন';
+                error.classList.add('show');
+                return;
+            }
+
+            if (!phoneKey) {
+                error.textContent = 'সঠিক মোবাইল নাম্বার দিন';
+                error.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.textContent = 'পাঠানো হচ্ছে...';
+
+            try {
+                const total = orderCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const now = Date.now();
+                const customersSnap = await get(ref(db, 'customers'));
+                const customers = snapshotToArray(customersSnap);
+                const existingCustomer = customers.find(c => normalizePhone(c.mobile || c.phone) === phoneKey) || null;
+                const customerId = existingCustomer && isSerialCustomerId(existingCustomer.id)
+                    ? String(existingCustomer.id)
+                    : getNextSerialCustomerId(customers);
+                const customerRef = ref(db, `customers/${customerId}`);
+                const shouldMigrateCustomer = existingCustomer && String(existingCustomer.id) !== customerId;
+                const customerPayload = {
+                    id: Number(customerId),
+                    name: customerName || existingCustomer?.name || '',
+                    mobile: phone,
+                    address: existingCustomer?.address || '',
+                    notes: existingCustomer?.notes || '',
+                    opening_balance: Number(existingCustomer?.opening_balance || 0),
+                    updatedAt: new Date(now).toISOString()
+                };
+
+                await set(customerRef, customerPayload);
+                if (shouldMigrateCustomer) {
+                    await window.rtdbRemove(ref(db, `customers/${existingCustomer.id}`));
+                }
+
+                const orderRef = push(ref(db, 'orders'));
+                const payload = {
+                    orderId: orderRef.key,
+                    customerId: customerId,
+                    customerName,
+                    phone,
+                    customerMobile: phone,
+                    items: orderCart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity
+                    })),
+                    total,
+                    status: 'pending',
+                    createdAt: now,
+                    updatedAt: now
+                };
+
+                await set(orderRef, payload);
+                showToast('অর্ডার সফলভাবে পাঠানো হয়েছে');
+                clearCart();
+                document.getElementById('orderForm').reset();
+                closeOrder();
+            } catch (err) {
+                console.error(err);
+                error.textContent = 'অর্ডার পাঠাতে সমস্যা হয়েছে';
+                error.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'অর্ডার পাঠান';
+            }
+        }
+
+        async function submitFeedback(e) {
+            e.preventDefault();
+            const error = document.getElementById('feedbackError');
+            const btn = document.getElementById('feedbackBtn');
+            const btnText = document.getElementById('feedbackBtnText');
+            const phone = document.getElementById('feedbackPhone').value.trim();
+            const phoneKey = normalizePhone(phone);
+            const rating = Number(document.getElementById('feedbackRating').value);
+            const message = document.getElementById('feedbackMessage').value.trim();
+
+            error.classList.remove('show');
+
+            if (!phoneKey) {
+                error.textContent = 'সঠিক মোবাইল নাম্বার দিন';
+                error.classList.add('show');
+                return;
+            }
+            if (!message) {
+                error.textContent = 'ফিডব্যাক লিখুন';
+                error.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.textContent = 'পাঠানো হচ্ছে...';
+
+            try {
+                const customersSnap = await get(ref(db, 'customers'));
+                const customers = snapshotToArray(customersSnap);
+                const customer = customers.find(c => normalizePhone(c.mobile || c.phone) === phoneKey) || null;
+                if (!customer) {
+                    error.textContent = 'এই মোবাইল নাম্বার কোনো কাস্টমারের সাথে মেলেনি';
+                    error.classList.add('show');
+                    return;
+                }
+
+                const feedbackRef = push(ref(db, 'feedbacks'));
+                await set(feedbackRef, {
+                    customerId: customer.id,
+                    customerName: customer.name || '',
+                    mobile: customer.mobile || phone,
+                    rating,
+                    message,
+                    status: 'approved',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                });
+
+                document.getElementById('feedbackForm').reset();
+                await loadFeedbacks();
+                showToast('ফিডব্যাক জমা হয়েছে');
+            } catch (err) {
+                console.error(err);
+                error.textContent = 'ফিডব্যাক জমা দিতে সমস্যা হয়েছে';
+                error.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'ফিডব্যাক পাঠান';
+            }
+        }
+
+        window.renderMenu = renderMenu;
+        window.renderContact = renderContact;
+        window.renderFeedbacks = renderFeedbacks;
+        window.nextFeedbackPage = nextFeedbackPage;
+        window.prevFeedbackPage = prevFeedbackPage;
+        window.toggleOrderItem = toggleOrderItem;
+        window.openOrder = openOrder;
+        window.closeOrder = closeOrder;
+        window.clearCart = clearCart;
+        window.placeOrder = placeOrder;
+        window.renderOrderSummary = renderOrderSummary;
+        window.submitFeedback = submitFeedback;
+
+        // Init
+        loadMenu();
+        loadSettings();
+        loadFeedbacks();
+        document.getElementById('loader').classList.add('hidden');
+
+        // Header scroll
+        window.addEventListener('scroll', () => {
+            document.getElementById('header').classList.toggle('scrolled', window.scrollY > 10);
+        });
+    </script>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('mobileMenu').classList.toggle('open');
+        }
+        function openLogin() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+        function closeLogin() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginError').classList.remove('show');
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        function filterMenu(category, btn) {
+            document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            const items = window.menuItems || [];
+            const filtered = category === 'all' ? items : items.filter(i => i.category === category);
+            if (window.renderMenu) window.renderMenu(filtered);
+        }
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('loginBtnText');
+            const error = document.getElementById('loginError');
+            
+            btn.disabled = true;
+            btnText.textContent = 'লোড হচ্ছে...';
+            
+            try {
+                await window.signInWithEmailAndPassword(window.auth, email, password);
+                window.location.href = 'admin.html';
+            } catch (err) {
+                error.textContent = 'ইমেইল বা পাসওয়ার্ড ভুল!';
+                error.classList.add('show');
+                btn.disabled = false;
+                btnText.textContent = 'লগইন করুন';
+            }
+        }
+    </script>
 </body>
 </html>
+
