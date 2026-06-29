@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "dfgdfg.sddsf.ter"
+        applicationId = "rizq.admin.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
