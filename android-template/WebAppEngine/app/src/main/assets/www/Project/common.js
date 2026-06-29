@@ -40,6 +40,34 @@ function todayDate() {
     return new Date().toISOString().split('T')[0];
 }
 
+// ============================================
+// APP FEATURES
+// ============================================
+const APP_FEATURES = {
+    dashboard: true,
+    customers: true,
+    sales: true,
+    collections: true,
+    expenses: true,
+    products: true,
+    staff: true,
+    suppliers: true,
+    reports: true,
+    printer: false
+};
+
+function isFeatureEnabled(key) {
+    return APP_FEATURES[key] !== false;
+}
+
+function applyFeatureVisibility() {
+    document.querySelectorAll('[data-feature]').forEach(el => {
+        const feature = el.getAttribute('data-feature');
+        if (!feature) return;
+        el.hidden = !isFeatureEnabled(feature);
+    });
+}
+
 function monthStartDate() {
     return new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
 }
@@ -259,8 +287,10 @@ function applySharedNavbar() {
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', applySharedNavbar);
+    document.addEventListener('DOMContentLoaded', applyFeatureVisibility);
 } else {
     applySharedNavbar();
+    applyFeatureVisibility();
 }
 
 // ============================================

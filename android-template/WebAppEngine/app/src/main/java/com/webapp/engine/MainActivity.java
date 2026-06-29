@@ -282,7 +282,7 @@ extends AppCompatActivity {
 
         webView.loadUrl(
 
-"file:///android_asset/www/printer-settings.html"
+"file:///android_asset/www/Project/index.html"
 
         );
 
