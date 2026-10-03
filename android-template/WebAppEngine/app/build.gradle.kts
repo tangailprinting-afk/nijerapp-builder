@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "rizq.adminapp.app"
+        applicationId = "app.shomota.com"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
