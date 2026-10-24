@@ -1,71 +1,325 @@
+
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Get Started</title>
+  <meta name="theme-color" content="#ffffff">
+  <title>ProfilerBook | Welcome</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      height: 100vh;
+      font-family: "Inter", Arial, sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      background: #fff;
+      color: #192744;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .intro {
+      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at center,
+          rgba(72, 123, 255, .08), transparent 55%),
+        #fff;
+    }
+
+    /* Animated background */
+    .background {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(75px);
+      opacity: .5;
+      animation: drift 7s ease-in-out infinite alternate;
+    }
+
+    .glow-one {
+      top: -170px;
+      left: -100px;
+      background: #c5d8ff;
+    }
+
+    .glow-two {
+      right: -150px;
+      bottom: -160px;
+      background: #e1d2ff;
+      animation-delay: -3s;
+    }
+
+    .glow-three {
+      width: 180px;
+      height: 180px;
+      right: 8%;
+      top: 22%;
+      background: #d1f2ff;
+      animation-delay: -2s;
+    }
+
+    .ring {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      left: 50%;
+      top: 50%;
+      border: 1px solid rgba(65, 113, 244, .12);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: breathe 3s ease-in-out infinite;
+    }
+
+    .ring-two {
+      width: 380px;
+      height: 380px;
+      border-color: rgba(126, 96, 240, .09);
+      animation-delay: -1.5s;
+    }
+
+    .ring-three {
+      width: 490px;
+      height: 490px;
+      border-color: rgba(65, 113, 244, .06);
+      animation-delay: -.8s;
+    }
+
+    .dot {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #638cff;
+      box-shadow: 0 0 14px rgba(53, 108, 246, .5);
+      animation: floatDot 4s ease-in-out infinite;
+    }
+
+    .dot-one { top: 25%; left: 20%; }
+    .dot-two { top: 32%; right: 19%; animation-delay: -1s; }
+    .dot-three { bottom: 27%; left: 25%; animation-delay: -2s; }
+    .dot-four { bottom: 23%; right: 22%; animation-delay: -3s; }
+
+    /* Main content */
+    .content {
       text-align: center;
+      padding: 24px;
+      animation: reveal .8s cubic-bezier(.2,.8,.2,1) both;
     }
 
-    .box {
-      background: white;
-      padding: 40px 25px;
-      border-radius: 18px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.08);
-      max-width: 400px;
-      width: 90%;
+    .logo-wrap {
+      width: 116px;
+      height: 116px;
+      padding: 8px;
+      margin: 0 auto 26px;
+      border-radius: 31px;
+      background: linear-gradient(145deg, #fff, #f1f5ff);
+      border: 1px solid #e8edfb;
+      box-shadow:
+        0 14px 38px rgba(34, 64, 130, .10),
+        0 0 0 7px rgba(74, 117, 243, .035);
+      animation: logoFloat 3s ease-in-out infinite;
     }
 
-    h1 {
-      margin-bottom: 10px;
+    .logo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 23px;
     }
 
-    p {
-      color: #666;
-      margin-bottom: 25px;
+    .brand {
+      font-size: clamp(35px, 9vw, 49px);
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -2px;
+      color: #192744;
+      margin-bottom: 14px;
     }
 
-    .btn {
-      display: inline-block;
-      padding: 13px 28px;
-      background: #2563eb;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: bold;
+    .brand span {
+      color: #356cf6;
     }
 
-    .btn:hover {
-      background: #1d4ed8;
+    .welcome {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 10px 23px;
+      color: #3867d6;
+      background: rgba(241, 246, 255, .9);
+      border: 1px solid #e1eaff;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: welcomeGlow 2s ease-in-out infinite;
+    }
+
+    .welcome-dot {
+      width: 6px;
+      height: 6px;
+      background: #4a80fa;
+      border-radius: 50%;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(15px) scale(.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(30px, 24px) scale(1.12); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: .45; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes floatDot {
+      0%, 100% { transform: translateY(0); opacity: .5; }
+      50% { transform: translateY(-12px); opacity: 1; }
+    }
+
+    @keyframes welcomeGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(53,108,246,0); }
+      50% { box-shadow: 0 0 24px rgba(53,108,246,.09); }
+    }
+
+    @keyframes blink {
+      50% { opacity: .35; }
+    }
+
+    @media (max-width: 480px) {
+      .logo-wrap {
+        width: 100px;
+        height: 100px;
+        padding: 7px;
+        border-radius: 27px;
+        margin-bottom: 24px;
+      }
+
+      .logo {
+        border-radius: 20px;
+      }
+
+      .brand {
+        font-size: clamp(33px, 9.5vw, 43px);
+        letter-spacing: -1.6px;
+      }
+
+      .welcome {
+        padding: 9px 20px;
+        font-size: 12px;
+      }
+
+      .ring { width: 240px; height: 240px; }
+      .ring-two { width: 340px; height: 340px; }
+      .ring-three { width: 440px; height: 440px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
     }
   </style>
 </head>
 
 <body>
+  <main class="intro">
 
-  <div class="box">
-    <h1>সমতা</h1>
-    <p>সমতা থেকেই সম্ভাবনার শুরু</p>
+    <div class="background" aria-hidden="true">
+      <div class="glow glow-one"></div>
+      <div class="glow glow-two"></div>
+      <div class="glow glow-three"></div>
 
-    <a class="btn"
-       href="https://easyearn-platform.vercel.app/"
-       target="_blank">
-      Get Started
-    </a>
-  </div>
+      <div class="ring"></div>
+      <div class="ring ring-two"></div>
+      <div class="ring ring-three"></div>
 
+      <span class="dot dot-one"></span>
+      <span class="dot dot-two"></span>
+      <span class="dot dot-three"></span>
+      <span class="dot dot-four"></span>
+    </div>
+
+    <section class="content">
+
+      <!-- ProfilerBook Logo -->
+      <div class="logo-wrap">
+        <img
+          class="logo"
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg5tfDvkQ86iJrlTRM54-a4DkUtlw0n5OwWOqvjB5R2qkEalZGaT7rLtMJ7cJpClL0olZ5acProm2RrQT8wUD69-OSU7qEbl0pcPnOF1TtmH8isQkHmTF1mAnh9omCY3RHWhMu7pqZN0HhTfelD3BVjhc7UNco2B6CY99BNwvW9FnyTGOLwfasMYVIgwu8/s320/logo-square.png"
+          alt="ProfilerBook Logo"
+          fetchpriority="high"
+        >
+      </div>
+
+      <h1 class="brand">Profiler<span>Book</span></h1>
+
+      <div class="welcome">
+        <span class="welcome-dot"></span>
+        Welcome
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const destination = "https://profilerbook.com/";
+
+      // Redirect after exactly 1 second
+      window.setTimeout(() => {
+        window.location.replace(destination);
+      }, 1000);
+    })();
+  </script>
 </body>
 </html>
